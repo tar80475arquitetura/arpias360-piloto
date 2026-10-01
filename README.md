@@ -7,7 +7,8 @@ Integrar e visualizar, em uma única interface, dados públicos territoriais, am
 
 ## Decisões cartográficas
 - **Território-piloto:** Niterói/RJ.
-- **Ortofoto principal:** mosaico oficial de 2019 da Prefeitura de Niterói/SIGeo, usado como base cartográfica de alta resolução e sempre identificado como histórico.
+- **Ortofoto principal:** mosaico oficial de 2019 da Prefeitura de Niterói/SIGeo, usado como base cartográfica de alta resolução, definido como base inicial do portal e sempre identificado como histórico.
+- **OpenStreetMap:** base vetorial pública alternativa para referência viária e toponímica.
 - **Satélite recente:** NASA GIBS/VIIRS, usado apenas como referência temporal complementar, com resolução inferior à ortofoto.
 - **TopoVision:** referência conceitual de arquitetura e organização de camadas; não é fonte territorial do piloto.
 
@@ -22,7 +23,7 @@ Integrar e visualizar, em uma única interface, dados públicos territoriais, am
 - Zona de Especial Interesse Ambiental.
 - Área de Proteção Permanente Municipal.
 - Área de Proteção Ambiental Municipal.
-- OpenStreetMap e mapa claro.
+- OpenStreetMap como mapa-base alternativo.
 - Busca de bairro, coordenadas, retorno ao enquadramento municipal, geolocalização opcional e tela cheia.
 
 ## Em integração
