@@ -110,3 +110,10 @@ test('sheet dismissal only accepts a downward swipe on mobile',()=>{
   handle.listeners.pointerdown({clientY:100,pointerId:1});handle.listeners.pointerup({clientY:120});assert.equal(closed,0);handle.listeners.pointerdown({clientY:100,pointerId:1});handle.listeners.pointerup({clientY:170});assert.equal(closed,1);
   c.mobileMedia.matches=false;handle.listeners.pointerdown({clientY:100,pointerId:1});handle.listeners.pointerup({clientY:170});assert.equal(closed,1);
 });
+
+test('ordinary navigation clicks never query or create a marker; consultation requires intention',()=>{
+  const {context:c}=sandbox();let callback,queries=0,mode='navigate';
+  c.map={on:(name,fn)=>{callback=fn;}};c.ARPIASUI={mode:()=>mode,query:()=>queries++};
+  vm.runInContext(source.split('\n').find(line=>line.startsWith("map.on('click'")),c);
+  callback({latlng:{lat:-22.9,lng:-43.1}});assert.equal(queries,0);mode='measure';callback({latlng:{}});assert.equal(queries,0);mode='edit';callback({latlng:{}});assert.equal(queries,0);mode='consult';callback({latlng:{}});assert.equal(queries,1);
+});

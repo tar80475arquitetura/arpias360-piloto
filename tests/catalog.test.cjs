@@ -13,6 +13,7 @@ test('layer search supports accents, thematic groups and required synonyms',()=>
     const found=search(query);names.forEach(name=>assert.ok(found.includes(name),`${query}: ${name}`));
   }
   assert.equal(search('termo inexistente').length,0);
+  assert.ok(search('imóvel').includes('Lotes Cadastrais'));assert.ok(search('imovel').includes('Transações Imobiliárias / ITBI 2025'));
 });
 test('functional catalog references are restricted to existing application controls',()=>{
   const app=fs.readFileSync(require.resolve('../js/app.js'),'utf8');

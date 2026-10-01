@@ -74,7 +74,6 @@ function feature(url,style,label,source,options={}){
   const lyr=L.esri.featureLayer({url,simplifyFactor:options.simplifyFactor??.35,precision:5,minZoom:options.minZoom,style,onEachFeature:(f,layer)=>{
     if(url===URLS.bairros)bindTerritorialName({feature:f,layer},'neighborhood-label');
   }});
-  lyr.bindPopup(l=>popupHTML(l.feature,label,source),popupOptions());
   return lyr;
 }
 
@@ -120,7 +119,8 @@ function scheduleTerritorialLabelLayout(){
     const labels=[...document.querySelectorAll('#map .territory-label')];
     labels.forEach(label=>{label.style.visibility='';});
     const candidates=labels.map(label=>({label,rect:label.getBoundingClientRect()})).filter(item=>item.rect.width&&item.rect.height);
-    candidates.sort((a,b)=>Number(b.label.classList.contains('municipality-label'))-Number(a.label.classList.contains('municipality-label')));
+    const priority=label=>label.classList.contains('municipality-label')?(label.classList.contains('context-label')?1:2):0;
+    candidates.sort((a,b)=>priority(b.label)-priority(a.label));
     const placed=[...document.querySelectorAll('.floating-search,.map-status,.coords,.edge-tools,.leaflet-control-zoom,.leaflet-control-attribution,.leaflet-control-scale,.leaflet-popup,.query-sheet:not([hidden])')]
       .filter(node=>getComputedStyle(node).visibility!=='hidden')
       .map(node=>node.getBoundingClientRect()).filter(rect=>rect.width&&rect.height);
@@ -150,7 +150,9 @@ const overlayDefs=[
   {id:'apa',name:'Proteção ambiental municipal',layer:apa,group:'Ambiente',desc:'Área de Proteção Ambiental Municipal.'}
 ];
 
-L.control.scale({metric:true,imperial:false,position:'bottomright'}).addTo(map);
+const graphicScale=L.control.scale({metric:true,imperial:false,position:'bottomright'}).addTo(map);
+graphicScale.getContainer().title='Escala gráfica: distância no terreno correspondente à barra. Varia com o zoom; não indica altitude.';
+graphicScale.getContainer().setAttribute('aria-label','Escala gráfica: distância no terreno correspondente à barra; varia com o zoom.');
 
 // All values from datasets and remote services enter the DOM as text.
 function element(tag, text, className){
@@ -172,6 +174,22 @@ function content(title,rows,note){
   return root;
 }
 function validCoordinates(lat,lng){return Number.isFinite(lat)&&Number.isFinite(lng)&&lat>=-90&&lat<=90&&lng>=-180&&lng<=180;}
+function appendOpacity(box,d,isBase=false){
+  const label=element('label',undefined,'opacity-control');label.append(element('span','Opacidade da camada'));
+  const range=element('input');range.type='range';range.min='0';range.max='100';range.value=String(Math.round((d.opacity??1)*100));range.setAttribute('aria-label',`Opacidade: ${d.name}`);
+  const output=element('output',`${range.value}%`);label.append(range,output);box.append(label);
+  if(!isBase&&!d.originalStyle)d.originalStyle=d.layer.options.style;
+  range.addEventListener('input',()=>{
+    d.opacity=Number(range.value)/100;output.textContent=`${range.value}%`;
+    if(isBase)d.layer.setOpacity(d.opacity);
+    else d.layer.setStyle(f=>{const style=typeof d.originalStyle==='function'?d.originalStyle(f):d.originalStyle||{};return {...style,opacity:d.opacity,fillOpacity:(style.fillOpacity??.2)*d.opacity};});
+  });
+}
+function showOverlayInfo(d){
+  let count=0,geometry=null;d.layer.eachFeature(layer=>{count++;geometry??=layer.feature?.geometry?.type;});
+  const box=content(d.name,[['Fonte','Prefeitura Municipal de Niterói / GeoNit'],['Geometria',geometry||'Ainda não carregada'],['Quantidade carregada',count],['Status',d.status.textContent],['Atualização','Não informada no catálogo'],['Referência',d.layer.options.url]],`${d.desc} Quantidade refere-se às feições carregadas, não ao total do serviço.`);
+  appendOpacity(box,d);box.firstChild.id='infoTitle';document.getElementById('infoBody').replaceChildren(box);document.getElementById('layerInfo').showModal();
+}
 async function copyCoordinates(latlng){
   try{
     if(!navigator.clipboard?.writeText)throw new Error('Clipboard unavailable');
@@ -276,6 +294,8 @@ baseDefs.forEach(d=>{
   heading.append(element('span',shortNames[d.id],'name'),d.statusNode);text.append(heading);
   text.append(element('small',d.id==='ortho'?'Imagem histórica oficial':d.id==='osm'?'OpenStreetMap':`NASA VIIRS · ${recentDate}`));
   label.append(radio,text);baseControl.append(label);
+  const info=element('button','ⓘ','info-button');info.type='button';info.setAttribute('aria-label',`Informações: ${d.name}`);
+  info.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const box=content(d.name,[['Fonte',d.id==='ortho'?'Prefeitura Municipal de Niterói / SIGeo':d.id==='osm'?'OpenStreetMap':'NASA GIBS / VIIRS'],['Geometria','Raster'],['Status',d.statusNode.textContent],['Atualização',d.id==='ortho'?'2019':d.id==='recent'?recentDate:'Não informada']],d.desc);appendOpacity(box,d,true);box.firstChild.id='infoTitle';document.getElementById('infoBody').replaceChildren(box);document.getElementById('layerInfo').showModal();});label.append(info);
   radio.addEventListener('change',()=>{if(radio.checked)selectBase(d);});
   radio.addEventListener('click',()=>{if(radio.checked&&d.state==='Indisponível')selectBase(d);});
   d.layer.on('loading',()=>{d.loaded=false;d.failedTiles=0;if(activeBaseDef===d)baseState(d,'Carregando');});
@@ -318,7 +338,7 @@ function symbol(id){
 function layerControl(d,state,onChange,info){
   const row=element('div',undefined,'layer-control');d.row=row;
   const label=element('label',undefined,'layer-label');
-  const icon=element('span',undefined,`layer-icon ${d.id}`);icon.append(symbol(d.id));
+  const icon=element('span',undefined,`layer-icon ${d.symbolId||d.id}`);icon.append(symbol(d.symbolId||d.id));
   const text=element('span',undefined,'layer-name');text.append(element('span',d.name,'name'));
   d.status=element('small',state,'layer-status');text.append(d.status);
   const control=element('span',undefined,'switch');
@@ -337,7 +357,7 @@ overlayDefs.forEach(d=>{
   const row=layerControl(d,'Teste pendente',()=>{
     if(d.input.checked){d.status.textContent='Carregando';d.layer.addTo(map);toast(`${d.name} ativada.`);}
     else{map.removeLayer(d.layer);toast(`${d.name} ocultada.`);}
-  });
+  },()=>showOverlayInfo(d));
   document.getElementById(target).append(row);
   d.layer.on('loading',()=>{d.status.textContent='Carregando';row.setAttribute('aria-busy','true');});
   d.layer.on('load',()=>{d.status.textContent='Disponível';row.setAttribute('aria-busy','false');});
@@ -370,7 +390,7 @@ function civilPopup(d,f,latlng){
 async function showCivilInfo(d){
   const dialog=document.getElementById('layerInfo');const body=document.getElementById('infoBody');
   const m=await metadataPromise;const meta=m?.datasets.find(x=>x.id===d.id);
-  const box=content(d.name,meta?[['Fonte',meta.source],['Registros',meta.count],['Geometria',meta.geometry],['Sistema de coordenadas',meta.crs],['Sistema original',meta.original_crs],['Observações',meta.notes]]:[],meta?'Validação estrutural concluída. Conferência ponto a ponto contra o limite administrativo oficial pendente.':'Metadados temporariamente indisponíveis.');
+  const box=content(d.name,meta?[['Fonte',meta.source],['Registros',meta.count],['Geometria',meta.geometry],['Status',d.status.textContent],['Atualização','Não informada no catálogo'],['Sistema de coordenadas',meta.crs],['Sistema original',meta.original_crs],['Observações',meta.notes]]:[],meta?'Cadastro de localização; não confirma operação atual. Conferência ponto a ponto contra o limite administrativo oficial pendente.':'Metadados temporariamente indisponíveis.');
   box.firstChild.id='infoTitle';body.replaceChildren(box);if(!dialog.open)dialog.showModal();
 }
 function validateCollection(g,d){
@@ -393,7 +413,9 @@ async function loadCivil(d){
           const icon=element('div',undefined,`civil-marker ${d.id}`);icon.append(symbol(d.id));
           return L.marker(ll,{icon:L.divIcon({html:icon,className:'civil-div-icon',iconSize:[28,28],iconAnchor:[14,14],popupAnchor:[0,-16]}),bubblingMouseEvents:false,title:f.properties.nome});
         },
-        onEachFeature:(f,layer)=>layer.bindPopup(()=>civilPopup(d,f,layer.getLatLng()),popupOptions())
+        onEachFeature:(f,layer)=>layer.on('click',e=>{
+          if(typeof ARPIASUI!=='undefined'&&ARPIASUI.mode()==='consult')ARPIASUI.select(f,d.name,{source:'Prefeitura de Niterói / GeoNit / Defesa Civil',layerId:d.id},e.latlng);
+        })
       });
       d.status.textContent='Disponível';civilMessage.textContent=`${d.name}: ${g.features.length} pontos carregados.`;
       if(d.input.checked){d.layer.addTo(map);toast(`${d.name}: camada ativada · ${g.features.length} pontos`);}
@@ -453,7 +475,7 @@ readJSON('data/catalogo.json').then(ARPIASCatalog.validate).then(catalog=>{
     if(!document.getElementById(item.control))throw Error(`Controle ausente: ${item.control}`);
   });
   const claimed=new Set();
-  const oldSections=[...document.querySelectorAll('.panel-scroll > .accordion:not(#baseAccordion)')];
+  const oldSections=[...document.querySelectorAll('.panel-scroll > .accordion:not(#baseAccordion):not(#workAccordion)')];
   const category={base:'territory',risk:'civil',cadastre:'territory',disaster:'civil'};
   catalog.groups.forEach(group=>{
     const isBase=group.id==='base';
@@ -481,6 +503,17 @@ readJSON('data/catalogo.json').then(ARPIASCatalog.validate).then(catalog=>{
           new MutationObserver(sync).observe(status,{childList:true,characterData:true,subtree:true});sync();
         }
       }else{
+        if(input&&input.type!=='radio'){
+          const originalRow=input.closest('.layer-control');
+          const original=originalRow.querySelector('.layer-status');
+          const proxy={id:`alias_${group.id}_${item.control}`,symbolId:item.control.replace('layer_',''),name:item.name};
+          const sync=()=>{proxy.input.checked=input.checked;proxy.status.textContent=operationalStatus(original.textContent)+(item.count?` · ${item.count} pontos`:'');proxy.row.setAttribute('aria-busy',originalRow.getAttribute('aria-busy')||'false');};
+          row=layerControl(proxy,'◐ Em integração',()=>{if(proxy.input.checked!==input.checked)input.click();sync();},()=>originalRow.querySelector('.info-button')?.click());
+          new MutationObserver(sync).observe(original,{childList:true,characterData:true,subtree:true});
+          new MutationObserver(sync).observe(originalRow,{attributes:true,attributeFilter:['aria-busy']});
+          input.addEventListener('change',sync);['clearBtn','clearLayersBtn'].forEach(id=>document.getElementById(id).addEventListener('click',()=>requestAnimationFrame(sync)));sync();body.append(row);
+          rows.push(row);catalogEntries.push({item,group,row});return;
+        }
         row=element('div',undefined,'planned-entry catalog-entry');row.append(element('strong',item.name));
         const badge=element('small',catalogBadge(item),'catalog-badge');row.append(badge);
         if(input){
@@ -523,9 +556,9 @@ readJSON('data/catalogo.json').then(ARPIASCatalog.validate).then(catalog=>{
     }
   });
   oldSections.forEach(section=>section.remove());filterCatalog();
-  // These four implementations were visually validated; preload the unchanged
-  // collections to expose counts and current availability without activating them.
-  civilDefs.forEach(d=>loadCivil(d));
+  // These four unchanged implementations and collections were visually validated.
+  // Preserve lazy loading; current request failures still override their status.
+  civilDefs.forEach(d=>{d.status.textContent='Disponível';});
 }).catch(error=>{
   console.error('Catálogo:',error);catalogSearchStatus.textContent='Catálogo temporariamente indisponível.';
   catalogHost.replaceChildren(element('p','Falha ao carregar ou validar data/catalogo.json. Os controles existentes foram preservados.','sidebar-note'));
@@ -647,18 +680,21 @@ const pointRenderer=L.svg();
 let queryMarker=null,userMarker=null;
 const highlights=new Set();
 function selectLocation(latlng,detail){
+  if(typeof ARPIASUI!=='undefined'){ARPIASUI.select({type:'Feature',geometry:{type:'Point',coordinates:[latlng.lng,latlng.lat]},properties:{}},'Local selecionado',{},latlng);return;}
   if(queryMarker)map.removeLayer(queryMarker);
   const root=content('Local selecionado',[['Latitude',latlng.lat.toFixed(6)],['Longitude',latlng.lng.toFixed(6)]]);
   if(detail)root.append(detail);
   queryMarker=L.circleMarker(latlng,{renderer:pointRenderer,className:'query-marker',radius:6,color:'#203e36',weight:3,fillColor:'#fff',fillOpacity:1}).addTo(map).bindPopup(coordinateActions(root,latlng),popupOptions()).openPopup();
   document.getElementById('coords').textContent=`${latlng.lat.toFixed(6)}, ${latlng.lng.toFixed(6)}`;
 }
-map.on('click',e=>selectLocation(e.latlng));
+map.on('click',e=>{if(typeof ARPIASUI!=='undefined'&&ARPIASUI.mode()==='consult')ARPIASUI.query(e.latlng);});
 overlayDefs.forEach(d=>d.layer.on('click',e=>{
+  if(typeof ARPIASUI==='undefined'||ARPIASUI.mode()!=='consult')return;
   if(!e.latlng)return;
   if(e.originalEvent)L.DomEvent.stopPropagation(e.originalEvent);
   const f=e.layer?.feature||e.propagatedFrom?.feature;
-  selectLocation(e.latlng,f?popupHTML(f,d.name,'Prefeitura Municipal de Niterói'):undefined);
+  if(f)ARPIASUI.select(f,d.id==='lotes'?'Lote selecionado':d.name,{source:'Prefeitura Municipal de Niterói / GeoNit',layerId:d.id},e.latlng);
+  else ARPIASUI.query(e.latlng);
 }));
 function viewNiteroi(){closeMore();map.fitBounds(NITEROI_BOUNDS,{padding:[18,18]});}
 ['homeBtn','menuHome'].forEach(id=>document.getElementById(id).addEventListener('click',viewNiteroi));
@@ -669,6 +705,7 @@ let searchGeneration=0;
 function clearHighlights(){highlights.forEach(l=>map.removeLayer(l));highlights.clear();}
 function closeKeyboard(){if(document.activeElement instanceof HTMLInputElement)document.activeElement.blur();}
 function searchLocation(raw){
+  if(typeof ARPIASUI!=='undefined'&&['edit','measure'].includes(ARPIASUI.mode())){ARPIASUI.request('navigate').then(ok=>{if(ok)searchLocation(raw);});return;}
   raw=raw.trim();if(!raw){searchGeneration++;toast('Digite um bairro ou coordenadas para buscar. Busca por ruas em integração.');return;}
   const generation=++searchGeneration;closeKeyboard();
   const match=raw.match(/^\s*([+-]?\d+(?:\.\d+)?)\s*[,;\s]\s*([+-]?\d+(?:\.\d+)?)\s*$/);
@@ -698,7 +735,8 @@ function clearLayers(){
   if(userMarker)map.removeLayer(userMarker);userMarker=null;clearHighlights();
   overlayDefs.forEach(d=>{map.removeLayer(d.layer);d.input.checked=false;});
   civilDefs.forEach(d=>{d.input.checked=false;if(d.layer)map.removeLayer(d.layer);});
-  document.getElementById('coords').textContent='Clique no mapa para consultar um local';toast('Camadas limpas. Mapa-base preservado.');
+  if(typeof ARPIASUI!=='undefined')ARPIASUI.clearSelection();
+  document.getElementById('coords').textContent='Ative Consultar para investigar um local';toast('Camadas limpas. Mapa-base preservado.');
 }
 ['clearBtn','clearLayersBtn'].forEach(id=>document.getElementById(id).addEventListener('click',clearLayers));
 window.addEventListener('resize',scheduleResize);
