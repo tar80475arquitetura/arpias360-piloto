@@ -1,5 +1,7 @@
 # Trabalho noturno — ARPIAS360
 
+Atualização: correções da segunda rodada e checkpoint final registradas em [SEGUNDA_RODADA_NOTURNA.md](SEGUNDA_RODADA_NOTURNA.md). A ortofoto foi confirmada visualmente em desktop e mobile e a suíte passou a 21 testes. O texto abaixo preserva o histórico da primeira rodada.
+
 Data: 01/10/2026. Branch: `codex/gecad-final`.
 Repositório: `tar80475arquitetura/arpias360-piloto`.
 

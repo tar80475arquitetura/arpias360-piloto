@@ -27,6 +27,11 @@ const ortho2019=L.esri.tiledMapLayer({
   url:URLS.ortho2019,
   minZoom:0,
   maxZoom:23,
+  zIndex:1,
+  bounds:L.latLngBounds(
+    L.CRS.EPSG3857.unproject(L.point(-4803407.779879997,-2631366.8937283764)),
+    L.CRS.EPSG3857.unproject(L.point(-4778732.753760434,-2613536.7069099215))
+  ),
   attribution:'Prefeitura Municipal de Niterói / SIGeo · Ortofoto 2019'
 });
 
@@ -34,11 +39,12 @@ const recentSatellite=L.tileLayer(`https://gibs.earthdata.nasa.gov/wmts/epsg3857
   minZoom:1,
   maxNativeZoom:9,
   maxZoom:19,
+  zIndex:1,
   attribution:`NASA GIBS / VIIRS · ${recentDate}`
 });
 
 const baseDefs=[
-  {id:'ortho',name:'Ortofoto Niterói 2019',layer:ortho2019,desc:'Imagem aérea oficial de alta resolução. Base histórica, não representa necessariamente a situação atual.'},
+  {id:'ortho',name:'Foto Aérea 2019',layer:ortho2019,desc:'Ortofoto oficial de Niterói. Imagem histórica de 2019; cobertura restrita ao município, sem representação atual.'},
   {id:'osm',name:'Mapa de ruas',layer:baseOSM,desc:'OpenStreetMap para referência viária e toponímica.'},
   {id:'recent',name:`Satélite recente · ${recentDate}`,layer:recentSatellite,desc:'NASA GIBS / VIIRS. Atualidade temporal complementar, com menor resolução espacial.'}
 ];
@@ -57,6 +63,7 @@ function toast(msg){
 }
 
 function updateStatus(def,msg){
+  document.getElementById('mapStatus').setAttribute('data-state',def.state||'Carregando');
   document.getElementById('activeBaseLabel').textContent=def.name;
   document.getElementById('statusMessage').textContent=msg||def.desc;
 }
@@ -64,7 +71,9 @@ function updateStatus(def,msg){
 function safeName(p){return p.tx_nome||p.NOME||p.Nome||p.COMUNIDADE||p.Classifica||p.Layer||p.tx_obs||`Elemento ${p.OBJECTID||''}`}
 function popupHTML(feature,label,source){return content(safeName(feature.properties||{}),[['Camada',label],['Fonte',source]]);}
 function feature(url,style,label,source,options={}){
-  const lyr=L.esri.featureLayer({url,simplifyFactor:options.simplifyFactor??.35,precision:5,minZoom:options.minZoom,style});
+  const lyr=L.esri.featureLayer({url,simplifyFactor:options.simplifyFactor??.35,precision:5,minZoom:options.minZoom,style,onEachFeature:(f,layer)=>{
+    if(url===URLS.bairros)bindTerritorialName({feature:f,layer},'neighborhood-label');
+  }});
   lyr.bindPopup(l=>popupHTML(l.feature,label,source),popupOptions());
   return lyr;
 }
@@ -81,6 +90,26 @@ const lotes=feature(URLS.lotes,()=>({color:'#f4f0e8',weight:.55,fillOpacity:0}),
 
 limite.addTo(map);
 bairros.addTo(map);
+
+function bindTerritorialName(event,className){
+  const name=event.feature?.properties?.tx_nome||event.layer?.feature?.properties?.tx_nome;
+  if(typeof name!=='string'||!name.trim())return;
+  const layer=event.layer;
+  if(!layer?.bindTooltip)return;
+  layer.bindTooltip(element('span',name),{permanent:true,direction:'center',className:`territory-label ${className}`,interactive:false});
+}
+bairros.on('createfeature',e=>bindTerritorialName(e,'neighborhood-label'));
+limite.on('load',()=>{
+  let largest=null,largestArea=0;
+  limite.eachFeature(layer=>{
+    if(!layer.getBounds)return;
+    const bounds=layer.getBounds(),area=(bounds.getNorth()-bounds.getSouth())*(bounds.getEast()-bounds.getWest());
+    if(area>largestArea){largestArea=area;largest=layer;}
+  });
+  if(largest)bindTerritorialName({layer:largest},'municipality-label');
+});
+function updateTerritorialLabels(){document.getElementById('map').classList.toggle('show-neighborhood-labels',map.getZoom()>=13);}
+map.on('zoomend',updateTerritorialLabels);updateTerritorialLabels();
 
 const overlayDefs=[
   {id:'limite',name:'Limite municipal',layer:limite,group:'Território',desc:'Contorno oficial do município.'},
@@ -171,11 +200,12 @@ const baseMeta=document.getElementById('baseMeta');
 let previousBaseDef=baseDefs[1];
 let baseGeneration=0;
 let baseTimer;
-function baseState(def,state){if(def.statusNode){def.statusNode.textContent=state;def.statusNode.setAttribute('data-state',state);}}
+function baseState(def,state){def.state=state;if(def.statusNode){def.statusNode.textContent=state==='Disponível'?'● Disponível':state==='Indisponível'?'× Temporariamente indisponível':state;def.statusNode.setAttribute('data-state',state);}}
 function selectBase(def){
   clearTimeout(baseTimer);baseGeneration++;
   if(activeBaseDef!==def)previousBaseDef=activeBaseDef;
   activeBaseDef=def;activeBase=def.layer;
+  document.getElementById('baseFallback').hidden=true;
   map.setMaxZoom(def.id==='ortho'?23:19);
   // Keep the previous base underneath while NASA tiles are being checked.
   baseDefs.forEach(d=>{if(d!==def&&!(def.id==='recent'&&d===previousBaseDef)&&map.hasLayer(d.layer))map.removeLayer(d.layer);});
@@ -184,21 +214,30 @@ function selectBase(def){
   baseMeta.textContent=def.desc;baseMeta.classList.add('visible');
   updateStatus(def,'Carregando base cartográfica…');baseState(def,'Carregando');
   if(def.loaded&&!def.layer.isLoading()){
+    if(def.id==='recent')baseDefs.forEach(other=>{if(other!==def&&map.hasLayer(other.layer))map.removeLayer(other.layer);});
     baseState(def,'Disponível');updateStatus(def,def.desc);return;
   }
   const generation=baseGeneration;
-  baseTimer=setTimeout(()=>{if(generation===baseGeneration&&def.layer.isLoading())baseFailure(def);},15000);
+  baseTimer=setTimeout(()=>{if(generation===baseGeneration&&!def.loaded)baseFailure(def);},15000);
 }
 function baseFailure(def){
   def.loaded=false;
   baseState(def,'Indisponível');
   if(activeBaseDef!==def)return;
-  const fallback=previousBaseDef!==def&&previousBaseDef.id!=='recent'?previousBaseDef:baseDefs[1];
+  if(def.id==='ortho'){
+    clearTimeout(baseTimer);
+    updateStatus(def,'Foto Aérea 2019 indisponível no momento. Use o mapa de ruas ou selecione a foto aérea novamente.');
+    document.getElementById('activeBaseLabel').textContent='Foto Aérea 2019 · indisponível';
+    document.getElementById('baseFallback').hidden=false;
+    toast('Foto Aérea 2019 indisponível no momento.');return;
+  }
+  const fallback=baseDefs[1];
   if(fallback===def){updateStatus(def,'Mapa de ruas temporariamente indisponível.');return;}
   selectBase(fallback);
   updateStatus(fallback,`${def.name} indisponível. Exibindo ${fallback.name}.`);
   toast(`${def.name} temporariamente indisponível.`);
 }
+function settleBase(def){if(activeBaseDef===def&&!def.loaded)baseFailure(def);}
 baseDefs.forEach(d=>{
   const label=element('label',undefined,'control-item');
   const radio=element('input');radio.type='radio';radio.name='base';radio.id=`base_${d.id}`;radio.checked=d===activeBaseDef;
@@ -211,14 +250,21 @@ baseDefs.forEach(d=>{
   text.append(element('small',d.id==='ortho'?'Imagem histórica oficial':d.id==='osm'?'OpenStreetMap':`NASA VIIRS · ${recentDate}`));
   label.append(radio,text);baseControl.append(label);
   radio.addEventListener('change',()=>{if(radio.checked)selectBase(d);});
+  radio.addEventListener('click',()=>{if(radio.checked&&d.state==='Indisponível')selectBase(d);});
+  d.layer.on('loading',()=>{d.loaded=false;d.failedTiles=0;if(activeBaseDef===d)baseState(d,'Carregando');});
   d.layer.on('tileload',()=>{
     if(activeBaseDef!==d)return;
     d.loaded=true;
+    document.getElementById('baseFallback').hidden=true;
     if(d.id==='recent')baseDefs.forEach(other=>{if(other!==d&&map.hasLayer(other.layer))map.removeLayer(other.layer);});
     clearTimeout(baseTimer);baseState(d,'Disponível');updateStatus(d,d.desc);
   });
-  d.layer.on('tileerror',()=>baseFailure(d));
+  // The official mosaic returns 404 for uncached/no-data tiles outside its footprint.
+  // A single missing tile must not discard other successfully rendered aerial tiles.
+  d.layer.on('tileerror',()=>{d.failedTiles=(d.failedTiles||0)+1;});
+  d.layer.on('load',()=>settleBase(d));
 });
+document.getElementById('baseFallback').addEventListener('click',()=>selectBase(baseDefs[1]));
 selectBase(baseDefs[0]);
 
 // Local SVG paths: no external icon requests or dataset HTML interpolation.
@@ -391,6 +437,14 @@ function closeLayers(restoreFocus=false){
   panel.classList.add('hidden');configurePanel();
   if(restoreFocus&&panelOpener?.isConnected)panelOpener.focus({preventScroll:true});
 }
+function dismissSheetOnSwipe(handle,close){
+  let startY=null;
+  handle.addEventListener('pointerdown',e=>{if(!mobileMedia.matches)return;startY=e.clientY;handle.setPointerCapture(e.pointerId);});
+  handle.addEventListener('pointerup',e=>{if(startY!==null&&e.clientY-startY>=48)close();startY=null;});
+  handle.addEventListener('pointercancel',()=>{startY=null;});
+}
+dismissSheetOnSwipe(panel.querySelector('.sheet-handle'),()=>closeLayers(true));
+dismissSheetOnSwipe(querySheet.querySelector('.sheet-handle'),()=>map.closePopup());
 ['togglePanel','layersBtn','mobileLayersBtn'].forEach(id=>document.getElementById(id).addEventListener('click',()=>panel.classList.contains('hidden')?openLayers():closeLayers(true)));
 ['closePanel','panelBackdrop'].forEach(id=>document.getElementById(id).addEventListener('click',()=>closeLayers(true)));
 panel.addEventListener('keydown',e=>{
@@ -423,6 +477,7 @@ function presentPopup(popup){
     popup.options.autoPan=false;closeLayers();closeMore();closeAbout();
     queryBody.replaceChildren(popupNode);querySheet.hidden=false;shell.classList.add('has-query');
     requestAnimationFrame(()=>{
+      if(currentPopup!==popup||querySheet.hidden)return;
       document.getElementById('queryHeading').focus({preventScroll:true});
       const visibleHeight=mapwrap.clientHeight-querySheet.offsetHeight;
       const point=map.latLngToContainerPoint(popup.getLatLng());
@@ -478,7 +533,7 @@ let searchGeneration=0;
 function clearHighlights(){highlights.forEach(l=>map.removeLayer(l));highlights.clear();}
 function closeKeyboard(){if(document.activeElement instanceof HTMLInputElement)document.activeElement.blur();}
 function searchLocation(raw){
-  raw=raw.trim();if(!raw)return;
+  raw=raw.trim();if(!raw){searchGeneration++;toast('Digite um bairro ou coordenadas para buscar. Busca por ruas em integração.');return;}
   const generation=++searchGeneration;closeKeyboard();
   const match=raw.match(/^\s*([+-]?\d+(?:\.\d+)?)\s*[,;\s]\s*([+-]?\d+(?:\.\d+)?)\s*$/);
   if(match){
@@ -502,6 +557,7 @@ function searchLocation(raw){
   document.getElementById(button).addEventListener('click',run);input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();run();}});
 });
 function clearLayers(){
+  map.stopLocate();
   closeMore();searchGeneration++;map.closePopup();if(queryMarker)map.removeLayer(queryMarker);queryMarker=null;
   if(userMarker)map.removeLayer(userMarker);userMarker=null;clearHighlights();
   overlayDefs.forEach(d=>{map.removeLayer(d.layer);d.input.checked=false;});

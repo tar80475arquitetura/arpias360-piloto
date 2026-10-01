@@ -76,3 +76,37 @@ test('sharing awaits clipboard and exposes only a coordinate link',async()=>{
   const root=new Element('div');const task=c.sharePoint(root,{lat:-22.9,lng:-43.1});assert.deepEqual(messages,[]);finish();await task;
   assert.equal(written,'https://example.test/arpias/?lat=-22.900000&lon=-43.100000&zoom=16');assert.ok(messages.at(-1).startsWith('Link do ponto copiado.'));assert.equal(root.children[0].readOnly,true);
 });
+
+test('cached satellite selection removes the previous base and preserves overlays',()=>{
+  const {context:c}=sandbox();const osm={id:'osm',layer:{}},sat={id:'recent',layer:{isLoading:()=>false},loaded:true,desc:'NASA'};const overlay={};const layers=new Set([osm.layer,sat.layer,overlay]);
+  const nodes=new Map();c.document.getElementById=id=>{if(!nodes.has(id))nodes.set(id,{classList:{add(){}},hidden:false});return nodes.get(id);};
+  Object.assign(c,{baseDefs:[osm,sat],activeBaseDef:osm,activeBase:osm.layer,previousBaseDef:osm,baseTimer:null,baseGeneration:0,baseMeta:nodes.get('meta')||{classList:{add(){}}},clearTimeout(){},setTimeout(){},baseState(){},updateStatus(){},map:{hasLayer:l=>layers.has(l),removeLayer:l=>layers.delete(l),setMaxZoom(){}}});
+  const start=source.indexOf('function selectBase(');vm.runInContext(source.slice(start,source.indexOf('function baseFailure(',start)),c);c.selectBase(sat);
+  assert.equal(layers.has(osm.layer),false);assert.equal(layers.has(sat.layer),true);assert.equal(layers.has(overlay),true);
+});
+
+test('aerial failure stays explicit and offers streets without silently selecting them',()=>{
+  const {context:c,messages}=sandbox();const ortho={id:'ortho',name:'Foto Aérea 2019'};const selected=[],nodes={baseFallback:{hidden:true},activeBaseLabel:{}};
+  Object.assign(c,{activeBaseDef:ortho,baseTimer:null,clearTimeout(){},baseState(){},updateStatus(){},selectBase:d=>selected.push(d)});c.document.getElementById=id=>nodes[id];
+  const start=source.indexOf('function baseFailure(');vm.runInContext(source.slice(start,source.indexOf('baseDefs.forEach(d=>{',start)),c);c.baseFailure(ortho);
+  assert.equal(selected.length,0);assert.equal(nodes.baseFallback.hidden,false);assert.match(nodes.activeBaseLabel.textContent,/indisponível/);assert.equal(messages[0],'Foto Aérea 2019 indisponível no momento.');
+});
+
+test('partial aerial tile coverage remains available after the tile batch settles',()=>{
+  const {context:c}=sandbox();const ortho={id:'ortho',loaded:true,failedTiles:2};let failures=0;
+  c.activeBaseDef=ortho;c.baseFailure=()=>failures++;const start=source.indexOf('function settleBase(');vm.runInContext(source.slice(start,source.indexOf('baseDefs.forEach(d=>{',start)),c);
+  c.settleBase(ortho);assert.equal(failures,0);ortho.loaded=false;c.settleBase(ortho);assert.equal(failures,1);c.activeBaseDef={};c.settleBase(ortho);assert.equal(failures,1);
+});
+
+test('territorial names use official attributes as text and skip unnamed features',()=>{
+  const {context:c}=sandbox();let tooltip;const layer={feature:{properties:{tx_nome:'Icaraí <img onerror=x>'}},bindTooltip:(node,options)=>{tooltip={node,options};}};
+  const start=source.indexOf('function bindTerritorialName(');vm.runInContext(source.slice(start,source.indexOf("bairros.on('createfeature'",start)),c);c.bindTerritorialName({layer},'neighborhood-label');
+  assert.equal(tooltip.node.textContent,'Icaraí <img onerror=x>');assert.equal(tooltip.node.innerHTML,undefined);assert.equal(tooltip.options.permanent,true);tooltip=null;c.bindTerritorialName({layer:{feature:{properties:{}}}},'neighborhood-label');assert.equal(tooltip,null);
+});
+
+test('sheet dismissal only accepts a downward swipe on mobile',()=>{
+  const {context:c}=sandbox();c.mobileMedia={matches:true};let closed=0;const handle=new Element('div');handle.setPointerCapture=()=>{};
+  const start=source.indexOf('function dismissSheetOnSwipe(');vm.runInContext(source.slice(start,source.indexOf('dismissSheetOnSwipe(panel.',start)),c);c.dismissSheetOnSwipe(handle,()=>closed++);
+  handle.listeners.pointerdown({clientY:100,pointerId:1});handle.listeners.pointerup({clientY:120});assert.equal(closed,0);handle.listeners.pointerdown({clientY:100,pointerId:1});handle.listeners.pointerup({clientY:170});assert.equal(closed,1);
+  c.mobileMedia.matches=false;handle.listeners.pointerdown({clientY:100,pointerId:1});handle.listeners.pointerup({clientY:170});assert.equal(closed,1);
+});
