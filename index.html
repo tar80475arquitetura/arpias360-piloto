@@ -11,7 +11,7 @@
   <meta name="description" content="WebGIS experimental para leitura integrada de dados territoriais e áreas sensíveis em Niterói/RJ." />
   <link rel="preconnect" href="https://geo.niteroi.rj.gov.br" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <link rel="stylesheet" href="css/style.css?v=20261001-0208" />
+  <link rel="stylesheet" href="css/style.css?v=20261001-fase1" />
 </head>
 <body>
   <header class="topbar">
@@ -21,13 +21,13 @@
     </div>
 
     <div class="toolbar" aria-label="Ferramentas principais">
-      <button id="homeBtn" class="tool-circle" title="Ver todo o município">⌂</button>
-      <button id="locateBtn" class="tool-circle" title="Minha localização">◎</button>
-      <button id="layersBtn" class="tool-circle active" title="Camadas">☷</button>
-      <button id="aboutBtn" class="tool-circle" title="Sobre o projeto">i</button>
-      <button id="fullBtnTop" class="tool-circle" title="Tela cheia">⛶</button>
+      <button id="homeBtn" class="tool-circle" title="Ver Niterói" aria-label="Ver Niterói">⌂</button>
+      <button id="locateBtn" class="tool-circle" title="Minha localização" aria-label="Minha localização">◎</button>
+      <button id="layersBtn" class="tool-circle active" title="Camadas" aria-label="Camadas">☷</button>
+      <button id="aboutBtn" class="tool-circle" title="Sobre o projeto" aria-label="Sobre o projeto">i</button>
+      <button id="fullBtnTop" class="tool-circle" title="Tela cheia" aria-label="Tela cheia">⛶</button>
+      <button id="clearBtn" class="tool-circle" title="Limpar mapa" aria-label="Limpar mapa">↺</button>
     </div>
-
     <div class="pilot-chip">Piloto Niterói/RJ</div>
   </header>
 
@@ -35,12 +35,12 @@
     <aside id="panel" class="layer-panel" aria-label="Painel de camadas">
       <div class="panel-title-row">
         <h2>Camadas</h2>
-        <button id="closePanel" class="close-btn" title="Recolher painel">×</button>
+        <button id="closePanel" class="close-btn" title="Recolher painel" aria-label="Recolher painel">×</button>
       </div>
 
       <div class="sidebar-search">
         <input id="searchInput" type="search" placeholder="Pesquisar bairro ou coordenadas" aria-label="Pesquisar bairro ou coordenadas" />
-        <button id="searchBtn" title="Buscar">⌕</button>
+        <button id="searchBtn" title="Buscar" aria-label="Buscar">⌕</button>
       </div>
 
       <details class="accordion" open>
@@ -53,6 +53,10 @@
         <div class="accordion-body"><div id="layerControl" class="control-list"></div></div>
       </details>
 
+      <details class="accordion" open>
+        <summary>Defesa Civil</summary>
+        <div class="accordion-body"><div id="civilControl" class="control-list"></div><div id="civilMessage" class="sidebar-note" role="status" aria-live="polite"></div></div>
+      </details>
       <details class="accordion">
         <summary>Camadas em integração</summary>
         <div class="accordion-body"><div id="plannedList" class="planned-list"></div></div>
@@ -74,7 +78,7 @@
       </div>
 
       <div class="edge-tools" aria-label="Ferramentas do mapa">
-        <button id="togglePanel" title="Abrir ou fechar camadas">☰</button>
+        <button id="togglePanel" title="Abrir ou fechar camadas" aria-label="Abrir ou fechar camadas">☰</button>
       </div>
 
       <div id="mapStatus" class="map-status">
@@ -95,20 +99,11 @@
     </section>
   </main>
 
+  <dialog id="layerInfo" aria-labelledby="infoTitle"><button id="closeInfo" class="close-btn" aria-label="Fechar informações">×</button><div id="infoBody"></div></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://unpkg.com/esri-leaflet@3.0.12/dist/esri-leaflet.js"></script>
-  <script src="js/app.js?v=20261001-0208"></script>
-  <script>
-    (function(){
-      const mirror=document.getElementById('searchMirror');
-      const source=document.getElementById('searchInput');
-      const go=document.getElementById('searchBtn');
-      function run(){source.value=mirror.value;go.click();}
-      document.getElementById('searchMirrorBtn').addEventListener('click',run);
-      mirror.addEventListener('keydown',e=>{if(e.key==='Enter')run();});
-    })();
-  </script>
+  <script src="js/app.js?v=20261001-fase1"></script>
 </body>
 </html>
