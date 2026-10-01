@@ -1,0 +1,72 @@
+[
+  {
+    "height": 800,
+    "map": {
+      "height": 740,
+      "width": 360
+    },
+    "panelHidden": "true",
+    "scrollWidth": 360,
+    "width": 360
+  },
+  {
+    "height": 844,
+    "map": {
+      "height": 784,
+      "width": 390.3999938964844
+    },
+    "panelHidden": "true",
+    "scrollWidth": 390,
+    "width": 390
+  },
+  {
+    "height": 915,
+    "map": {
+      "height": 855.2000122070312,
+      "width": 412
+    },
+    "panelHidden": "true",
+    "scrollWidth": 412,
+    "width": 412
+  },
+  {
+    "height": 1024,
+    "map": {
+      "height": 960,
+      "width": 768
+    },
+    "panelHidden": "true",
+    "scrollWidth": 768,
+    "width": 768
+  },
+  {
+    "height": 768,
+    "map": {
+      "height": 700,
+      "width": 1034.4000244140625
+    },
+    "panelHidden": "false",
+    "scrollWidth": 1366,
+    "width": 1366
+  },
+  {
+    "height": 1080,
+    "map": {
+      "height": 1012,
+      "width": 1588
+    },
+    "panelHidden": "false",
+    "scrollWidth": 1920,
+    "width": 1920
+  },
+  {
+    "height": 768,
+    "map": {
+      "height": 704,
+      "width": 734
+    },
+    "panelHidden": "false",
+    "scrollWidth": 1024,
+    "width": 1024
+  }
+]
