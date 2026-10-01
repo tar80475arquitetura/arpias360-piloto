@@ -34,8 +34,8 @@ const ARPIASReport=(()=>{
   function visibleLayers(){
     const result=overlayDefs.filter(d=>map.hasLayer(d.layer)).map(d=>({name:d.name,source:'Prefeitura Municipal de Niterói / GeoNit',color:d.layer.options.style?.color||'#536976'}));
     reliefDefs.filter(d=>d.layer&&map.hasLayer(d.layer)).forEach(d=>result.push({name:d.name,source:d.source+' · '+ARPIASGeomorphology.warning}));
-    civilDefs.filter(d=>d.layer&&d.input.checked).forEach(d=>result.push({name:d.name,source:'Prefeitura de Niterói / GeoNit / Defesa Civil'}));
-    if(ARPIASUI.workGroup.getLayers().some(layer=>map.hasLayer(layer)))result.push({name:'Minhas camadas',source:'Camadas de trabalho do usuário'});return result;
+    civilDefs.filter(d=>d.layer&&map.hasLayer(d.layer)).forEach(d=>result.push({name:d.name,source:'Prefeitura de Niterói / GeoNit / Defesa Civil'}));
+    if(ARPIASUI.workGroup.getLayers().some(layer=>map.hasLayer(layer)))result.push({name:'Minhas camadas',source:'Camadas de trabalho / não oficiais'});return result;
   }
   async function nearby(s){
     const rows=[];await Promise.all(civilDefs.map(async d=>{
@@ -67,6 +67,7 @@ const ARPIASReport=(()=>{
         ['Seleção',s.title],['Município',s.context.municipio||'Não confirmado · piloto Niterói/RJ'],['Bairro',s.context.bairro||'Não identificado'],['Região administrativa',s.context.regiao||'Não identificada'],['Mapa-base',activeBaseDef.name],['Inscrição municipal','Dado ainda não integrado'],['Identificador ARPIAS','Integração futura']
       ]),content('Geometria e localização',ARPIASUI.measurementRows(s.metrics),'Estimativas geográficas por Turf 7.2.0, sem precisão cadastral certificada. Centroide dos polígonos: centro de massa, ponderado por área nas geometrias multipartes.'));
       ARPIASUI.publicAttributes(s.feature.properties).forEach(group=>body.append(content(group.title,group.rows)));
+      if(s.meta.layerId==='relevo')body.append(content('Referência geomorfológica',[['Fonte',ARPIASGeomorphology.source]],ARPIASGeomorphology.warning));
       if(s.meta.work)body.append(content('Geometria de trabalho / não oficial',[['Referência original',s.feature.arpiasOrigin?`${s.feature.arpiasOrigin.layer} · ${s.feature.arpiasOrigin.id}`:'Desenho do usuário'],['Persistência','Local neste dispositivo; sem sincronização com servidor']]));
       const incident=incidence(s);body.append(content('Características territoriais no ponto de referência',incident,incident.length?'Incidências entre as feições oficiais carregadas das camadas visíveis; não é uma análise integral da extensão da seleção.':'Nenhuma incidência foi confirmada entre as feições carregadas. Isso não comprova ausência de restrições ou riscos.'));
       body.append(content('Riscos e Proteção Civil · referências próximas',nearest,'Distâncias em linha reta até locais cadastrados. Não confirmam funcionamento atual, abertura, atendimento ou condição de risco.'));

@@ -192,6 +192,7 @@ function appendOpacity(box,d,isBase=false){
   range.addEventListener('input',()=>{
     d.opacity=Number(range.value)/100;output.textContent=`${range.value}%`;
     if(isBase)d.layer.setOpacity(d.opacity);
+    else if(d.id==='relevo')d.layer.setStyle(reliefStyle);
     else d.layer.setStyle(f=>{const style=typeof d.originalStyle==='function'?d.originalStyle(f):d.originalStyle||{};return {...style,opacity:d.opacity,fillOpacity:(style.fillOpacity??.2)*d.opacity};});
   });
 }
@@ -211,13 +212,13 @@ function coordinateActions(root,latlng){
   const pair=`${latlng.lat.toFixed(6)},${latlng.lng.toFixed(6)}`;
   const actions=element('div',undefined,'popup-actions');
   const links=[
-    ['Ver fachada',`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${pair}`],
+    ['Abrir visualização de rua',`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${pair}`],
     ['Google Maps',`https://www.google.com/maps/search/?api=1&query=${pair}`],
     ['Abrir no Google Earth',`https://earth.google.com/web/search/${pair}/`]
   ];
   links.forEach(([label,url])=>{
     const a=element('a',label);a.href=url;a.target='_blank';a.rel='noopener noreferrer';
-    if(label==='Ver fachada')a.title='Visualização de rua disponível próxima ao ponto selecionado.';
+    if(label==='Abrir visualização de rua')a.title='Abre o Google Street View; a cobertura no ponto depende do serviço.';
     actions.append(a);
   });
   const copy=element('button','Copiar coordenadas');copy.type='button';copy.addEventListener('click',()=>copyCoordinates(latlng));actions.append(copy);
@@ -255,7 +256,7 @@ const baseMeta=document.getElementById('baseMeta');
 let previousBaseDef=baseDefs[1];
 let baseGeneration=0;
 let baseTimer;
-function baseState(def,state){def.state=state;if(def.statusNode){def.statusNode.textContent=state==='Disponível'?'● Funcional':state==='Indisponível'?'× Temporariamente indisponível':state;def.statusNode.setAttribute('data-state',state);}}
+function baseState(def,state){def.state=state;if(def.statusNode){def.statusNode.textContent=state==='Disponível'?'● DISPONÍVEL NO MAPA':state==='Indisponível'?'× Temporariamente indisponível':state;def.statusNode.setAttribute('data-state',state);}}
 function selectBase(def){
   clearTimeout(baseTimer);baseGeneration++;
   if(activeBaseDef!==def)previousBaseDef=activeBaseDef;
@@ -300,7 +301,7 @@ baseDefs.forEach(d=>{
   const text=element('span',undefined,'base-detail');
   const heading=element('span',undefined,'base-name-row');
   const shortNames={ortho:'Foto aérea · 2019',osm:'Ruas',recent:'Satélite'};
-  d.statusNode=element('span','◐ Teste de carregamento pendente','status');
+  d.statusNode=element('span','DISPONÍVEL NO MAPA','status');
   heading.append(element('span',shortNames[d.id],'name'),d.statusNode);text.append(heading);
   text.append(element('small',d.id==='ortho'?'Imagem histórica oficial':d.id==='osm'?'OpenStreetMap':`NASA VIIRS · ${recentDate}`));
   label.append(radio,text);baseControl.append(label);
@@ -364,7 +365,7 @@ function layerControl(d,state,onChange,info){
 }
 overlayDefs.forEach(d=>{
   const target=d.group==='Ambiente'?'environmentControl':d.group==='Áreas sensíveis'?'sensitiveControl':'territoryControl';
-  const row=layerControl(d,'Teste pendente',()=>{
+  const row=layerControl(d,'DISPONÍVEL NO MAPA',()=>{
     if(d.input.checked){d.status.textContent='Carregando';d.layer.addTo(map);toast(`${d.name} ativada.`);}
     else{map.removeLayer(d.layer);toast(`${d.name} ocultada.`);}
   },()=>showOverlayInfo(d));
@@ -438,7 +439,7 @@ async function loadCivil(d){
   return d.loading;
 }
 civilDefs.forEach(d=>{
-  const row=layerControl(d,'Dados validados / teste pendente',()=>{
+  const row=layerControl(d,'DISPONÍVEL NO MAPA',()=>{
     if(d.input.checked){if(d.layer){d.layer.addTo(map);toast(`${d.name}: camada ativada · ${d.count} pontos`);}else loadCivil(d);}
     else{if(d.layer)map.removeLayer(d.layer);toast(`${d.name}: camada ocultada`);}
   },()=>showCivilInfo(d));
@@ -448,32 +449,44 @@ document.getElementById('closeInfo').addEventListener('click',()=>document.getEl
 const reliefDefs=[{id:'relevo',name:'Padrões de Relevo',source:ARPIASGeomorphology.source,field:'PADRAO',ready:false}];
 symbols.relevo='M2 20L8 7l5 9 4-12 5 16H2';
 const relief=reliefDefs[0];
-const reliefRow=layerControl(relief,'Dados em validação',()=>{if(!relief.ready){relief.input.checked=false;return;}if(relief.input.checked){relief.layer.addTo(map);relief.status.textContent='Disponível';}else map.removeLayer(relief.layer);},()=>infoModal('Padrões de Relevo — CPRM/SGB',[['Fonte',relief.source],['Autores','Marcelo E. Dantas; Lais Costa'],['Publicação','Fevereiro de 2017 · escala 1:30.000'],['Polígonos','399'],['CRS original','SIRGAS 2000 · EPSG:4674'],['Derivado','EPSG:4326 · sem simplificação'],['Campos',Object.keys(relief.data?.features[0].properties||ARPIASGeomorphology.fields).join(', ')],['Arquivo','niteroi_padraoderelevo.zip'],['Referência',ARPIASGeomorphology.url]],ARPIASGeomorphology.warning));
-relief.input.disabled=true;
+const reliefRow=layerControl(relief,'DISPONÍVEL NO MAPA',async()=>{
+  if(!relief.input.checked){if(relief.layer)map.removeLayer(relief.layer);return;}
+  const layer=await loadRelief();if(layer&&relief.input.checked)layer.addTo(map);
+},showReliefInfo);
+const reliefMessage=element('p',undefined,'popup-note');reliefMessage.hidden=true;reliefMessage.setAttribute('role','alert');reliefRow.append(reliefMessage);
+function reliefStyle(f){return ARPIASGeomorphology.style(relief.data,relief.field,f,relief.opacity??1);}
+function showReliefInfo(){
+  infoModal('Padrões de Relevo — CPRM/SGB',[['Fonte',relief.source],['Autores','Marcelo E. Dantas; Lais Costa'],['Publicação','Fevereiro de 2017 · escala 1:30.000'],['Polígonos','399'],['CRS original','SIRGAS 2000 · EPSG:4674'],['Derivado','EPSG:4326 · sem simplificação'],['Campos',Object.keys(relief.data?.features[0].properties||ARPIASGeomorphology.fields).join(', ')],['Arquivo','niteroi_padraoderelevo.zip'],['Referência',ARPIASGeomorphology.url]],ARPIASGeomorphology.warning);
+  if(relief.layer)appendOpacity(document.getElementById('infoBody'),relief);
+}
 const classification=element('select');classification.id='reliefClassification';classification.setAttribute('aria-label','Classificação do relevo');
 Object.entries(ARPIASGeomorphology.fields).forEach(([value,label])=>{const option=element('option',label);option.value=value;classification.append(option);});
 classification.disabled=true;reliefRow.append(classification);document.getElementById('territoryControl').append(reliefRow);
-classification.addEventListener('change',()=>{relief.field=classification.value;relief.layer.setStyle(f=>ARPIASGeomorphology.style(relief.data,relief.field,f));});
-readJSON('data/processed/cprm/padroes-relevo.geojson').then(ARPIASGeomorphology.validate).then(data=>{
+classification.addEventListener('change',()=>{relief.field=classification.value;relief.layer.setStyle(reliefStyle);});
+const fetchRelief=ARPIASGeomorphology.createLoader(()=>readJSON('data/processed/cprm/padroes-relevo.geojson'));
+async function loadRelief(){
+  if(relief.layer)return relief.layer;
+  if(relief.loading)return relief.loading;
+  relief.status.textContent='Carregando…';reliefRow.setAttribute('aria-busy','true');reliefMessage.hidden=true;
+  relief.loading=fetchRelief().then(data=>{
   data.features.forEach(f=>ARPIASGeometry.validateGeometry(f.geometry));relief.data=data;
-  relief.layer=L.geoJSON(data,{renderer:cartographicRenderer,bubblingMouseEvents:false,style:f=>ARPIASGeomorphology.style(data,relief.field,f),onEachFeature:(f,layer)=>{
+  relief.layer=L.geoJSON(data,{renderer:cartographicRenderer,bubblingMouseEvents:false,style:reliefStyle,onEachFeature:(f,layer)=>{
     layer.on('click',e=>{L.DomEvent.stopPropagation(e.originalEvent);if(typeof ARPIASUI!=='undefined')ARPIASUI.query(e.latlng,{layerId:'relevo',feature:f});});
-    layer.on('mouseover',()=>layer.setStyle({weight:3}));layer.on('mouseout',()=>layer.setStyle(ARPIASGeomorphology.style(data,relief.field,f)));
-  }});relief.ready=true;relief.input.disabled=false;classification.disabled=false;relief.status.textContent='Dados validados · teste no mapa pendente';if(typeof ARPIASUI!=='undefined')ARPIASUI.refreshQueryable();
-}).catch(error=>{relief.status.textContent='Indisponível';relief.input.checked=false;console.error('Relevo:',error);});
+    layer.on('mouseover',()=>layer.setStyle({weight:3}));layer.on('mouseout',()=>layer.setStyle(reliefStyle(f)));
+  }});relief.ready=true;classification.disabled=false;relief.status.textContent='DISPONÍVEL NO MAPA';if(typeof ARPIASUI!=='undefined')ARPIASUI.refreshQueryable();return relief.layer;
+}).catch(error=>{relief.status.textContent='EM INTEGRAÇÃO';relief.input.checked=false;reliefMessage.textContent='Não foi possível carregar a camada de relevo.';reliefMessage.hidden=false;toast(reliefMessage.textContent);console.error('Relevo:',error);return null;}).finally(()=>{relief.loading=null;reliefRow.setAttribute('aria-busy','false');});
+  return relief.loading;
+}
 const catalogHost=document.getElementById('catalogGroups');
 const catalogSearch=document.getElementById('layerSearch');
 const catalogSearchStatus=document.getElementById('catalogSearchStatus');
 const catalogEntries=[];
 const catalogSections=[];
 function catalogBadge(item){
-  return item.state==='available'?'◐ Dados disponíveis / Em integração':item.state==='unavailable'?'× Indisponível':'○ Integração futura';
+  return ARPIASCatalog.publicStatus(item);
 }
 function operationalStatus(text){
-  if(/Indisponível|indisponível/.test(text))return '× Indisponível';
-  if(/Disponível|Funcional/.test(text))return '● Funcional';
-  if(/Carregando/.test(text))return '◐ Carregando';
-  return '◐ Em integração / teste pendente';
+  return ARPIASCatalog.operationalStatus(text);
 }
 function filterCatalog(){
   const query=catalogSearch.value;
@@ -541,7 +554,7 @@ readJSON('data/catalogo.json').then(ARPIASCatalog.validate).then(catalog=>{
           rows.push(row);catalogEntries.push({item,group,row});return;
         }
         row=element('div',undefined,'planned-entry catalog-entry');row.append(element('strong',item.name));
-        const badge=element('small',item.displayStatus||catalogBadge(item),'catalog-badge');row.append(badge);
+        const badge=element('small',catalogBadge(item),'catalog-badge');row.append(badge);
         if(input){
           const original=input.closest('.layer-control,.control-item').querySelector('.layer-status,.status');
           const button=element('button',undefined,'catalog-select');button.type='button';
@@ -588,7 +601,7 @@ readJSON('data/catalogo.json').then(ARPIASCatalog.validate).then(catalog=>{
   civilDefs.forEach(d=>{d.status.textContent='Disponível';});
 }).catch(error=>{
   console.error('Catálogo:',error);catalogSearchStatus.textContent='Catálogo temporariamente indisponível.';
-  catalogHost.replaceChildren(element('p','Falha ao carregar ou validar data/catalogo.json. Os controles existentes foram preservados.','sidebar-note'));
+  catalogHost.replaceChildren(element('p','Não foi possível carregar o catálogo. Tente novamente.','sidebar-note'));
 });
 
 const panel=document.getElementById('panel');
@@ -660,7 +673,7 @@ document.getElementById('closeAbout').addEventListener('click',()=>{closeAbout()
 async function showFragilityMethodology(){
   closeMore();
   try{const model=await readJSON('config/fragilidade.json');
-    const rows=[['Status',model.status],['Cálculo','Não habilitado; nenhuma pontuação produzida'],['Unidade territorial',model.territorialUnit],['Escala','0–100 proposta; classes e limiares ainda não validados'],['Pesos / normalização / fórmula','Ainda não definidos'],['Última revisão da arquitetura',model.reviewedAt]];
+    const rows=[['Status','METODOLOGIA EM DESENVOLVIMENTO'],['Cálculo','Não habilitado; nenhuma pontuação produzida'],['Unidade territorial',model.territorialUnit],['Escala','0–100: proposta metodológica não validada'],['Pesos / normalização / fórmula','Ainda não definidos'],['Última revisão da arquitetura',model.reviewedAt]];
     const box=content(model.name,rows,model.warning);box.firstChild.id='infoTitle';
     const labels={available:'Disponível',partial:'Parcialmente disponível',future:'Futuro'};
     model.dimensions.forEach(d=>box.append(content(d.name,[['Disponibilidade',labels[d.availability]],['Direção',d.direction],['Fonte',d.source],['Ano dos dados',d.year||'Não informado']],d.limitation)));

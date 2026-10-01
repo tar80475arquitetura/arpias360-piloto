@@ -27,6 +27,7 @@
     return record({type:'Feature',geometry:feature.geometry,properties:{titulo:`Cópia de trabalho · ${layer}`,categoria:layer,status:'Não oficial',source,observacoes:'Geometria de trabalho / não oficial. Base oficial somente leitura.'},arpiasOrigin:{layer,id:feature.properties?.OBJECTID??feature.properties?.id,source,geometry:feature.geometry,attributes}},'creation');
   }
   function restoreOriginal(feature){const result=sanitizeFeature(feature);if(!result.arpiasOrigin)throw Error('Sem geometria original registrada');result.geometry=JSON.parse(JSON.stringify(result.arpiasOrigin.geometry));return record(result,'restore-original');}
-  const api={copyOfficial,restoreOriginal,record,fields,sanitizeFeature,validateCollection,read,save};
+  function assertWorkLayers(group){const layers=group.getLayers();if(layers.some(layer=>layer._arpiasWork!==true))throw Error('Edição recusada: bases oficiais são somente leitura.');return layers;}
+  const api={copyOfficial,restoreOriginal,record,fields,sanitizeFeature,validateCollection,read,save,assertWorkLayers};
   if(typeof module==='object'&&module.exports)module.exports=api;else root.ARPIASWork=api;
 })(typeof window==='object'?window:globalThis);

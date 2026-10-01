@@ -26,11 +26,12 @@ const ARPIASUI=(()=>{
   }
   function serialize(){return {type:'FeatureCollection',features:workGroup.getLayers().map(layer=>ARPIASWork.sanitizeFeature(layer.toGeoJSON(false)))};}
   function workLayer(feature){
+    feature=ARPIASWork.sanitizeFeature(feature);
     let result;
     L.geoJSON(feature,{renderer:cartographicRenderer,style:ARPIASCartography.style('work'),pointToLayer:(f,ll)=>L.marker(ll,{icon:L.divIcon({className:'work-point',html:'✎',iconSize:[28,28],iconAnchor:[14,14]}),bubblingMouseEvents:false}),onEachFeature:(f,layer)=>{
       layer.on('click',e=>{if(mode==='consult')query(e.latlng);});result=layer;
     }});
-    return result;
+    result._arpiasWork=true;return result;
   }
   function restore(collection){workGroup.clearLayers();ARPIASWork.validateCollection(collection).features.forEach(feature=>workGroup.addLayer(workLayer(feature)));renderWork();}
   function stopHandler(){if(handler){handler.disable();handler=null;}if(editing){editing.disable();editing=null;}byId('finishDrawing').hidden=true;byId('finishGeometry').hidden=true;}
@@ -216,7 +217,8 @@ const ARPIASUI=(()=>{
     }catch(error){toast('Não foi possível salvar neste dispositivo. Exporte suas camadas para preservar o trabalho.');}
   });
   byId('editGeometry').addEventListener('click',()=>{
-    if(mode!=='edit'||!workGroup.getLayers().length){toast('Crie uma feição de trabalho antes de editar vértices.');return;}stopHandler();
+    if(mode!=='edit'||!workGroup.getLayers().length){toast('Crie uma feição de trabalho antes de editar vértices.');return;}
+    try{ARPIASWork.assertWorkLayers(workGroup);}catch(error){toast(error.message);return;}stopHandler();
     workGroup.eachLayer(layer=>{if(!map.hasLayer(layer))layer.addTo(map);});
     editing=new L.EditToolbar.Edit(map,{featureGroup:workGroup,selectedPathOptions:ARPIASCartography.style('editing')});editing.enable();byId('finishGeometry').hidden=false;byId('toolHint').textContent='Arraste os vértices ou pontos das suas camadas de trabalho. Bases oficiais protegidas.';
   });
@@ -245,6 +247,7 @@ const ARPIASUI=(()=>{
   }
   function visibleLegend(){
     const box=element('div',undefined,'visible-legend');
+    if(reliefDefs.some(d=>d.layer&&map.hasLayer(d.layer)))box.append(element('p',ARPIASGeomorphology.legendWarning,'geomorph-warning'));
     const definitions=[...overlayDefs.filter(d=>map.hasLayer(d.layer)),...civilDefs.filter(d=>d.layer&&d.input.checked)];
     definitions.forEach(d=>{const row=element('div',undefined,'legend-entry');const icon=element('span',undefined,`layer-icon ${d.symbolId||d.id}`);if(overlayDefs.includes(d))icon.append(styleSwatch(d.id,d.opacity??1));else {icon.classList.add('legend-civil-marker');icon.append(symbol(d.symbolId||d.id));}row.append(icon,element('span',d.name));box.append(row);});
     [...new Set(workGroup.getLayers().filter(layer=>map.hasLayer(layer)).map(layer=>layer.toGeoJSON(false).geometry.type))].forEach(type=>{const row=element('div',undefined,'legend-entry');row.append(type==='Point'?element('span','✎','legend-work-point'):styleSwatch('work',1,type),element('span',`Minhas camadas · ${type==='Point'?'pontos quadrados':type==='LineString'?'linhas tracejadas':'polígonos tracejados'}`));box.append(row);});
@@ -254,15 +257,14 @@ const ARPIASUI=(()=>{
       box.append(element('strong',d.name+' · '+ARPIASGeomorphology.fields[d.field]));
       ARPIASGeomorphology.classes(d.data,d.field).forEach(c=>{
         const row=element('div',undefined,'legend-entry');
-        row.append(styleSwatch('relevo',1,'Polygon',{color:c.color,fillColor:c.color,weight:1.5,fillOpacity:.25,dashArray:c.dashArray}),element('span',c.key+' · '+c.name+' ('+c.count+')'));box.append(row);
+        row.append(styleSwatch('relevo',d.opacity??1,'Polygon',{color:c.color,fillColor:c.color,weight:1.5,opacity:.95,fillOpacity:.25,dashArray:c.dashArray}),element('span',c.key+' · '+c.name+' ('+c.count+')'));box.append(row);
       });
     });
     return box;
   }
   byId('legendBtn').addEventListener('click',()=>{
     const rows=[['Mapa-base',activeBaseDef.name]];
-    overlayDefs.filter(d=>map.hasLayer(d.layer)).forEach(d=>rows.push([d.name,'Camada oficial visível']));civilDefs.filter(d=>d.layer&&d.input.checked).forEach(d=>rows.push([d.name,`${d.count} pontos · símbolo próprio`]));
-    if(workGroup.getLayers().some(layer=>map.hasLayer(layer)))rows.push(['Minhas camadas','Feições de trabalho do usuário']);infoModal('Legenda das camadas visíveis',rows,'Ativa significa exibida no mapa; não confirma operação atual dos equipamentos.');byId('infoBody').append(visibleLegend());
+    infoModal('Legenda das camadas visíveis',rows,'Ativa significa exibida no mapa; não confirma operação atual dos equipamentos.');byId('infoBody').append(visibleLegend());
   });
   byId('sourcesBtn').addEventListener('click',()=>infoModal('Fontes utilizadas',[
     ['Foto Aérea 2019','Prefeitura Municipal de Niterói / SIGeo · imagem histórica de 2019'],['Ruas','OpenStreetMap'],['Satélite recente',`NASA GIBS / VIIRS · ${recentDate} · sem imagem em tempo real`],['Defesa Civil','Prefeitura de Niterói / GeoNit / Defesa Civil'],['Camadas territoriais','Geoportal oficial de Niterói']
