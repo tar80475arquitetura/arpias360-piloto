@@ -90,7 +90,7 @@
     "year": 2017,
     "scale": "1:30.000",
     "url": "https://rigeo.sgb.gov.br/handle/doc/17483",
-    "availability": "Fonte identificada; vetores ainda não validados",
+    "availability": "399 polígonos CPRM validados; contexto físico de 2017, sem pontuação",
     "direction": "Contextual; relação com fragilidade a validar",
     "calculationEnabled": false
   }

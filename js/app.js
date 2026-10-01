@@ -445,6 +445,22 @@ civilDefs.forEach(d=>{
   document.getElementById('civilControl').append(row);
 });
 document.getElementById('closeInfo').addEventListener('click',()=>document.getElementById('layerInfo').close());
+const reliefDefs=[{id:'relevo',name:'Padrões de Relevo',source:ARPIASGeomorphology.source,field:'PADRAO',ready:false}];
+symbols.relevo='M2 20L8 7l5 9 4-12 5 16H2';
+const relief=reliefDefs[0];
+const reliefRow=layerControl(relief,'Dados em validação',()=>{if(!relief.ready){relief.input.checked=false;return;}if(relief.input.checked){relief.layer.addTo(map);relief.status.textContent='Disponível';}else map.removeLayer(relief.layer);},()=>infoModal('Padrões de Relevo — CPRM/SGB',[['Fonte',relief.source],['Autores','Marcelo E. Dantas; Lais Costa'],['Publicação','Fevereiro de 2017 · escala 1:30.000'],['Polígonos','399'],['CRS original','SIRGAS 2000 · EPSG:4674'],['Derivado','EPSG:4326 · sem simplificação'],['Campos',Object.keys(relief.data?.features[0].properties||ARPIASGeomorphology.fields).join(', ')],['Arquivo','niteroi_padraoderelevo.zip'],['Referência',ARPIASGeomorphology.url]],ARPIASGeomorphology.warning));
+relief.input.disabled=true;
+const classification=element('select');classification.id='reliefClassification';classification.setAttribute('aria-label','Classificação do relevo');
+Object.entries(ARPIASGeomorphology.fields).forEach(([value,label])=>{const option=element('option',label);option.value=value;classification.append(option);});
+classification.disabled=true;reliefRow.append(classification);document.getElementById('territoryControl').append(reliefRow);
+classification.addEventListener('change',()=>{relief.field=classification.value;relief.layer.setStyle(f=>ARPIASGeomorphology.style(relief.data,relief.field,f));});
+readJSON('data/processed/cprm/padroes-relevo.geojson').then(ARPIASGeomorphology.validate).then(data=>{
+  data.features.forEach(f=>ARPIASGeometry.validateGeometry(f.geometry));relief.data=data;
+  relief.layer=L.geoJSON(data,{renderer:cartographicRenderer,bubblingMouseEvents:false,style:f=>ARPIASGeomorphology.style(data,relief.field,f),onEachFeature:(f,layer)=>{
+    layer.on('click',e=>{L.DomEvent.stopPropagation(e.originalEvent);if(typeof ARPIASUI!=='undefined')ARPIASUI.query(e.latlng,{layerId:'relevo',feature:f});});
+    layer.on('mouseover',()=>layer.setStyle({weight:3}));layer.on('mouseout',()=>layer.setStyle(ARPIASGeomorphology.style(data,relief.field,f)));
+  }});relief.ready=true;relief.input.disabled=false;classification.disabled=false;relief.status.textContent='Dados validados · teste no mapa pendente';if(typeof ARPIASUI!=='undefined')ARPIASUI.refreshQueryable();
+}).catch(error=>{relief.status.textContent='Indisponível';relief.input.checked=false;console.error('Relevo:',error);});
 const catalogHost=document.getElementById('catalogGroups');
 const catalogSearch=document.getElementById('layerSearch');
 const catalogSearchStatus=document.getElementById('catalogSearchStatus');
@@ -769,6 +785,7 @@ function clearLayers(){
   closeMore();searchGeneration++;placeResults.hidden=true;map.closePopup();if(queryMarker)map.removeLayer(queryMarker);queryMarker=null;
   if(userMarker)map.removeLayer(userMarker);userMarker=null;clearHighlights();
   overlayDefs.forEach(d=>{map.removeLayer(d.layer);d.input.checked=false;});
+  reliefDefs.forEach(d=>{d.input.checked=false;if(d.layer)map.removeLayer(d.layer);});
   civilDefs.forEach(d=>{d.input.checked=false;if(d.layer)map.removeLayer(d.layer);});
   if(typeof ARPIASUI!=='undefined')ARPIASUI.clearSelection();
   document.getElementById('coords').textContent='Ative Consultar para investigar um local';toast('Camadas limpas. Mapa-base preservado.');

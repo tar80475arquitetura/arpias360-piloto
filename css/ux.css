@@ -39,3 +39,5 @@
 #consultControls label{display:block;font-size:15px;font-weight:600;margin:10px 0 6px}#queryLayer{width:100%;min-height:44px;font:inherit;border:1px solid #718078;border-radius:8px;background:white;padding:8px}.consult-active .leaflet-container,.consult-active .leaflet-interactive{cursor:crosshair}.tool-panel.collapsed #consultControls{display:none}
 
 :root{--category-relief:#806226}.accordion[data-category="relief"]{--category-color:var(--category-relief)}
+#reliefClassification{width:100%;min-width:0;font-size:15px;padding:8px;border:1px solid #c8cfd2;border-radius:6px;background:#fff;color:#243644;grid-column:1/-1}
+.layer-control:has(#reliefClassification){display:grid;grid-template-columns:minmax(0,1fr) 36px;min-width:0;padding:0 5px 8px}

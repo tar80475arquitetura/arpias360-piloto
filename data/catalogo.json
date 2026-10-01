@@ -1068,26 +1068,26 @@
       "items": [
         {
           "name": "Padrões de Relevo",
-          "state": "available",
-          "displayStatus": "Fonte identificada / em integração",
+          "state": "integrated",
           "source": "CPRM / Serviço Geológico do Brasil · carta de Niterói · 2017 · 1:30.000",
           "url": "https://rigeo.sgb.gov.br/handle/doc/17483",
-          "note": "Pacote vetorial ainda não validado. Sem camada cartográfica ativa. Referência geomorfológica; não é classificação de risco. TOPODATA/INPE é referência metodológica, sem raster integrado.",
+          "note": "399 polígonos validados; 21 padrões. Quatro classificações reutilizam as mesmas geometrias. Referência de 2017; não é classificação de risco.",
           "keywords": [
             "geomorfologia",
             "CPRM",
             "SGB",
             "TOPODATA",
             "altimetria"
-          ]
+          ],
+          "control": "layer_relevo"
         },
         {
           "name": "Unidades Geomorfológicas",
           "state": "available",
-          "displayStatus": "Fonte identificada / em integração",
+          "displayStatus": "Classificação disponível em Padrões de Relevo",
           "source": "CPRM / Serviço Geológico do Brasil · carta de Niterói · 2017 · 1:30.000",
           "url": "https://rigeo.sgb.gov.br/handle/doc/17483",
-          "note": "Pacote vetorial ainda não validado. Sem camada cartográfica ativa. Referência geomorfológica; não é classificação de risco. TOPODATA/INPE é referência metodológica, sem raster integrado.",
+          "note": "Selecionar UnGeomorf no controle de classificação. Mesmos 399 polígonos; seis unidades reais.",
           "keywords": [
             "geomorfologia",
             "CPRM",

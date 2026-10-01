@@ -33,6 +33,7 @@ const ARPIASReport=(()=>{
   }
   function visibleLayers(){
     const result=overlayDefs.filter(d=>map.hasLayer(d.layer)).map(d=>({name:d.name,source:'Prefeitura Municipal de Niterói / GeoNit',color:d.layer.options.style?.color||'#536976'}));
+    reliefDefs.filter(d=>d.layer&&map.hasLayer(d.layer)).forEach(d=>result.push({name:d.name,source:d.source+' · '+ARPIASGeomorphology.warning}));
     civilDefs.filter(d=>d.layer&&d.input.checked).forEach(d=>result.push({name:d.name,source:'Prefeitura de Niterói / GeoNit / Defesa Civil'}));
     if(ARPIASUI.workGroup.getLayers().some(layer=>map.hasLayer(layer)))result.push({name:'Minhas camadas',source:'Camadas de trabalho do usuário'});return result;
   }

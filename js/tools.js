@@ -72,7 +72,7 @@ const ARPIASUI=(()=>{
   }
   function summary(){
     if(!selection)return;
-    const s=selection;const rows=[];if(s.meta.layerId)rows.push(['Camada',[...overlayDefs,...civilDefs].find(d=>d.id===s.meta.layerId)?.name||s.meta.layerId]);
+    const s=selection;const rows=[];if(s.meta.layerId)rows.push(['Camada',[...overlayDefs,...civilDefs,...reliefDefs.filter(d=>d.ready)].find(d=>d.id===s.meta.layerId)?.name||s.meta.layerId]);
     if(s.context.bairro)rows.push(['Bairro',s.context.bairro]);
     if(s.metrics.area!==undefined)rows.push(['Área estimada',areaLabel(s.metrics.area)]);
     rows.push(['Coordenadas',`${s.metrics.lat.toFixed(6)}, ${s.metrics.lon.toFixed(6)}`]);
@@ -107,14 +107,15 @@ const ARPIASUI=(()=>{
     const typing=document.activeElement?.matches('input,textarea');
     if(currentPopup&&!typing)summary();if(!byId('territorialPanel').hidden&&!typing)showTerritorial();
   }
-  function queryInstruction(){return !queryLayer?'Escolha uma camada para consultar.':queryLayer==='bairros'?'Clique no mapa para selecionar um bairro.':`Clique no mapa para consultar ${[...overlayDefs,...civilDefs].find(d=>d.id===queryLayer)?.name||'a camada escolhida'}.`;}
+  function queryInstruction(){return !queryLayer?'Escolha uma camada para consultar.':queryLayer==='bairros'?'Clique no mapa para selecionar um bairro.':`Clique no mapa para consultar ${[...overlayDefs,...civilDefs,...reliefDefs.filter(d=>d.ready)].find(d=>d.id===queryLayer)?.name||'a camada escolhida'}.`;}
   const querySelect=byId('queryLayer');
-  [...overlayDefs,...civilDefs].forEach(d=>{const option=document.createElement('option');option.value=d.id;option.textContent=d.name;querySelect.append(option);});
+  function refreshQueryable(){const selected=querySelect.value;querySelect.querySelectorAll('option:not(:first-child)').forEach(o=>o.remove());[...overlayDefs,...civilDefs,...reliefDefs.filter(d=>d.ready)].forEach(d=>{const option=document.createElement('option');option.value=d.id;option.textContent=d.name;querySelect.append(option);});querySelect.value=selected;}
+  refreshQueryable();
   querySelect.addEventListener('change',()=>{clearSelection();queryLayer=querySelect.value||null;byId('toolHint').textContent=queryInstruction();});
   async function query(latlng,hit){
     if(mode!=='consult'||!queryLayer)return;
     clearSelection();const token=++generation,id=queryLayer;
-    const definition=[...overlayDefs,...civilDefs].find(d=>d.id===id);if(!definition)return;
+    const definition=[...overlayDefs,...civilDefs,...reliefDefs.filter(d=>d.ready)].find(d=>d.id===id);if(!definition)return;
     if(id==='lotes'&&map.getZoom()<16){byId('toolHint').textContent='Aproxime o mapa para consultar lotes (zoom 16 ou maior).';return;}
     byId('toolHint').textContent='Consultando a camada escolhida…';
     let features;
@@ -122,13 +123,15 @@ const ARPIASUI=(()=>{
     else if(civilDefs.includes(definition)){
       const layer=await loadCivil(definition);
       features=layer?layer.toGeoJSON(false).features.filter(f=>map.latLngToContainerPoint(L.latLng(f.geometry.coordinates[1],f.geometry.coordinates[0])).distanceTo(map.latLngToContainerPoint(latlng))<=22).sort((a,b)=>map.distance(latlng,L.latLng(a.geometry.coordinates[1],a.geometry.coordinates[0]))-map.distance(latlng,L.latLng(b.geometry.coordinates[1],b.geometry.coordinates[0]))):null;
+    }else if(reliefDefs.includes(definition)){
+      features=definition.data.features.filter(f=>ARPIASTurf.booleanPointInPolygon(ARPIASTurf.point([latlng.lng,latlng.lat]),f));
     }else{
       const location=id==='hidro'?L.latLngBounds(map.containerPointToLatLng(map.latLngToContainerPoint(latlng).subtract([8,8])),map.containerPointToLatLng(map.latLngToContainerPoint(latlng).add([8,8]))):latlng;
       features=await queryService(URLS[id],location);
     }
     if(mode!=='consult'||queryLayer!==id||token!==generation)return;
     if(!features?.length){byId('toolHint').textContent=features===null?'Consulta temporariamente indisponível. Tente novamente.':'Nenhuma feição da camada escolhida encontrada neste local.';return;}
-    const feature=features[0];select(feature,feature.properties.nome||feature.properties.tx_nome||definition.name,{layerId:id,source:civilDefs.includes(definition)?'Prefeitura de Niterói / GeoNit / Defesa Civil':'Prefeitura Municipal de Niterói / GeoNit'},latlng);
+    const feature=features[0];select(feature,feature.properties.PADRAO||feature.properties.nome||feature.properties.tx_nome||definition.name,{layerId:id,source:definition.source|| (civilDefs.includes(definition)?'Prefeitura de Niterói / GeoNit / Defesa Civil':'Prefeitura Municipal de Niterói / GeoNit')},latlng);
     showTerritorial();
   }
   function closeTerritorial(){byId('territorialPanel').hidden=true;if(mode==='consult'){byId('toolPanel').hidden=false;byId('toolHint').textContent=queryInstruction();}shell.classList.remove('has-territorial');scheduleResize();}
@@ -136,9 +139,10 @@ const ARPIASUI=(()=>{
     if(!selection)return;const s=selection;
     const body=byId('territorialBody');body.replaceChildren(content(s.title,measurementRows(s.metrics),'Área, perímetro e comprimento são estimativas geográficas. Centroide de polígonos calculado por centro de massa (Turf), com ponderação por área nas geometrias multipartes.'));
     body.append(content('Identificação territorial',[
-      ['Município',s.context.municipio||'Não confirmado · projeto piloto Niterói/RJ'],['Bairro',s.context.bairro||'Não identificado no ponto de referência'],['Região administrativa',s.context.regiao||'Não identificada no ponto de referência'],['Inscrição municipal','Dado ainda não integrado'],['Identificador ARPIAS','Integração futura'],['Camada consultada',[...overlayDefs,...civilDefs].find(d=>d.id===s.meta.layerId)?.name||'Busca / seleção explícita'],['Fonte da seleção',s.meta.source||'Coordenadas informadas pelo usuário']
+      ['Município',s.context.municipio||'Não confirmado · projeto piloto Niterói/RJ'],['Bairro',s.context.bairro||'Não identificado no ponto de referência'],['Região administrativa',s.context.regiao||'Não identificada no ponto de referência'],['Inscrição municipal','Dado ainda não integrado'],['Identificador ARPIAS','Integração futura'],['Camada consultada',[...overlayDefs,...civilDefs,...reliefDefs.filter(d=>d.ready)].find(d=>d.id===s.meta.layerId)?.name||'Busca / seleção explícita'],['Fonte da seleção',s.meta.source||'Coordenadas informadas pelo usuário']
     ]));
     geo.publicAttributes(s.feature.properties).forEach(group=>{const detail=element('details',undefined,'attribute-group');detail.append(element('summary',group.title),content('',group.rows));body.append(detail);});
+    if(s.meta.layerId==='relevo')body.append(element('p',ARPIASGeomorphology.warning+' AREA_KM2 está zerado no arquivo original. As faixas de declividade são atributos da classe, não um raster de declividade atual.','popup-note'));
     if(civilDefs.some(d=>d.id===s.meta.layerId))body.append(element('p','Cadastro de localização. Sem confirmação de operação, abertura ou leitura pluviométrica atual. Pluviômetros municipais não são a rede Cemaden.','popup-note'));
     if(['lotes','logradouros'].includes(s.meta.layerId)&&['Polygon','LineString'].includes(s.feature.geometry.type))body.append(action('Criar cópia de trabalho',async()=>{const original=JSON.parse(JSON.stringify(s.feature)),layerId=s.meta.layerId,source=s.meta.source;if(!await request('edit'))return;try{workGroup.addLayer(workLayer(ARPIASWork.copyOfficial(original,layerId,source)));dirty=true;renderWork();byId('toolHint').textContent='Você está editando uma cópia de trabalho. A camada oficial não será alterada.';}catch(error){toast(error.message);}},'quiet-button'));
     if(s.meta.work)body.append(element('p','Geometria de trabalho / não oficial. Referência original: '+(s.feature.arpiasOrigin?`${s.feature.arpiasOrigin.layer} · ${s.feature.arpiasOrigin.id}`:'Desenho do usuário'),'popup-note'));
@@ -246,6 +250,13 @@ const ARPIASUI=(()=>{
     [...new Set(workGroup.getLayers().filter(layer=>map.hasLayer(layer)).map(layer=>layer.toGeoJSON(false).geometry.type))].forEach(type=>{const row=element('div',undefined,'legend-entry');row.append(type==='Point'?element('span','✎','legend-work-point'):styleSwatch('work',1,type),element('span',`Minhas camadas · ${type==='Point'?'pontos quadrados':type==='LineString'?'linhas tracejadas':'polígonos tracejados'}`));box.append(row);});
     if(selection){const row=element('div',undefined,'legend-entry');row.append(styleSwatch(ARPIASCartography.selectionKind(selection.meta),1,selection.metrics.type,ARPIASCartography.selectionStyle(selection.meta,selection.metrics.type)),element('span',selection.meta.origin==='search'?'⌕ Resultado da busca · tracejado':'◇ Seleção de consulta · contínuo'));box.append(row);}
     ['measure','measure-kept'].forEach(id=>{[...new Set(measureGroup.getLayers().filter(layer=>Boolean(layer._arpiasKept)===(id==='measure-kept')).map(layer=>layer.toGeoJSON(false).geometry.type))].forEach(type=>{const row=element('div',undefined,'legend-entry');row.append(styleSwatch(id,1,type),element('span',`${id==='measure-kept'?'Medição mantida · traço e ponto':'Medição concluída · pontilhado'} · ${type==='LineString'?'linha':'área'}`));box.append(row);});});
+    reliefDefs.filter(d=>d.layer&&map.hasLayer(d.layer)).forEach(d=>{
+      box.append(element('strong',d.name+' · '+ARPIASGeomorphology.fields[d.field]));
+      ARPIASGeomorphology.classes(d.data,d.field).forEach(c=>{
+        const row=element('div',undefined,'legend-entry');
+        row.append(styleSwatch('relevo',1,'Polygon',{color:c.color,fillColor:c.color,weight:1.5,fillOpacity:.25,dashArray:c.dashArray}),element('span',c.key+' · '+c.name+' ('+c.count+')'));box.append(row);
+      });
+    });
     return box;
   }
   byId('legendBtn').addEventListener('click',()=>{
@@ -259,5 +270,5 @@ const ARPIASUI=(()=>{
   window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
   try{restore(ARPIASWork.read(localStorage));const raw=localStorage.getItem('arpias360.workspace.trash.v1');if(raw)trash=ARPIASWork.validateCollection(JSON.parse(raw)).features;renderWork();}catch(error){toast('Não foi possível ler as camadas locais. Os dados existentes não foram sobrescritos.');}
   const linked=ARPIASLocation.parse(new URLSearchParams(location.search));if(linked&&!linked.error)select({type:'Feature',geometry:{type:'Point',coordinates:[linked.lon,linked.lat]},properties:{}},'Local compartilhado',{},L.latLng(linked.lat,linked.lon));
-  return {mode:()=>mode,request,select,query,clearSelection,selection:()=>selection,fitSelection,measurementRows,areaLabel,distanceLabel,publicAttributes:geo.publicAttributes,confirm,workGroup,measureGroup,showTerritorial,closeTerritorial,visibleLegend};
+  return {refreshQueryable,mode:()=>mode,request,select,query,clearSelection,selection:()=>selection,fitSelection,measurementRows,areaLabel,distanceLabel,publicAttributes:geo.publicAttributes,confirm,workGroup,measureGroup,showTerritorial,closeTerritorial,visibleLegend};
 })();
