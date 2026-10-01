@@ -68,7 +68,7 @@ function updateStatus(def,msg){
   document.getElementById('statusMessage').textContent=msg||def.desc;
 }
 
-function safeName(p){return p.tx_nome||p.NOME||p.Nome||p.COMUNIDADE||p.Classifica||p.Layer||p.tx_obs||`Elemento ${p.OBJECTID||''}`}
+function safeName(p){const name=p.tx_nome||p.NOME||p.Nome||p.COMUNIDADE||p.Classifica||p.Layer||p.tx_obs||`Elemento ${p.OBJECTID||''}`;return typeof ARPIASSearch==='undefined'?name:ARPIASSearch.displayName(name);}
 function popupHTML(feature,label,source){return content(safeName(feature.properties||{}),[['Camada',label],['Fonte',source]]);}
 function feature(url,style,label,source,options={}){
   const lyr=L.esri.featureLayer({url,simplifyFactor:options.simplifyFactor??.35,precision:5,minZoom:options.minZoom,style,onEachFeature:(f,layer)=>{
@@ -95,7 +95,8 @@ function bindTerritorialName(event,className){
   if(typeof name!=='string'||!name.trim())return;
   const layer=event.layer;
   if(!layer?.bindTooltip)return;
-  layer.bindTooltip(element('span',name),{permanent:true,direction:'center',className:`territory-label ${className}`,interactive:false});
+  const label=typeof ARPIASSearch==='undefined'?name:ARPIASSearch.displayName(name);
+  layer.bindTooltip(element('span',label),{permanent:true,direction:'center',className:`territory-label ${className}`,interactive:false});
 }
 bairros.on('createfeature',e=>bindTerritorialName(e,'neighborhood-label'));
 limite.on('load',()=>{
@@ -414,7 +415,7 @@ async function loadCivil(d){
           return L.marker(ll,{icon:L.divIcon({html:icon,className:'civil-div-icon',iconSize:[28,28],iconAnchor:[14,14],popupAnchor:[0,-16]}),bubblingMouseEvents:false,title:f.properties.nome});
         },
         onEachFeature:(f,layer)=>layer.on('click',e=>{
-          if(typeof ARPIASUI!=='undefined'&&ARPIASUI.mode()==='consult')ARPIASUI.select(f,d.name,{source:'Prefeitura de Niterói / GeoNit / Defesa Civil',layerId:d.id},e.latlng);
+          if(typeof ARPIASUI!=='undefined'&&ARPIASUI.mode()==='consult')ARPIASUI.select(f,f.properties.nome||d.name,{source:'Prefeitura de Niterói / GeoNit / Defesa Civil',layerId:d.id},e.latlng);
         })
       });
       d.status.textContent='Disponível';civilMessage.textContent=`${d.name}: ${g.features.length} pontos carregados.`;
@@ -660,7 +661,7 @@ function presentPopup(popup){
 }
 map.on('popupopen',e=>presentPopup(e.popup));
 map.on('popupclose',()=>{currentPopup=null;popupNode=null;querySheet.hidden=true;shell.classList.remove('has-query');queryBody.replaceChildren();});
-document.getElementById('closeQuery').addEventListener('click',()=>{map.closePopup();document.getElementById('mobileLayersBtn').focus({preventScroll:true});});
+document.getElementById('closeQuery').addEventListener('click',()=>{map.closePopup();document.getElementById('layersBtn').focus({preventScroll:true});});
 document.addEventListener('keydown',e=>{
   if(e.key!=='Escape'||document.getElementById('layerInfo').open)return;
   if(!moreMenu.hidden){closeMore(true);return;}
@@ -669,7 +670,7 @@ document.addEventListener('keydown',e=>{
   map.closePopup();
 });
 function adaptViewport(){
-  if(compactMedia.matches)closeLayers();else openLayers();
+  closeLayers();
   if(currentPopup)presentPopup(currentPopup);
   scheduleResize();
 }
@@ -696,17 +697,34 @@ overlayDefs.forEach(d=>d.layer.on('click',e=>{
   if(f)ARPIASUI.select(f,d.id==='lotes'?'Lote selecionado':d.name,{source:'Prefeitura Municipal de Niterói / GeoNit',layerId:d.id},e.latlng);
   else ARPIASUI.query(e.latlng);
 }));
-function viewNiteroi(){closeMore();map.fitBounds(NITEROI_BOUNDS,{padding:[18,18]});}
+function viewNiteroi(){closeMore();map.closePopup();placeResults.hidden=true;if(typeof ARPIASUI!=='undefined')ARPIASUI.closeTerritorial();map.fitBounds(NITEROI_BOUNDS,{padding:[18,18]});}
 ['homeBtn','menuHome'].forEach(id=>document.getElementById(id).addEventListener('click',viewNiteroi));
-['locateBtn','mobileLocateBtn'].forEach(id=>document.getElementById(id).addEventListener('click',()=>{map.closePopup();map.locate({setView:true,maxZoom:16,enableHighAccuracy:true});}));
+['locateBtn','mobileLocateBtn','menuLocate'].forEach(id=>document.getElementById(id).addEventListener('click',()=>{closeMore();map.closePopup();map.locate({setView:true,maxZoom:16,enableHighAccuracy:true});}));
 map.on('locationfound',e=>{if(userMarker)map.removeLayer(userMarker);userMarker=L.circleMarker(e.latlng,{renderer:pointRenderer,className:'user-location-marker',radius:7,weight:3,color:'#3e7056',fillColor:'#a7c7a5',fillOpacity:.5}).addTo(map).bindPopup(()=>coordinateActions(content('Sua localização aproximada',[['Latitude',e.latlng.lat.toFixed(6)],['Longitude',e.latlng.lng.toFixed(6)]]),e.latlng),popupOptions()).openPopup();});
 map.on('locationerror',()=>toast('Não foi possível obter sua localização.'));
 let searchGeneration=0;
+let neighborhoodSearchPromise=null;
+const placeResults=document.getElementById('placeResults');
+function neighborhoodSearchData(){
+  if(!neighborhoodSearchPromise)neighborhoodSearchPromise=new Promise((resolve,reject)=>{
+    const timer=setTimeout(()=>reject(Error('Serviço de bairros temporariamente indisponível.')),15000);
+    L.esri.query({url:URLS.bairros}).where('1=1').run((error,fc)=>{clearTimeout(timer);if(error||!Array.isArray(fc?.features)||fc.exceededTransferLimit)reject(Error('Serviço de bairros temporariamente indisponível ou com resposta incompleta.'));else resolve(fc.features);});
+  }).catch(error=>{neighborhoodSearchPromise=null;throw error;});
+  return neighborhoodSearchPromise;
+}
+function chooseNeighborhood(result,generation){
+  if(generation!==searchGeneration)return;
+  placeResults.hidden=true;clearHighlights();closeLayers();
+  const fc={type:'FeatureCollection',features:result.features};
+  const shape=L.geoJSON(fc);map.fitBounds(shape.getBounds(),{padding:[28,28],maxZoom:15});
+  if(typeof ARPIASUI!=='undefined')ARPIASUI.select(result.features[0],result.name,{source:'Prefeitura Municipal de Niterói / GeoNit',layerId:'bairros'});
+  else L.popup(popupOptions()).setLatLng(shape.getBounds().getCenter()).setContent(content(result.name,[['Seleção','Bairro'],['Fonte','Prefeitura Municipal de Niterói']])).openOn(map);
+}
 function clearHighlights(){highlights.forEach(l=>map.removeLayer(l));highlights.clear();}
 function closeKeyboard(){if(document.activeElement instanceof HTMLInputElement)document.activeElement.blur();}
 function searchLocation(raw){
   if(typeof ARPIASUI!=='undefined'&&['edit','measure'].includes(ARPIASUI.mode())){ARPIASUI.request('navigate').then(ok=>{if(ok)searchLocation(raw);});return;}
-  raw=raw.trim();if(!raw){searchGeneration++;toast('Digite um bairro ou coordenadas para buscar. Busca por ruas em integração.');return;}
+  raw=raw.trim();placeResults.hidden=true;if(!raw){searchGeneration++;toast('Digite um bairro ou coordenadas para buscar. Busca por ruas em integração.');return;}
   const generation=++searchGeneration;closeKeyboard();
   const match=raw.match(/^\s*([+-]?\d+(?:\.\d+)?)\s*[,;\s]\s*([+-]?\d+(?:\.\d+)?)\s*$/);
   if(match){
@@ -714,24 +732,25 @@ function searchLocation(raw){
     if(!validCoordinates(lat,lng)){toast('Coordenadas inválidas: latitude entre −90 e 90 e longitude entre −180 e 180.');return;}
     closeLayers();map.setView([lat,lng],Math.min(17,map.getMaxZoom()));selectLocation(L.latLng(lat,lng));return;
   }
-  const term=raw.replace(/'/g,"''");
-  L.esri.query({url:URLS.bairros}).where(`UPPER(tx_nome) LIKE UPPER('%${term}%') OR UPPER(tx_obs) LIKE UPPER('%${term}%')`).run((err,fc)=>{
+  placeResults.replaceChildren(element('p','Buscando bairros oficiais…'));placeResults.hidden=false;
+  neighborhoodSearchData().then(features=>{
     if(generation!==searchGeneration)return;
-    if(err||!fc?.features?.length){toast('Bairro não encontrado ou serviço indisponível. Ruas ainda não integradas.');return;}
-    clearHighlights();const highlight=L.geoJSON(fc,{style:{color:'#3e7056',weight:4,fillOpacity:.12}}).addTo(map);highlights.add(highlight);
-    closeLayers();map.fitBounds(highlight.getBounds(),{padding:[50,50],maxZoom:15});
-    const center=highlight.getBounds().getCenter();
-    L.popup(popupOptions()).setLatLng(center).setContent(coordinateActions(content(safeName(fc.features[0].properties||{}),[['Seleção','Bairro'],['Fonte','Prefeitura Municipal de Niterói']]),center)).openOn(map);
-    setTimeout(()=>{map.removeLayer(highlight);highlights.delete(highlight);},12000);
-  });
+    const results=ARPIASSearch.matches(features,raw);
+    if(!results.length){placeResults.replaceChildren(element('p','Nenhum local encontrado. Busca por ruas ainda em integração.'));return;}
+    if(results.length===1){chooseNeighborhood(results[0],generation);return;}
+    placeResults.replaceChildren(element('p',`${results.length} bairros encontrados. Escolha um resultado:`));
+    results.forEach(result=>{const button=element('button',result.name);button.type='button';button.addEventListener('click',()=>chooseNeighborhood(result,generation));placeResults.append(button);});
+  }).catch(error=>{if(generation===searchGeneration)placeResults.replaceChildren(element('p',`${error.message} Tente buscar novamente.`));});
 }
+document.getElementById('headerSearchBtn').addEventListener('click',()=>{closeMore();closeLayers();document.getElementById('searchMirror').focus();});
 [['searchInput','searchBtn'],['searchMirror','searchMirrorBtn']].forEach(([field,button])=>{
   const input=document.getElementById(field);const run=()=>searchLocation(input.value);
+  input.addEventListener('input',()=>{searchGeneration++;placeResults.hidden=true;});
   document.getElementById(button).addEventListener('click',run);input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();run();}});
 });
 function clearLayers(){
   map.stopLocate();
-  closeMore();searchGeneration++;map.closePopup();if(queryMarker)map.removeLayer(queryMarker);queryMarker=null;
+  closeMore();searchGeneration++;placeResults.hidden=true;map.closePopup();if(queryMarker)map.removeLayer(queryMarker);queryMarker=null;
   if(userMarker)map.removeLayer(userMarker);userMarker=null;clearHighlights();
   overlayDefs.forEach(d=>{map.removeLayer(d.layer);d.input.checked=false;});
   civilDefs.forEach(d=>{d.input.checked=false;if(d.layer)map.removeLayer(d.layer);});

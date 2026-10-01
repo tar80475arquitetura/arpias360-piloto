@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
   <link rel="stylesheet" href="css/style.css?v=20261001-noturno" />
   <link rel="stylesheet" href="js/vendor/leaflet-draw/leaflet.draw.css" />
+  <link rel="stylesheet" href="css/ux.css" />
 </head>
 <body>
   <a class="skip-link" href="#searchMirror">Ir para a busca no mapa</a>
@@ -20,19 +21,24 @@
     </div>
     <nav class="toolbar" aria-label="Ferramentas principais">
       <button id="homeBtn" class="tool-button" title="Ver Niterói" hidden><span aria-hidden="true">⌂</span> Ver Niterói</button>
-      <button id="locateBtn" class="tool-button" title="Minha localização"><span aria-hidden="true">◎</span> Minha localização</button>
+      <button id="headerSearchBtn" class="tool-button" aria-controls="searchMirror"><span aria-hidden="true">⌕</span> Buscar</button>
       <button id="layersBtn" class="tool-button active" aria-controls="panel" aria-expanded="true"><span aria-hidden="true">☷</span> Camadas</button>
       <button id="consultBtn" class="tool-button" aria-pressed="false"><span aria-hidden="true">ⓘ</span> Consultar</button>
+      <button id="locateBtn" class="tool-button" title="Minha localização"><span aria-hidden="true">◎</span> Minha localização</button>
     </nav>
     <div class="header-end"><span class="pilot-chip"><span aria-hidden="true">●</span> Piloto Niterói/RJ</span>
       <div class="more-wrap">
         <button id="moreBtn" class="tool-button" aria-expanded="false" aria-controls="moreMenu"><span aria-hidden="true">•••</span> Mais</button>
         <div id="moreMenu" class="more-menu" hidden>
           <button id="menuHome"><span aria-hidden="true">⌂</span> Ver Niterói</button>
+          <button id="menuLocate" class="menu-location">Minha localização</button>
           <button id="measureBtn"><span aria-hidden="true">📏</span> Medir</button>
           <button id="editBtn"><span aria-hidden="true">✎</span> Editar mapa</button>
           <button id="legendBtn">Legenda</button>
           <button id="shareSelectionBtn" disabled>Compartilhar seleção</button>
+          <button id="menuReport" disabled>Gerar relatório</button>
+          <button id="helpBtn">Ajuda</button>
+          <button id="methodBtn">Metodologia</button>
           <button id="sourcesBtn">Fontes</button>
           <button id="clearSelectionBtn">Limpar seleção</button>
           <button id="aboutBtn"><span aria-hidden="true">i</span> Sobre o projeto</button>
@@ -72,6 +78,7 @@
     <section class="mapwrap" aria-label="Área cartográfica">
       <div id="map" aria-label="Mapa interativo de Niterói"></div>
       <div class="floating-search" role="search"><span class="search-icon" aria-hidden="true">⌕</span><input id="searchMirror" type="search" placeholder="Bairro, rua ou coordenada" aria-label="Bairro, rua ou coordenada" aria-describedby="searchHint" enterkeyhint="search" /><button id="searchMirrorBtn">Buscar</button></div>
+      <section id="placeResults" class="place-results" aria-label="Resultados da busca territorial" aria-live="polite" hidden></section>
       <div class="edge-tools"><button id="togglePanel" aria-label="Abrir camadas" aria-controls="panel" aria-expanded="true" title="Camadas">☷</button></div>
       <div id="mapStatus" class="map-status"><span class="status-dot" aria-hidden="true"></span><div><strong id="activeBaseLabel">Foto Aérea 2019</strong><small id="statusMessage">Carregando base cartográfica…</small></div></div>
       <div id="coords" class="coords">Ative Consultar para investigar um local</div>
@@ -85,7 +92,7 @@
   <dialog id="layerInfo" aria-labelledby="infoTitle"><button id="closeInfo" class="close-btn" aria-label="Fechar informações">×</button><div id="infoBody"></div></dialog>
   <dialog id="confirmAction" aria-labelledby="confirmTitle"><h2 id="confirmTitle">Confirmar ação</h2><p id="confirmText"></p><div class="dialog-actions"><button id="confirmCancel">Cancelar</button><button id="confirmAccept">Confirmar</button></div></dialog>
   <dialog id="workFormDialog" aria-labelledby="workFormTitle"><h2 id="workFormTitle">Feição de trabalho</h2><form id="workForm"><label>Título<input name="titulo" required maxlength="160" /></label><label>Categoria<input name="categoria" maxlength="160" /></label><label>Descrição<textarea name="descricao" maxlength="2000"></textarea></label><label>Data<input name="data" type="date" /></label><label>Status<select name="status"><option>Rascunho</option><option>Em análise</option><option>Concluído</option></select></label><label>Prioridade<select name="prioridade"><option>Não definida</option><option>Baixa</option><option>Média</option><option>Alta</option></select></label><label>Fonte<input name="source" maxlength="160" placeholder="Informe a origem da anotação" /></label><label>Observações<textarea name="observacoes" maxlength="2000"></textarea></label><div class="dialog-actions"><button id="cancelWorkForm" type="button">Cancelar</button><button type="submit">Aplicar à camada de trabalho</button></div></form></dialog>
-  <dialog id="shareDialog" aria-labelledby="shareTitle"><h2 id="shareTitle">Compartilhar seleção</h2><p>Link com as coordenadas e o zoom da seleção.</p><input id="selectionLink" readonly aria-label="Link da seleção" /><img id="selectionQR" alt="QR Code para abrir a seleção no ARPIAS360" /><div class="dialog-actions"><button id="copySelectionLink">Copiar link</button><button id="closeShare">Fechar</button></div></dialog>
+  <dialog id="shareDialog" aria-labelledby="shareTitle"><h2 id="shareTitle">Compartilhar seleção</h2><p id="shareHint">Link com as coordenadas e o zoom da seleção.</p><input id="selectionLink" readonly aria-label="Link da seleção" /><img id="selectionQR" alt="QR Code para abrir a seleção no ARPIAS360" /><div class="dialog-actions"><button id="copySelectionLink">Copiar link</button><button id="closeShare">Fechar</button></div></dialog>
   <dialog id="technicalReport" aria-labelledby="reportTitle"><header class="report-controls"><h2 id="reportTitle">Relatório técnico</h2><button id="printReport">Imprimir / Salvar como PDF</button><button id="closeReport" aria-label="Fechar relatório">×</button></header><article id="reportBody"></article></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
@@ -97,6 +104,7 @@
   <script src="js/vendor/qr.js"></script>
   <script src="js/geometry.js"></script>
   <script src="js/workspace.js"></script>
+  <script src="js/search.js"></script>
   <script src="js/app.js?v=20261001-noturno"></script>
   <script src="js/reference-labels.js"></script>
   <script src="js/tools.js"></script>

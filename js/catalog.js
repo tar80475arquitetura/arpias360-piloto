@@ -15,7 +15,7 @@
     return catalog;
   }
   function matches(item,group,query){
-    const text=normalize([item.name,group.title,...(item.keywords||[]),...(['market','cadastre'].includes(group.id)?['imóvel','imóveis']:[])].join(' '));
+    const text=normalize([item.name,group.title,...(item.keywords||[]),...(item.control==='layer_appm'?['APP','proteção permanente']:[]),...(['market','cadastre'].includes(group.id)?['imóvel','imóveis']:[])].join(' '));
     return normalize(query).split(/\s+/).every(word=>text.includes(word));
   }
   const api={normalize,validate,matches};

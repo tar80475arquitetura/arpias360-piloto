@@ -1,0 +1,20 @@
+/* Compact controls keep the map dominant without shrinking reading text. */
+:root{--header-height:72px;--panel-width:332px}
+.topbar{gap:12px;padding:0 16px}.tool-button{min-height:44px;padding:7px 10px}.brand-copy h1{font-size:24px}.brand-subtitle{max-width:265px}
+.floating-search{height:46px;width:min(460px,calc(100% - 120px));top:12px}.floating-search button{min-height:44px}.floating-search .search-icon{width:34px}.floating-search input{font-size:16px}
+.territorial-panel{width:320px}.has-territorial .mapwrap{right:320px}.territorial-body{padding:14px}.popup-actions a,.popup-actions button{min-height:44px;padding:8px 10px}.tool-panel{top:70px;padding:12px 14px}.tool-panel p{margin:5px 0}
+.place-results{position:absolute;top:64px;left:50%;transform:translateX(-50%);width:min(460px,calc(100% - 120px));max-height:min(340px,60%);overflow:auto;background:#fff;border:1px solid #a3b5a6;box-shadow:var(--shadow);border-radius:8px;padding:12px;z-index:1300;color:var(--ink)}
+.place-results p{font-size:15px;margin:0 0 8px}.place-results button{display:block;width:100%;min-height:44px;text-align:left;border:0;border-top:1px solid var(--line);background:#fff;color:var(--ink);font-size:16px;padding:8px}.place-results button:hover{background:var(--territory-soft)}
+.selection-secondary{margin-top:10px;border-top:1px solid var(--line);padding-top:6px}.selection-secondary summary{min-height:44px;display:flex;align-items:center;font-size:15px;font-weight:600;cursor:pointer}.selection-secondary summary::before{content:'＋';margin-right:8px}.selection-secondary[open] summary::before{content:'−'}
+.more-menu{max-height:calc(100dvh - 90px);overflow:auto}.menu-location{display:none!important}
+@media(min-width:600px) and (max-width:1199px){#locateBtn{display:none}.menu-location{display:flex!important}.pilot-chip{display:none}.topbar{gap:8px}.brand-block{max-width:245px}.brand-subtitle{max-width:220px;font-size:13px}.tool-button{padding:7px}.has-territorial .mapwrap{right:0}.territorial-panel{width:320px}}
+@media(max-width:599px){
+  :root{--header-height:108px}
+  .topbar{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:44px 44px;gap:2px 8px;padding:6px 12px}
+  .brand-block{max-width:none;min-width:0;gap:8px}.brand-mark{width:32px;height:32px}.brand-copy h1{font-size:23px}.brand-copy{min-width:0}.mobile-pilot{font-size:13px}
+  .header-end{grid-column:2;grid-row:1}.toolbar{display:flex;grid-column:1/-1;grid-row:2;width:100%;gap:4px}.toolbar .tool-button{flex:1;min-width:0;font-size:15px;padding:6px 4px;gap:5px}#locateBtn{display:none}.menu-location{display:flex!important}
+  .floating-search{height:46px;left:12px;right:12px;width:auto;transform:none;top:10px}.floating-search button{padding:0 12px}.place-results{top:62px;left:12px;right:12px;width:auto;transform:none;max-height:45dvh}
+  .mobile-actions{left:auto;right:12px;bottom:12px;width:160px}.mobile-actions #mobileLayersBtn,.mobile-actions #mobileConsultBtn{display:none}.mobile-actions #mobileLocateBtn{min-height:44px;flex-direction:row;font-size:15px;padding:6px;gap:6px}.map-status{bottom:16px;max-width:190px}.map-status[data-state="Indisponível"]{bottom:66px}.toast{bottom:66px}
+  .query-sheet:not([hidden]){max-height:52dvh}.query-body{padding:12px 14px 16px}.query-body .popup-actions a,.query-body .popup-actions button{min-height:44px;padding:7px 8px}.territorial-panel{width:100%;max-height:62dvh}.territorial-body{padding:12px 14px}.has-territorial .mapwrap{right:0}.tool-panel{top:66px;padding:10px 12px}.tool-panel .tool-actions button{min-width:100px}.more-menu{max-height:calc(100dvh - 72px)}
+}
+@media(max-width:359px){.brand-copy h1{font-size:22px}.topbar{padding-left:10px;padding-right:10px}}

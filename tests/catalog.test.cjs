@@ -8,6 +8,7 @@ test('catalog has all thirteen non-empty thematic groups and valid source refere
   assert.deepEqual(catalog.groups.map(g=>g.id),['base','risk','territory','planning','environment','climate','market','security','social','infrastructure','cadastre','disaster','fragility']);
 });
 const search=query=>catalog.groups.flatMap(g=>g.items.filter(i=>api.matches(i,g,query)).map(i=>i.name));
+test('APP acronym finds the existing permanent-preservation control without fabricating a layer',()=>assert.ok(search('APP').includes('Áreas de Preservação Permanente')));
 test('layer search supports accents, thematic groups and required synonyms',()=>{
   for(const [query,names] of [['sirene',['Sirenes de Alerta']],['chuva',['Rede Municipal de Pluviometria','Cemaden','Precipitação']],['lote',['Lotes Cadastrais']],['ITBI',['Transações Imobiliárias / ITBI 2020','Transações Imobiliárias / ITBI 2025']],['seguranca',['Delegacias','Indicadores ISP']],['curva',['Curvas de Nível']],['alag',['Áreas Alagáveis','Ocorrências de Inundação e Alagamento']]]){
     const found=search(query);names.forEach(name=>assert.ok(found.includes(name),`${query}: ${name}`));
