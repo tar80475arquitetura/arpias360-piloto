@@ -36,6 +36,7 @@
     'Camada de trabalho':{titulo:'Título',categoria:'Categoria',descricao:'Descrição',data:'Data',status:'Status',prioridade:'Prioridade',source:'Fonte',observacoes:'Observações'}
   };
   const normalize=key=>key.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
+  function publicProperties(properties={}){const keys=new Set(Object.values(groups).flatMap(g=>Object.keys(g).map(normalize)));return Object.fromEntries(Object.entries(properties).filter(([key,value])=>keys.has(normalize(key))&&['string','number','boolean'].includes(typeof value)));}
   function publicAttributes(properties={}){
     const values=new Map(Object.entries(properties).map(([key,value])=>[normalize(key),value]));
     return Object.entries(groups).map(([title,fields])=>({title,rows:Object.entries(fields).flatMap(([key,label])=>{
@@ -46,6 +47,6 @@
     const quote=value=>'"'+String(value??'').replace(/^[=+@\-\t\r]/,"'$&").replace(/"/g,'""')+'"';
     return [['Título','Categoria','Tipo','Latitude de referência','Longitude de referência','Área (m²)','Perímetro (m)','Comprimento (m)'],...collection.features.map(feature=>{const m=metrics(feature);return [feature.properties.titulo,feature.properties.categoria,m.type,m.lat,m.lon,m.area??'',m.perimeter??'',m.length??''];})].map(row=>row.map(quote).join(',')).join('\r\n');
   }
-  const api={validPosition,validateGeometry,metrics,distance,publicAttributes,csv};
+  const api={validPosition,validateGeometry,metrics,distance,publicProperties,publicAttributes,csv};
   if(typeof module==='object'&&module.exports)module.exports=api;else root.ARPIASGeometry=api;
 })(typeof window==='object'?window:globalThis);

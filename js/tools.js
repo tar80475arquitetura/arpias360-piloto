@@ -9,7 +9,7 @@ const ARPIASUI=(()=>{
   const workGroup=L.featureGroup().addTo(map);
   const measureGroup=L.featureGroup().addTo(map);
   let mode='navigate',changing=false,dirty=false,backup=null,backupTrash=[],handler=null,editing=null;
-  let selection=null,selectionLayer=null,generation=0,pending=null,trash=[];
+  let selection=null,selectionLayer=null,generation=0,pending=null,trash=[],queryLayer=null;
   let vertexCount=0,currentDrawType=null;
   const format=new Intl.NumberFormat('pt-BR',{maximumFractionDigits:2});
   const distanceLabel=value=>value>=1000?`${format.format(value/1000)} km`:`${format.format(value)} m`;
@@ -24,11 +24,11 @@ const ARPIASUI=(()=>{
       byId('confirmAccept').addEventListener('click',yes);byId('confirmCancel').addEventListener('click',no);dialog.addEventListener('cancel',cancel);dialog.showModal();
     });
   }
-  function serialize(){return {type:'FeatureCollection',features:workGroup.getLayers().map(layer=>ARPIASWork.sanitizeFeature(layer.toGeoJSON()))};}
+  function serialize(){return {type:'FeatureCollection',features:workGroup.getLayers().map(layer=>ARPIASWork.sanitizeFeature(layer.toGeoJSON(false)))};}
   function workLayer(feature){
     let result;
-    L.geoJSON(feature,{style:{color:'#705484',weight:3,fillColor:'#b59bc8',fillOpacity:.16},pointToLayer:(f,ll)=>L.marker(ll,{icon:L.divIcon({className:'work-point',html:'✎',iconSize:[28,28],iconAnchor:[14,14]}),bubblingMouseEvents:false}),onEachFeature:(f,layer)=>{
-      layer.on('click',e=>{if(mode==='consult'){const actual=layer.toGeoJSON();select(actual,actual.properties.titulo,{source:actual.properties.source||'Camada de trabalho do usuário',work:true},e.latlng);}});result=layer;
+    L.geoJSON(feature,{renderer:cartographicRenderer,style:ARPIASCartography.style('work'),pointToLayer:(f,ll)=>L.marker(ll,{icon:L.divIcon({className:'work-point',html:'✎',iconSize:[28,28],iconAnchor:[14,14]}),bubblingMouseEvents:false}),onEachFeature:(f,layer)=>{
+      layer.on('click',e=>{if(mode==='consult')query(e.latlng);});result=layer;
     }});
     return result;
   }
@@ -40,18 +40,21 @@ const ARPIASUI=(()=>{
     try{
       if(mode==='edit'&&dirty){if(!await confirm('Há alterações não salvas. Deseja descartá-las e encerrar a edição?','Descartar e sair'))return false;stopHandler();trash=JSON.parse(JSON.stringify(backupTrash));restore(backup);dirty=false;}
       if(next==='edit'&&!await confirm('Deseja iniciar uma camada de trabalho? As bases oficiais permanecem somente para leitura.','Iniciar edição'))return false;
-      stopHandler();if(mode==='consult')clearSelection();closeTerritorial();map.closePopup();closeMore();closeLayers();placeResults.hidden=true;
-      mode=next;if(next==='edit'){backup=serialize();backupTrash=JSON.parse(JSON.stringify(trash));}
+      stopHandler();if(mode==='consult'||next==='consult')clearSelection();closeTerritorial();map.closePopup();closeMore();closeLayers();placeResults.hidden=true;
+      mode=next;queryLayer=null;byId('queryLayer').value='';byId('consultControls').hidden=next!=='consult';shell.classList.toggle('consult-active',next==='consult');if(next==='edit'){backup=serialize();backupTrash=JSON.parse(JSON.stringify(trash));}
+      byId('toolPanel').classList.remove('collapsed');byId('collapseTool').setAttribute('aria-expanded','true');byId('collapseTool').textContent='−';
       byId('toolPanel').hidden=next==='navigate';byId('measureControls').hidden=next!=='measure';byId('editControls').hidden=next!=='edit';
       ['measureDistance','measureArea','clearMeasure'].forEach(id=>byId(id).hidden=false);
-      byId('toolTitle').textContent=next==='consult'?'Consultar':next==='measure'?'Medir':'Editar camada de trabalho';
-      byId('toolHint').textContent=next==='consult'?'Consulta ativada. Clique ou toque no local que deseja investigar.':next==='measure'?'Escolha distância ou área; marque os vértices no mapa.':'Desenhe ou ajuste suas feições. Nenhuma base oficial é editável.';
+      byId('toolTitle').textContent=next==='consult'?'Consultar no mapa':next==='measure'?'Medir':'Editar camada de trabalho';
+      byId('toolHint').textContent=next==='consult'?queryInstruction():next==='measure'?'Escolha distância ou área; marque os vértices no mapa.':'Desenhe ou ajuste suas feições. Nenhuma base oficial é editável.';
       byId('toolResult').textContent='';byId('keepMeasure').hidden=true;
       shell.classList.toggle('has-tool',next!=='navigate');
       ['consultBtn','mobileConsultBtn'].forEach(id=>{byId(id).classList.toggle('active',next==='consult');byId(id).setAttribute('aria-pressed',String(next==='consult'));});
+      [['measureBtn','measure'],['editBtn','edit']].forEach(([id,state])=>{byId(id).classList.toggle('active',next===state);byId(id).setAttribute('aria-pressed',String(next===state));});byId('toolPanel').dataset.mode=next;
       return true;
     }finally{changing=false;}
   }
+  byId('collapseTool').addEventListener('click',()=>{const collapsed=byId('toolPanel').classList.toggle('collapsed');byId('collapseTool').setAttribute('aria-expanded',String(!collapsed));byId('collapseTool').setAttribute('aria-label',collapsed?'Expandir ferramenta':'Recolher ferramenta');byId('collapseTool').textContent=collapsed?'+':'−';});
   function measurementRows(m){
     const rows=[['Geometria',m.type==='Point'?'Ponto':/Polygon/.test(m.type)?'Polígono':'Linha'],['Latitude de referência',m.lat.toFixed(6)],['Longitude de referência',m.lon.toFixed(6)]];
     if(m.area!==undefined)rows.push(['Área geográfica estimada',areaLabel(m.area)],['Perímetro',distanceLabel(m.perimeter)]);
@@ -62,17 +65,19 @@ const ARPIASUI=(()=>{
     let m;try{m=geo.metrics(feature);}catch(error){toast('Não foi possível validar a geometria selecionada.');return;}
     clearSelection();const token=++generation;
     selection={feature:JSON.parse(JSON.stringify(feature)),title,meta,metrics:m,ref:L.latLng(m.lat,m.lon),context:{},token};
-    selectionLayer=L.geoJSON(feature,{style:{color:'#9b661a',weight:3,fillColor:'#e9ad38',fillOpacity:.3},pointToLayer:(f,ll)=>L.circleMarker(ll,{radius:7,color:'#203e36',weight:3,fillColor:'#e9ad38',fillOpacity:1,renderer:pointRenderer}),interactive:false}).addTo(map);
+    const selectedStyle=ARPIASCartography.selectionStyle(meta,m.type);
+    selectionLayer=L.geoJSON(feature,{renderer:cartographicRenderer,style:selectedStyle,pointToLayer:(f,ll)=>L.circleMarker(ll,{...selectedStyle,renderer:pointRenderer}),interactive:false}).addTo(map);
     byId('shareSelectionBtn').disabled=false;byId('menuReport').disabled=false;byId('coords').textContent=`${m.lat.toFixed(6)}, ${m.lon.toFixed(6)}`;
     summary();resolveContext(selection);return selection;
   }
   function summary(){
     if(!selection)return;
-    const s=selection;const rows=[];
+    const s=selection;const rows=[];if(s.meta.layerId)rows.push(['Camada',[...overlayDefs,...civilDefs].find(d=>d.id===s.meta.layerId)?.name||s.meta.layerId]);
     if(s.context.bairro)rows.push(['Bairro',s.context.bairro]);
     if(s.metrics.area!==undefined)rows.push(['Área estimada',areaLabel(s.metrics.area)]);
     rows.push(['Coordenadas',`${s.metrics.lat.toFixed(6)}, ${s.metrics.lon.toFixed(6)}`]);
     const box=content(s.title,rows);
+    box.prepend(element('p',s.meta.origin==='search'?'⌕ Resultado da busca · contorno tracejado':'◇ Seleção de consulta · contorno contínuo','selection-state'));
     if(civilDefs.some(d=>d.id===s.meta.layerId))box.append(element('p','Cadastro de localização; não confirma operação atual.','popup-note'));
     const controls=element('div',undefined,'popup-actions selection-actions');
     controls.append(action('ⓘ Informações',showTerritorial),action('◎ Coordenadas',()=>{
@@ -102,32 +107,43 @@ const ARPIASUI=(()=>{
     const typing=document.activeElement?.matches('input,textarea');
     if(currentPopup&&!typing)summary();if(!byId('territorialPanel').hidden&&!typing)showTerritorial();
   }
-  async function query(latlng){
-    if(mode!=='consult')return;
-    const token=++generation;
-    let lotUnavailable=false;
-    if(map.getZoom()>=16){
-      byId('toolHint').textContent='Consultando o cadastro público neste local…';
-      const lots=await queryService(URLS.lotes,latlng);if(mode!=='consult'||token!==generation)return;
-      lotUnavailable=lots===null;
-      if(lots?.[0]){select(lots[0],'Lote selecionado',{source:'Prefeitura Municipal de Niterói / GeoNit',layerId:'lotes'},latlng);byId('toolHint').textContent='Lote selecionado. Abra Informações para consultar os campos públicos disponíveis.';return;}
+  function queryInstruction(){return !queryLayer?'Escolha uma camada para consultar.':queryLayer==='bairros'?'Clique no mapa para selecionar um bairro.':`Clique no mapa para consultar ${[...overlayDefs,...civilDefs].find(d=>d.id===queryLayer)?.name||'a camada escolhida'}.`;}
+  const querySelect=byId('queryLayer');
+  [...overlayDefs,...civilDefs].forEach(d=>{const option=document.createElement('option');option.value=d.id;option.textContent=d.name;querySelect.append(option);});
+  querySelect.addEventListener('change',()=>{clearSelection();queryLayer=querySelect.value||null;byId('toolHint').textContent=queryInstruction();});
+  async function query(latlng,hit){
+    if(mode!=='consult'||!queryLayer)return;
+    clearSelection();const token=++generation,id=queryLayer;
+    const definition=[...overlayDefs,...civilDefs].find(d=>d.id===id);if(!definition)return;
+    if(id==='lotes'&&map.getZoom()<16){byId('toolHint').textContent='Aproxime o mapa para consultar lotes (zoom 16 ou maior).';return;}
+    byId('toolHint').textContent='Consultando a camada escolhida…';
+    let features;
+    if(hit?.layerId===id&&hit.feature)features=[hit.feature];
+    else if(civilDefs.includes(definition)){
+      const layer=await loadCivil(definition);
+      features=layer?layer.toGeoJSON(false).features.filter(f=>map.latLngToContainerPoint(L.latLng(f.geometry.coordinates[1],f.geometry.coordinates[0])).distanceTo(map.latLngToContainerPoint(latlng))<=22).sort((a,b)=>map.distance(latlng,L.latLng(a.geometry.coordinates[1],a.geometry.coordinates[0]))-map.distance(latlng,L.latLng(b.geometry.coordinates[1],b.geometry.coordinates[0]))):null;
+    }else{
+      const location=id==='hidro'?L.latLngBounds(map.containerPointToLatLng(map.latLngToContainerPoint(latlng).subtract([8,8])),map.containerPointToLatLng(map.latLngToContainerPoint(latlng).add([8,8]))):latlng;
+      features=await queryService(URLS[id],location);
     }
-    select({type:'Feature',geometry:{type:'Point',coordinates:[latlng.lng,latlng.lat]},properties:{}},'Local selecionado',{},latlng);
-    const message=map.getZoom()<16?'Local selecionado. Aproxime o mapa para consultar lotes (zoom 16 ou maior).':lotUnavailable?'Consulta de lotes temporariamente indisponível. O ponto foi selecionado; tente consultar novamente mais tarde.':'Local selecionado. O cadastro consultado não retornou lote neste ponto.';
-    byId('toolHint').textContent=message;
-    if(lotUnavailable)toast(message);
+    if(mode!=='consult'||queryLayer!==id||token!==generation)return;
+    if(!features?.length){byId('toolHint').textContent=features===null?'Consulta temporariamente indisponível. Tente novamente.':'Nenhuma feição da camada escolhida encontrada neste local.';return;}
+    const feature=features[0];select(feature,feature.properties.nome||feature.properties.tx_nome||definition.name,{layerId:id,source:civilDefs.includes(definition)?'Prefeitura de Niterói / GeoNit / Defesa Civil':'Prefeitura Municipal de Niterói / GeoNit'},latlng);
+    showTerritorial();
   }
-  function closeTerritorial(){byId('territorialPanel').hidden=true;shell.classList.remove('has-territorial');scheduleResize();}
+  function closeTerritorial(){byId('territorialPanel').hidden=true;if(mode==='consult'){byId('toolPanel').hidden=false;byId('toolHint').textContent=queryInstruction();}shell.classList.remove('has-territorial');scheduleResize();}
   function showTerritorial(){
     if(!selection)return;const s=selection;
     const body=byId('territorialBody');body.replaceChildren(content(s.title,measurementRows(s.metrics),'Área, perímetro e comprimento são estimativas geográficas. Centroide de polígonos calculado por centro de massa (Turf), com ponderação por área nas geometrias multipartes.'));
     body.append(content('Identificação territorial',[
-      ['Município',s.context.municipio||'Não confirmado · projeto piloto Niterói/RJ'],['Bairro',s.context.bairro||'Não identificado no ponto de referência'],['Região administrativa',s.context.regiao||'Não identificada no ponto de referência'],['Inscrição municipal','Dado ainda não integrado'],['Identificador ARPIAS','Integração futura'],['Fonte da seleção',s.meta.source||'Coordenadas informadas pelo usuário']
+      ['Município',s.context.municipio||'Não confirmado · projeto piloto Niterói/RJ'],['Bairro',s.context.bairro||'Não identificado no ponto de referência'],['Região administrativa',s.context.regiao||'Não identificada no ponto de referência'],['Inscrição municipal','Dado ainda não integrado'],['Identificador ARPIAS','Integração futura'],['Camada consultada',[...overlayDefs,...civilDefs].find(d=>d.id===s.meta.layerId)?.name||'Busca / seleção explícita'],['Fonte da seleção',s.meta.source||'Coordenadas informadas pelo usuário']
     ]));
     geo.publicAttributes(s.feature.properties).forEach(group=>{const detail=element('details',undefined,'attribute-group');detail.append(element('summary',group.title),content('',group.rows));body.append(detail);});
     if(civilDefs.some(d=>d.id===s.meta.layerId))body.append(element('p','Cadastro de localização. Sem confirmação de operação, abertura ou leitura pluviométrica atual. Pluviômetros municipais não são a rede Cemaden.','popup-note'));
+    if(['lotes','logradouros'].includes(s.meta.layerId)&&['Polygon','LineString'].includes(s.feature.geometry.type))body.append(action('Criar cópia de trabalho',async()=>{const original=JSON.parse(JSON.stringify(s.feature)),layerId=s.meta.layerId,source=s.meta.source;if(!await request('edit'))return;try{workGroup.addLayer(workLayer(ARPIASWork.copyOfficial(original,layerId,source)));dirty=true;renderWork();byId('toolHint').textContent='Você está editando uma cópia de trabalho. A camada oficial não será alterada.';}catch(error){toast(error.message);}},'quiet-button'));
+    if(s.meta.work)body.append(element('p','Geometria de trabalho / não oficial. Referência original: '+(s.feature.arpiasOrigin?`${s.feature.arpiasOrigin.layer} · ${s.feature.arpiasOrigin.id}`:'Desenho do usuário'),'popup-note'));
     coordinateActions(body,s.ref);body.append(action('Gerar ficha técnica',()=>ARPIASReport.generate(),'quiet-button'));
-    map.closePopup();byId('territorialPanel').hidden=false;shell.classList.add('has-territorial');scheduleResize();byId('closeTerritorial').focus({preventScroll:true});
+    map.closePopup();byId('territorialPanel').hidden=false;byId('toolPanel').hidden=true;shell.classList.add('has-territorial');scheduleResize();byId('closeTerritorial').focus({preventScroll:true});
   }
   function fitSelection(){if(!selection)return;closeTerritorial();map.closePopup();const bounds=selectionLayer.getBounds();if(selection.metrics.type==='Point')map.setView(selection.ref,Math.min(17,map.getMaxZoom()));else map.fitBounds(bounds,{padding:[40,40],maxZoom:18});}
   async function share(){
@@ -138,7 +154,7 @@ const ARPIASUI=(()=>{
   function draw(type){
     if(!['edit','measure'].includes(mode))return;stopHandler();
     vertexCount=0;currentDrawType=type;
-    const options={shapeOptions:{color:mode==='edit'?'#705484':'#9b661a',weight:3,fillOpacity:.16},allowIntersection:false,showArea:false};
+    const options={shapeOptions:{...ARPIASCartography.style(mode==='edit'?'work':'measure'),renderer:cartographicRenderer},allowIntersection:false,showArea:false};
     handler=type==='point'?new L.Draw.Marker(map,{icon:L.divIcon({className:'work-point',html:'✎',iconSize:[28,28],iconAnchor:[14,14]})}):type==='line'?new L.Draw.Polyline(map,options):new L.Draw.Polygon(map,options);
     handler.enable();byId('finishDrawing').hidden=type==='point';
     // The same explicit finish action is available during editing.
@@ -157,9 +173,9 @@ const ARPIASUI=(()=>{
     e.preventDefault();if(!pending)return;
     const p=Object.fromEntries(new FormData(e.target).entries());
     try{
-      const feature=ARPIASWork.sanitizeFeature({...pending.layer.toGeoJSON(),properties:p});
-      pending.layer.feature=feature;
-      if(pending.isNew){map.removeLayer(pending.layer);workGroup.addLayer(workLayer(feature));}
+      const feature=ARPIASWork.sanitizeFeature({...pending.layer.toGeoJSON(false),properties:p});feature.arpiasOrigin=pending.layer.feature?.arpiasOrigin;feature.arpiasHistory=pending.layer.feature?.arpiasHistory;const recorded=ARPIASWork.record(feature,pending.isNew?'creation':'edit');
+      pending.layer.feature=recorded;
+      if(pending.isNew){map.removeLayer(pending.layer);workGroup.addLayer(workLayer(recorded));}
       dirty=true;pending=null;byId('workFormDialog').close();renderWork();byId('toolResult').textContent='Alteração aplicada. Salve neste dispositivo para persistir.';
     }catch(error){toast(error.message);}
   });
@@ -167,7 +183,7 @@ const ARPIASUI=(()=>{
   map.on('draw:created',e=>{
     handler=null;byId('finishDrawing').hidden=true;
     if(mode==='measure'){
-      const m=geo.metrics(e.layer.toGeoJSON());measureGroup.addLayer(e.layer);byId('toolResult').textContent=m.area!==undefined?`Área: ${areaLabel(m.area)} · perímetro: ${distanceLabel(m.perimeter)}`:`Distância: ${distanceLabel(m.length)}`;e.layer.bindTooltip(element('span',byId('toolResult').textContent),{permanent:true,direction:'center',className:'measurement-label'});byId('keepMeasure').hidden=false;
+      const m=geo.metrics(e.layer.toGeoJSON(false));measureGroup.addLayer(e.layer);byId('toolResult').textContent=m.area!==undefined?`Área: ${areaLabel(m.area)} · perímetro: ${distanceLabel(m.perimeter)}`:`Distância: ${distanceLabel(m.length)}`;e.layer.bindTooltip(element('span',byId('toolResult').textContent),{permanent:true,direction:'center',className:'measurement-label'});byId('keepMeasure').hidden=false;
     }else if(mode==='edit'){e.layer.addTo(map);openForm(e.layer,true);byId('measureControls').hidden=true;}
   });
   map.on('draw:drawstop',()=>{byId('finishDrawing').hidden=true;});
@@ -180,52 +196,56 @@ const ARPIASUI=(()=>{
       const label=element('label');const visible=element('input');visible.type='checkbox';visible.checked=map.hasLayer(layer);visible.setAttribute('aria-label',`Exibir ${p.titulo}`);
       visible.addEventListener('change',()=>{if(visible.checked)layer.addTo(map);else map.removeLayer(layer);});label.append(visible,element('strong',p.titulo));row.append(label);
       row.append(element('small',`Camada de trabalho · ${p.categoria||'Sem categoria'}`));
-      row.append(action('Consultar',()=>select(layer.toGeoJSON(),p.titulo,{source:p.source||'Camada de trabalho do usuário',work:true})),action('Renomear / editar atributos',async()=>{if(await request('edit'))openForm(layer,false);}),action('Excluir',async()=>{
+      row.append(action('Consultar',()=>select(layer.toGeoJSON(false),p.titulo,{source:p.source||'Camada de trabalho do usuário',work:true})),action('Renomear / editar atributos',async()=>{if(await request('edit'))openForm(layer,false);}),action('Excluir',async()=>{
         if(!await request('edit'))return;if(!await confirm(`Excluir a feição de trabalho “${p.titulo}”? Ela poderá ser restaurada.`, 'Excluir feição'))return;
-        trash.push(ARPIASWork.sanitizeFeature(layer.toGeoJSON()));workGroup.removeLayer(layer);map.removeLayer(layer);dirty=true;renderWork();
-      }));list.append(row);
+        trash.push(ARPIASWork.record(layer.toGeoJSON(false),'delete'));workGroup.removeLayer(layer);map.removeLayer(layer);dirty=true;renderWork();
+      }));if(layer.feature?.arpiasOrigin)row.append(action('Restaurar geometria original',async()=>{if(!await request('edit'))return;const original=ARPIASWork.restoreOriginal(layer.toGeoJSON(false));workGroup.removeLayer(layer);map.removeLayer(layer);workGroup.addLayer(workLayer(original));dirty=true;renderWork();}));list.append(row);
     });
   }
   function download(name,text,type){const a=element('a');a.download=name;a.href=URL.createObjectURL(new Blob([text],{type}));a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
   byId('workExportGeo').addEventListener('click',()=>download('arpias360-camadas-trabalho.geojson',JSON.stringify(serialize(),null,2),'application/geo+json'));
   byId('workExportCSV').addEventListener('click',()=>download('arpias360-camadas-trabalho.csv','\uFEFF'+geo.csv(serialize()),'text/csv;charset=utf-8'));
-  byId('restoreWork').addEventListener('click',async()=>{if(trash.length&&await request('edit')){workGroup.addLayer(workLayer(trash.pop()));dirty=true;renderWork();}});
+  byId('restoreWork').addEventListener('click',async()=>{if(trash.length&&await request('edit')){workGroup.addLayer(workLayer(ARPIASWork.record(trash.pop(),'restore')));dirty=true;renderWork();}});
   byId('saveWork').addEventListener('click',()=>{
-    try{if(editing){editing.save();editing.disable();editing=null;byId('finishGeometry').hidden=true;}
+    try{if(editing){editing.save();editing.disable();editing=null;workGroup.eachLayer(layer=>{layer.feature=ARPIASWork.record(layer.toGeoJSON(false),'edit');});byId('finishGeometry').hidden=true;}
       localStorage.setItem('arpias360.workspace.trash.v1',JSON.stringify({type:'FeatureCollection',features:trash}));ARPIASWork.save(localStorage,serialize());dirty=false;backup=serialize();backupTrash=JSON.parse(JSON.stringify(trash));byId('toolResult').textContent='Dados salvos neste dispositivo.';toast('Dados salvos neste dispositivo.');
     }catch(error){toast('Não foi possível salvar neste dispositivo. Exporte suas camadas para preservar o trabalho.');}
   });
   byId('editGeometry').addEventListener('click',()=>{
     if(mode!=='edit'||!workGroup.getLayers().length){toast('Crie uma feição de trabalho antes de editar vértices.');return;}stopHandler();
     workGroup.eachLayer(layer=>{if(!map.hasLayer(layer))layer.addTo(map);});
-    editing=new L.EditToolbar.Edit(map,{featureGroup:workGroup,selectedPathOptions:{color:'#9b661a',weight:3,fillOpacity:.25}});editing.enable();byId('finishGeometry').hidden=false;byId('toolHint').textContent='Arraste os vértices ou pontos das suas camadas de trabalho. Bases oficiais protegidas.';
+    editing=new L.EditToolbar.Edit(map,{featureGroup:workGroup,selectedPathOptions:ARPIASCartography.style('editing')});editing.enable();byId('finishGeometry').hidden=false;byId('toolHint').textContent='Arraste os vértices ou pontos das suas camadas de trabalho. Bases oficiais protegidas.';
   });
-  byId('finishGeometry').addEventListener('click',()=>{if(editing){editing.save();editing.disable();editing=null;dirty=true;renderWork();byId('finishGeometry').hidden=true;}});
+  byId('finishGeometry').addEventListener('click',()=>{if(editing){editing.save();editing.disable();editing=null;workGroup.eachLayer(layer=>{layer.feature=ARPIASWork.record(layer.toGeoJSON(false),'edit');});dirty=true;renderWork();byId('finishGeometry').hidden=true;}});
   byId('cancelWork').addEventListener('click',()=>request('navigate'));
   ['consultBtn','mobileConsultBtn'].forEach(id=>byId(id).addEventListener('click',()=>request(mode==='consult'?'navigate':'consult')));
   byId('measureBtn').addEventListener('click',()=>request('measure'));byId('editBtn').addEventListener('click',()=>request('edit'));byId('exitTool').addEventListener('click',()=>request('navigate'));
   byId('measureDistance').addEventListener('click',()=>draw('line'));byId('measureArea').addEventListener('click',()=>draw('polygon'));byId('finishDrawing').addEventListener('click',finishDraw);
   ['Point','Line','Polygon'].forEach(type=>byId('draw'+type).addEventListener('click',()=>draw(type.toLowerCase())));
   byId('clearMeasure').addEventListener('click',()=>{stopHandler();measureGroup.clearLayers();byId('toolResult').textContent='Medição limpa.';byId('keepMeasure').hidden=true;});
-  byId('keepMeasure').addEventListener('click',()=>request('navigate'));
+  byId('keepMeasure').addEventListener('click',async()=>{if(await request('navigate'))measureGroup.eachLayer(layer=>{layer.setStyle(ARPIASCartography.style('measure-kept'));layer._arpiasKept=true;const m=geo.metrics(layer.toGeoJSON(false));layer.setTooltipContent(element('span',`Medição mantida · ${m.area!==undefined?'Área: '+areaLabel(m.area)+' · perímetro: '+distanceLabel(m.perimeter):'Distância: '+distanceLabel(m.length)}`));});});
   byId('clearSelectionBtn').addEventListener('click',()=>{closeMore();clearSelection();});byId('closeTerritorial').addEventListener('click',closeTerritorial);
   byId('shareSelectionBtn').addEventListener('click',()=>{closeMore();share();});byId('closeShare').addEventListener('click',()=>byId('shareDialog').close());
   byId('copySelectionLink').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(byId('selectionLink').value);toast('Link copiado.');}catch(error){byId('selectionLink').focus();byId('selectionLink').select();toast('Copie o link exibido.');}});
-  map.on('popupclose',()=>{if(mode==='consult'){byId('toolPanel').hidden=false;byId('toolHint').textContent='Consulta ativada. Clique ou toque no local que deseja investigar.';}});
+  map.on('popupclose',()=>{if(mode==='consult'){byId('toolPanel').hidden=false;byId('toolHint').textContent=queryInstruction();}});
   function infoModal(title,rows,note){closeMore();const box=content(title,rows,note);box.firstChild.id='infoTitle';byId('infoBody').replaceChildren(box);byId('layerInfo').showModal();}
   byId('menuReport').addEventListener('click',()=>{closeMore();ARPIASReport.generate();});
   byId('helpBtn').addEventListener('click',()=>infoModal('Ajuda',[
-    ['Buscar','Procure bairros ou coordenadas. A busca ignora acentos e espaços extras. Ruas ainda em integração.'],['Camadas','Escolha uma base e combine sobreposições temáticas.'],['Consultar','Ativa a consulta por clique; clique novamente em Consultar para encerrar.'],['Minha localização','Solicita ao navegador sua localização aproximada.'],['Mais','Medição, edição local, compartilhamento e relatório.'],['Escala','A barra mostra distância no terreno, não altitude. Varia com o zoom.']
+    ['Buscar','Procure bairros ou coordenadas. A busca ignora acentos e espaços extras. Ruas ainda em integração.'],['Camadas','Escolha uma base e combine sobreposições temáticas.'],['Consultar','Escolha a camada no seletor e toque no mapa. Visibilidade e consulta são independentes. Clique novamente em Consultar para encerrar.'],['Minha localização','Solicita ao navegador sua localização aproximada.'],['Mais','Medição, edição local, compartilhamento e relatório.'],['Escala','A barra mostra distância no terreno, não altitude. Varia com o zoom.']
   ]));
   byId('methodBtn').addEventListener('click',()=>infoModal('Metodologia',[
     ['Geometria','Área e distância geográficas por Turf. Estimativas sem certificação cadastral.'],['Referência','Centro de massa dos polígonos; ponderação por área para multipartes.'],['Incidências','Apenas no ponto de referência e entre feições carregadas.'],['Equipamentos','Cadastros de localização; não comprovam operação atual.'],['Dados pessoais','A ficha exibe somente os atributos públicos permitidos.']
   ]));
+  function styleSwatch(id,opacity=1,type,override){
+    const style=override||ARPIASCartography.style(id);const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 40 28');svg.setAttribute('class','legend-swatch');svg.setAttribute('aria-hidden','true');const path=document.createElementNS(svg.namespaceURI,'path');path.setAttribute('d',id==='hidro'||/LineString/.test(type||'')?'M3 22L14 7L23 18L37 4':type==='Point'?'M20 4a10 10 0 1 0 0 20a10 10 0 1 0 0-20':'M4 4H36V24H4Z');path.setAttribute('stroke',style.color);path.setAttribute('stroke-width',style.weight);path.setAttribute('fill',id==='hidro'||/LineString/.test(type||'')?'none':style.fillColor||'none');path.setAttribute('fill-opacity',(type==='Point'?(id==='consult'?0:1):(style.fillOpacity??0))*opacity);path.setAttribute('stroke-opacity',opacity);if(style.dashArray)path.setAttribute('stroke-dasharray',style.dashArray);svg.append(path);return svg;
+  }
   function visibleLegend(){
     const box=element('div',undefined,'visible-legend');
     const definitions=[...overlayDefs.filter(d=>map.hasLayer(d.layer)),...civilDefs.filter(d=>d.layer&&d.input.checked)];
-    definitions.forEach(d=>{const row=element('div',undefined,'legend-entry');const icon=element('span',undefined,`layer-icon ${d.symbolId||d.id}`);icon.append(symbol(d.symbolId||d.id));row.append(icon,element('span',d.name));box.append(row);});
-    if(workGroup.getLayers().some(layer=>map.hasLayer(layer))){const row=element('div',undefined,'legend-entry');row.append(element('span','✎','legend-work'),element('span','Minhas camadas · trabalho do usuário'));box.append(row);}
-    if(selection){const row=element('div',undefined,'legend-entry');row.append(element('span','◇','legend-selection'),element('span','Seleção · destaque âmbar'));box.append(row);}
+    definitions.forEach(d=>{const row=element('div',undefined,'legend-entry');const icon=element('span',undefined,`layer-icon ${d.symbolId||d.id}`);if(overlayDefs.includes(d))icon.append(styleSwatch(d.id,d.opacity??1));else {icon.classList.add('legend-civil-marker');icon.append(symbol(d.symbolId||d.id));}row.append(icon,element('span',d.name));box.append(row);});
+    [...new Set(workGroup.getLayers().filter(layer=>map.hasLayer(layer)).map(layer=>layer.toGeoJSON(false).geometry.type))].forEach(type=>{const row=element('div',undefined,'legend-entry');row.append(type==='Point'?element('span','✎','legend-work-point'):styleSwatch('work',1,type),element('span',`Minhas camadas · ${type==='Point'?'pontos quadrados':type==='LineString'?'linhas tracejadas':'polígonos tracejados'}`));box.append(row);});
+    if(selection){const row=element('div',undefined,'legend-entry');row.append(styleSwatch(ARPIASCartography.selectionKind(selection.meta),1,selection.metrics.type,ARPIASCartography.selectionStyle(selection.meta,selection.metrics.type)),element('span',selection.meta.origin==='search'?'⌕ Resultado da busca · tracejado':'◇ Seleção de consulta · contínuo'));box.append(row);}
+    ['measure','measure-kept'].forEach(id=>{[...new Set(measureGroup.getLayers().filter(layer=>Boolean(layer._arpiasKept)===(id==='measure-kept')).map(layer=>layer.toGeoJSON(false).geometry.type))].forEach(type=>{const row=element('div',undefined,'legend-entry');row.append(styleSwatch(id,1,type),element('span',`${id==='measure-kept'?'Medição mantida · traço e ponto':'Medição concluída · pontilhado'} · ${type==='LineString'?'linha':'área'}`));box.append(row);});});
     return box;
   }
   byId('legendBtn').addEventListener('click',()=>{

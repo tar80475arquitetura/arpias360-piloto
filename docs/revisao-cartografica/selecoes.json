@@ -1,0 +1,74 @@
+[
+  {
+    "layer": "sirenes",
+    "base": "ortho",
+    "popup": "◇ Seleção de consulta · contorno contínuoTravessa BeltrãoCoordenadas-22.903442, -43.087700Cadastro de localização; não confirma operação atual.ⓘ Informações◎ CoordenadasEnquadrar seleçãoMais ações do localGerar ficha técnicaCompartilhar / QR CodeVer fachadaGoogle MapsAbrir no Google EarthCopiar coordenadasCompartilhar pontoVisualização de rua disponível próxima ao ponto selecionado.Identificação territorialIntegração futuraInscrição municipalDado ainda não integradoIdentificador ARPIASIntegração futura",
+    "selected": 1
+  },
+  {
+    "layer": "pluviometros",
+    "base": "ortho",
+    "popup": "◇ Seleção de consulta · contorno contínuoMorro da PenhaCoordenadas-22.884697, -43.125997Cadastro de localização; não confirma operação atual.ⓘ Informações◎ CoordenadasEnquadrar seleçãoMais ações do localGerar ficha técnicaCompartilhar / QR CodeVer fachadaGoogle MapsAbrir no Google EarthCopiar coordenadasCompartilhar pontoVisualização de rua disponível próxima ao ponto selecionado.Identificação territorialIntegração futuraInscrição municipalDado ainda não integradoIdentificador ARPIASIntegração futura",
+    "selected": 1
+  },
+  {
+    "layer": "nudecs",
+    "base": "ortho",
+    "popup": "◇ Seleção de consulta · contorno contínuoBairro de FatimaCoordenadas-22.893745, -43.106745Cadastro de localização; não confirma operação atual.ⓘ Informações◎ CoordenadasEnquadrar seleçãoMais ações do localGerar ficha técnicaCompartilhar / QR CodeVer fachadaGoogle MapsAbrir no Google EarthCopiar coordenadasCompartilhar pontoVisualização de rua disponível próxima ao ponto selecionado.Identificação territorialIntegração futuraInscrição municipalDado ainda não integradoIdentificador ARPIASIntegração futura",
+    "selected": 1
+  },
+  {
+    "layer": "pontos_apoio",
+    "base": "ortho",
+    "popup": "◇ Seleção de consulta · contorno contínuoBiquinha / Praça São José / Praça Max Wolf (José Leomil)Coordenadas-22.882904, -43.082601Cadastro de localização; não confirma operação atual.ⓘ Informações◎ CoordenadasEnquadrar seleçãoMais ações do localGerar ficha técnicaCompartilhar / QR CodeVer fachadaGoogle MapsAbrir no Google EarthCopiar coordenadasCompartilhar pontoVisualização de rua disponível próxima ao ponto selecionado.Identificação territorialIntegração futuraInscrição municipalDado ainda não integradoIdentificador ARPIASIntegração futura",
+    "selected": 1
+  },
+  {
+    "layer": "limite",
+    "base": "ortho",
+    "popup": "◇ Seleção de consulta · contorno contínuoLimite municipalÁrea estimada132.744.429,12 m² (13.274,44 ha)Coordenadas-22.914984, -43.054441ⓘ Informações◎ CoordenadasEnquadrar seleçãoCalcular áreaMais ações do localGerar ficha técnicaCompartilhar / QR CodeVer fachadaGoogle MapsAbrir no Google EarthCopiar coordenadasCompartilhar pontoVisualização de rua disponível próxima ao ponto selecionado.Identificação territorialIntegração futuraInscrição municipalDado ainda não integradoIdentificador ARPIASIntegração futura",
+    "selected": 1
+  },
+  {
+    "layer": "bairros",
+    "base": "ortho",
+    "popup": "◇ Seleção de consulta · contorno contínuoBairros oficiaisBairroEngenho do MatoÁrea estimada7.222.118,87 m² (722,21 ha)Coordenadas-22.936900, -43.004549ⓘ Informações◎ CoordenadasEnquadrar seleçãoCalcular áreaMais ações do localGerar ficha técnicaCompartilhar / QR CodeVer fachadaGoogle MapsAbrir no Google EarthCopiar coordenadasCompartilhar pontoVisualização de rua disponível próxima ao ponto selecionado.Identificação territorialIntegração futuraInscrição municipalDado ainda não integradoIdentificador ARPIASIntegração futura",
+    "selected": 1
+  },
+  {
+    "layer": "hidro",
+    "base": "ortho",
+    "popup": "◇ Seleção de consulta · contorno contínuoHidrografiaCoordenadas-22.864796, -43.037176ⓘ Informações◎ CoordenadasEnquadrar seleçãoMais ações do localGerar ficha técnicaCompartilhar / QR CodeVer fachadaGoogle MapsAbrir no Google EarthCopiar coordenadasCompartilhar pontoVisualização de rua disponível próxima ao ponto selecionado.Identificação territorialIntegração futuraInscrição municipalDado ainda não integradoIdentificador ARPIASIntegração futura",
+    "selected": 1
+  },
+  {
+    "layer": "zeis",
+    "base": "ortho",
+    "popup": "◇ Seleção de consulta · contorno contínuoZEISÁrea estimada501.273,91 m² (50,13 ha)Coordenadas-22.888550, -43.075546ⓘ Informações◎ CoordenadasEnquadrar seleçãoCalcular áreaMais ações do localGerar ficha técnicaCompartilhar / QR CodeVer fachadaGoogle MapsAbrir no Google EarthCopiar coordenadasCompartilhar pontoVisualização de rua disponível próxima ao ponto selecionado.Identificação territorialIntegração futuraInscrição municipalDado ainda não integradoIdentificador ARPIASIntegração futura",
+    "selected": 1
+  },
+  {
+    "layer": "zeia",
+    "base": "ortho",
+    "popup": "◇ Seleção de consulta · contorno contínuoInteresse ambientalÁrea estimada791.592,39 m² (79,16 ha)Coordenadas-22.894091, -43.020787ⓘ Informações◎ CoordenadasEnquadrar seleçãoCalcular áreaMais ações do localGerar ficha técnicaCompartilhar / QR CodeVer fachadaGoogle MapsAbrir no Google EarthCopiar coordenadasCompartilhar pontoVisualização de rua disponível próxima ao ponto selecionado.Identificação territorialIntegração futuraInscrição municipalDado ainda não integradoIdentificador ARPIASIntegração futura",
+    "selected": 1
+  },
+  {
+    "layer": "appm",
+    "base": "ortho",
+    "popup": "◇ Seleção de consulta · contorno contínuoLocal selecionadoCoordenadas-22.878706, -43.055832ⓘ Informações◎ CoordenadasEnquadrar seleçãoMais ações do localGerar ficha técnicaCompartilhar / QR CodeVer fachadaGoogle MapsAbrir no Google EarthCopiar coordenadasCompartilhar pontoVisualização de rua disponível próxima ao ponto selecionado.Identificação territorialIntegração futuraInscrição municipalDado ainda não integradoIdentificador ARPIASIntegração futura",
+    "selected": 1
+  },
+  {
+    "layer": "apa",
+    "base": "ortho",
+    "popup": "◇ Seleção de consulta · contorno contínuoProteção ambiental municipalÁrea estimada1.409.833,7 m² (140,98 ha)Coordenadas-22.933658, -43.122477ⓘ Informações◎ CoordenadasEnquadrar seleçãoCalcular áreaMais ações do localGerar ficha técnicaCompartilhar / QR CodeVer fachadaGoogle MapsAbrir no Google EarthCopiar coordenadasCompartilhar pontoVisualização de rua disponível próxima ao ponto selecionado.Identificação territorialIntegração futuraInscrição municipalDado ainda não integradoIdentificador ARPIASIntegração futura",
+    "selected": 1
+  },
+  {
+    "layer": "comunidades",
+    "base": "ortho",
+    "popup": "◇ Seleção de consulta · contorno contínuoComunidadesÁrea estimada501.273,91 m² (50,13 ha)Coordenadas-22.888550, -43.075546ⓘ Informações◎ CoordenadasEnquadrar seleçãoCalcular áreaMais ações do localGerar ficha técnicaCompartilhar / QR CodeVer fachadaGoogle MapsAbrir no Google EarthCopiar coordenadasCompartilhar pontoVisualização de rua disponível próxima ao ponto selecionado.Identificação territorialIntegração futuraInscrição municipalDado ainda não integradoIdentificador ARPIASIntegração futura",
+    "selected": 1
+  }
+]

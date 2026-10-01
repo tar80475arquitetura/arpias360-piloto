@@ -1,0 +1,58 @@
+[
+  {
+    "width": 390,
+    "height": 844,
+    "observed": {
+      "active": "true",
+      "dialog": false,
+      "height": 844,
+      "mode": "Consultar no mapa",
+      "options": 13,
+      "overflow": false,
+      "selected": "",
+      "width": 390
+    }
+  },
+  {
+    "width": 768,
+    "height": 1024,
+    "observed": {
+      "active": "true",
+      "dialog": false,
+      "height": 1024,
+      "mode": "Consultar no mapa",
+      "options": 13,
+      "overflow": false,
+      "selected": "",
+      "width": 768
+    }
+  },
+  {
+    "width": 1366,
+    "height": 768,
+    "observed": {
+      "active": "true",
+      "dialog": false,
+      "height": 768,
+      "mode": "Consultar no mapa",
+      "options": 13,
+      "overflow": false,
+      "selected": "",
+      "width": 1366
+    }
+  },
+  {
+    "width": 1920,
+    "height": 1080,
+    "observed": {
+      "active": "true",
+      "dialog": false,
+      "height": 1080,
+      "mode": "Consultar no mapa",
+      "options": 13,
+      "overflow": false,
+      "selected": "",
+      "width": 1920
+    }
+  }
+]

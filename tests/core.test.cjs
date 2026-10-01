@@ -5,6 +5,15 @@ const vm=require('node:vm');
 const path=require('node:path');
 const root=path.resolve(__dirname,'..');
 const source=fs.readFileSync(path.join(root,'js/app.js'),'utf8');
+test('late tile callbacks cannot update a removed or reattached base',()=>{
+  let callback,attached=true,remove;const completed=[];
+  const layer={on:(event,fn)=>{remove=fn;},createTile:(coords,done)=>{callback=done;return {};}};
+  const context=vm.createContext({map:{hasLayer:()=>attached}});
+  vm.runInContext(source.slice(source.indexOf('function protectTileLifecycle('),source.indexOf('baseDefs.forEach(d=>protectTileLifecycle')),context);
+  context.protectTileLifecycle(layer);layer.createTile({},(...args)=>completed.push(args));callback(null,{});assert.equal(completed.length,1);
+  layer.createTile({},(...args)=>completed.push(args));const stale=callback;attached=false;remove();stale(Error('delayed'),{});assert.equal(completed.length,1);
+  attached=true;layer.createTile({},(...args)=>completed.push(args));stale(null,{});assert.equal(completed.length,1);callback(null,{});assert.equal(completed.length,2);
+});
 class Element{
   constructor(tag){this.tag=tag;this.children=[];this.listeners={};this.textContent='';}
   append(...nodes){this.children.push(...nodes);}

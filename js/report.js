@@ -11,13 +11,14 @@ const ARPIASReport=(()=>{
     loaded.forEach(({tile,image})=>{const r=tile.getBoundingClientRect();ctx.drawImage(image,r.left-frame.left,r.top-frame.top,r.width,r.height);});
     for(const node of document.querySelectorAll('#map .leaflet-overlay-pane canvas,#map .leaflet-overlay-pane svg')){
       const r=node.getBoundingClientRect();if(!r.width||!r.height)continue;
-      const image=node.tagName.toLowerCase()==='canvas'?node:await loadImage('data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(node)));
+      let image=node;
+      if(node.tagName.toLowerCase()!=='canvas'){const copy=node.cloneNode(true);const originalPaths=node.querySelectorAll('path');copy.querySelectorAll('path').forEach((path,index)=>{path.style.filter=getComputedStyle(originalPaths[index]).filter;});image=await loadImage('data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(copy)));}
       ctx.drawImage(image,r.left-frame.left,r.top-frame.top,r.width,r.height);
     }
     for(const marker of document.querySelectorAll('#map .civil-marker,#map .work-point')){
       const r=marker.getBoundingClientRect();if(!r.width||!r.height||r.right<frame.left||r.left>frame.right||r.bottom<frame.top||r.top>frame.bottom)continue;
       const color=getComputedStyle(marker).color;ctx.fillStyle='#fff';ctx.strokeStyle=color;ctx.lineWidth=2;
-      ctx.beginPath();ctx.arc(r.left-frame.left+r.width/2,r.top-frame.top+r.height/2,r.width/2-1,0,Math.PI*2);ctx.fill();ctx.stroke();
+      ctx.beginPath();if(marker.classList.contains('work-point'))ctx.rect(r.left-frame.left+1,r.top-frame.top+1,r.width-2,r.height-2);else ctx.arc(r.left-frame.left+r.width/2,r.top-frame.top+r.height/2,r.width/2-1,0,Math.PI*2);ctx.fill();ctx.stroke();
       const svg=marker.querySelector('svg');if(svg){const copy=svg.cloneNode(true);copy.setAttribute('color',color);copy.setAttribute('width','24');copy.setAttribute('height','24');copy.setAttribute('fill','none');copy.setAttribute('stroke',color);copy.setAttribute('stroke-width','1.8');const image=await loadImage('data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(copy)));ctx.drawImage(image,r.left-frame.left+4,r.top-frame.top+4,r.width-8,r.height-8);}else{ctx.fillStyle=color;ctx.font='16px system-ui';ctx.fillText('✎',r.left-frame.left+5,r.top-frame.top+21);}
     }
     for(const label of document.querySelectorAll('#map .territory-label')){
@@ -65,9 +66,10 @@ const ARPIASReport=(()=>{
         ['Seleção',s.title],['Município',s.context.municipio||'Não confirmado · piloto Niterói/RJ'],['Bairro',s.context.bairro||'Não identificado'],['Região administrativa',s.context.regiao||'Não identificada'],['Mapa-base',activeBaseDef.name],['Inscrição municipal','Dado ainda não integrado'],['Identificador ARPIAS','Integração futura']
       ]),content('Geometria e localização',ARPIASUI.measurementRows(s.metrics),'Estimativas geográficas por Turf 7.2.0, sem precisão cadastral certificada. Centroide dos polígonos: centro de massa, ponderado por área nas geometrias multipartes.'));
       ARPIASUI.publicAttributes(s.feature.properties).forEach(group=>body.append(content(group.title,group.rows)));
+      if(s.meta.work)body.append(content('Geometria de trabalho / não oficial',[['Referência original',s.feature.arpiasOrigin?`${s.feature.arpiasOrigin.layer} · ${s.feature.arpiasOrigin.id}`:'Desenho do usuário'],['Persistência','Local neste dispositivo; sem sincronização com servidor']]));
       const incident=incidence(s);body.append(content('Características territoriais no ponto de referência',incident,incident.length?'Incidências entre as feições oficiais carregadas das camadas visíveis; não é uma análise integral da extensão da seleção.':'Nenhuma incidência foi confirmada entre as feições carregadas. Isso não comprova ausência de restrições ou riscos.'));
       body.append(content('Riscos e Proteção Civil · referências próximas',nearest,'Distâncias em linha reta até locais cadastrados. Não confirmam funcionamento atual, abertura, atendimento ou condição de risco.'));
-      body.append(content('Pontuação de Fragilidade',[['Status','Integração futura']]));
+      body.append(content('Índice ARPIAS de Fragilidade Urbana',[['Status','Em desenvolvimento metodológico · sem pontuação calculada']]));
       const visible=visibleLayers();body.append(content('Legenda · camadas visíveis',visible.map(layer=>[layer.name,'Camada ativada na captura']),'A barra representa distância no terreno; o norte indica a orientação do mapa. A escala varia com o enquadramento.'),ARPIASUI.visibleLegend());
       const sources=new Set(visible.map(layer=>layer.source));sources.add(activeBaseDef.id==='ortho'?'Prefeitura Municipal de Niterói / SIGeo · Ortofoto 2019':activeBaseDef.id==='osm'?'OpenStreetMap contributors':`NASA GIBS / VIIRS · ${recentDate}`);
       if(nearest.length)sources.add('Prefeitura de Niterói / GeoNit / Defesa Civil');if(s.meta.source)sources.add(s.meta.source);if(s.context.bairro||s.context.regiao||s.context.municipio)sources.add('Geoportal oficial de Niterói · identificação territorial');

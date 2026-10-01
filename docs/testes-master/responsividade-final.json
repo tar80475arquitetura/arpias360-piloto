@@ -1,0 +1,426 @@
+[
+  {
+    "actions": [
+      "⌕ Buscar",
+      "☷ Camadas",
+      "ⓘ Consultar"
+    ],
+    "buttons": [
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "⌕ Buscar",
+        "width": 97.32500457763672
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "☷ Camadas",
+        "width": 97.3375015258789
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "ⓘ Consultar",
+        "width": 97.3375015258789
+      }
+    ],
+    "headerHeight": 108,
+    "height": 568,
+    "overflow": false,
+    "searchHeight": 46,
+    "searchWidth": 296,
+    "width": 320
+  },
+  {
+    "actions": [
+      "⌕ Buscar",
+      "☷ Camadas",
+      "ⓘ Consultar"
+    ],
+    "buttons": [
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "⌕ Buscar",
+        "width": 109.32500457763672
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "☷ Camadas",
+        "width": 109.3375015258789
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "ⓘ Consultar",
+        "width": 109.3375015258789
+      }
+    ],
+    "headerHeight": 108,
+    "height": 800,
+    "overflow": false,
+    "searchHeight": 46,
+    "searchWidth": 336,
+    "width": 360
+  },
+  {
+    "actions": [
+      "⌕ Buscar",
+      "☷ Camadas",
+      "ⓘ Consultar"
+    ],
+    "buttons": [
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "⌕ Buscar",
+        "width": 114.4000015258789
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "☷ Camadas",
+        "width": 114.4000015258789
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "ⓘ Consultar",
+        "width": 114.4000015258789
+      }
+    ],
+    "headerHeight": 108,
+    "height": 812,
+    "overflow": false,
+    "searchHeight": 46,
+    "searchWidth": 351.20001220703125,
+    "width": 375
+  },
+  {
+    "actions": [
+      "⌕ Buscar",
+      "☷ Camadas",
+      "ⓘ Consultar"
+    ],
+    "buttons": [
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "⌕ Buscar",
+        "width": 119.4625015258789
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "☷ Camadas",
+        "width": 119.4749984741211
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "ⓘ Consultar",
+        "width": 119.4625015258789
+      }
+    ],
+    "headerHeight": 108,
+    "height": 844,
+    "overflow": false,
+    "searchHeight": 46,
+    "searchWidth": 366.3999938964844,
+    "width": 390
+  },
+  {
+    "actions": [
+      "⌕ Buscar",
+      "☷ Camadas",
+      "ⓘ Consultar"
+    ],
+    "buttons": [
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "⌕ Buscar",
+        "width": 126.6624984741211
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "☷ Camadas",
+        "width": 126.6750030517578
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "ⓘ Consultar",
+        "width": 126.6624984741211
+      }
+    ],
+    "headerHeight": 108,
+    "height": 915,
+    "overflow": false,
+    "searchHeight": 46,
+    "searchWidth": 388,
+    "width": 412
+  },
+  {
+    "actions": [
+      "⌕ Buscar",
+      "☷ Camadas",
+      "ⓘ Consultar"
+    ],
+    "buttons": [
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "⌕ Buscar",
+        "width": 132.8000030517578
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "☷ Camadas",
+        "width": 132.8000030517578
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "ⓘ Consultar",
+        "width": 132.8000030517578
+      }
+    ],
+    "headerHeight": 108,
+    "height": 932,
+    "overflow": false,
+    "searchHeight": 46,
+    "searchWidth": 406.3999938964844,
+    "width": 430
+  },
+  {
+    "actions": [
+      "⌕ Buscar",
+      "☷ Camadas",
+      "ⓘ Consultar"
+    ],
+    "buttons": [
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "⌕ Buscar",
+        "width": 80.4749984741211
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "☷ Camadas",
+        "width": 102.875
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "ⓘ Consultar",
+        "width": 109.4000015258789
+      }
+    ],
+    "headerHeight": 72,
+    "height": 1024,
+    "overflow": false,
+    "searchHeight": 46,
+    "searchWidth": 460,
+    "width": 768
+  },
+  {
+    "actions": [
+      "⌕ Buscar",
+      "☷ Camadas",
+      "ⓘ Consultar"
+    ],
+    "buttons": [
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "⌕ Buscar",
+        "width": 80.4749984741211
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "☷ Camadas",
+        "width": 102.875
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "ⓘ Consultar",
+        "width": 109.4000015258789
+      }
+    ],
+    "headerHeight": 72,
+    "height": 1180,
+    "overflow": false,
+    "searchHeight": 46,
+    "searchWidth": 460,
+    "width": 820
+  },
+  {
+    "actions": [
+      "⌕ Buscar",
+      "☷ Camadas",
+      "ⓘ Consultar",
+      "◎ Minha localização"
+    ],
+    "buttons": [
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "⌕ Buscar",
+        "width": 86.4749984741211
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "☷ Camadas",
+        "width": 108.875
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "ⓘ Consultar",
+        "width": 115.4000015258789
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "◎ Minha localização",
+        "width": 170.72500610351562
+      }
+    ],
+    "headerHeight": 72,
+    "height": 720,
+    "overflow": false,
+    "searchHeight": 46,
+    "searchWidth": 460,
+    "width": 1280
+  },
+  {
+    "actions": [
+      "⌕ Buscar",
+      "☷ Camadas",
+      "ⓘ Consultar",
+      "◎ Minha localização"
+    ],
+    "buttons": [
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "⌕ Buscar",
+        "width": 86.4749984741211
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "☷ Camadas",
+        "width": 108.875
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "ⓘ Consultar",
+        "width": 115.4000015258789
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "◎ Minha localização",
+        "width": 170.72500610351562
+      }
+    ],
+    "headerHeight": 72,
+    "height": 768,
+    "overflow": false,
+    "searchHeight": 46,
+    "searchWidth": 460,
+    "width": 1366
+  },
+  {
+    "actions": [
+      "⌕ Buscar",
+      "☷ Camadas",
+      "ⓘ Consultar",
+      "◎ Minha localização"
+    ],
+    "buttons": [
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "⌕ Buscar",
+        "width": 86.4749984741211
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "☷ Camadas",
+        "width": 108.875
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "ⓘ Consultar",
+        "width": 115.4000015258789
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "◎ Minha localização",
+        "width": 170.72500610351562
+      }
+    ],
+    "headerHeight": 72,
+    "height": 900,
+    "overflow": false,
+    "searchHeight": 46,
+    "searchWidth": 460,
+    "width": 1440
+  },
+  {
+    "actions": [
+      "⌕ Buscar",
+      "☷ Camadas",
+      "ⓘ Consultar",
+      "◎ Minha localização"
+    ],
+    "buttons": [
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "⌕ Buscar",
+        "width": 86.4749984741211
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "☷ Camadas",
+        "width": 108.875
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "ⓘ Consultar",
+        "width": 115.4000015258789
+      },
+      {
+        "font": "15px",
+        "height": 44,
+        "label": "◎ Minha localização",
+        "width": 170.72500610351562
+      }
+    ],
+    "headerHeight": 72,
+    "height": 1080,
+    "overflow": false,
+    "searchHeight": 46,
+    "searchWidth": 460,
+    "width": 1920
+  }
+]

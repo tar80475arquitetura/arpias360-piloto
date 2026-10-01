@@ -1,0 +1,671 @@
+[
+  {
+    "layer": "limite",
+    "base": "osm",
+    "markers": 0,
+    "paths": 8,
+    "status": "Disponível",
+    "tiles": 24
+  },
+  {
+    "layer": "bairros",
+    "base": "osm",
+    "markers": 0,
+    "paths": 58,
+    "status": "Disponível",
+    "tiles": 24
+  },
+  {
+    "layer": "hidro",
+    "base": "osm",
+    "markers": 0,
+    "paths": 184,
+    "status": "Disponível",
+    "tiles": 24
+  },
+  {
+    "layer": "zeis",
+    "base": "osm",
+    "markers": 0,
+    "paths": 43,
+    "status": "Disponível",
+    "tiles": 24
+  },
+  {
+    "layer": "zeia",
+    "base": "osm",
+    "markers": 0,
+    "paths": 6,
+    "status": "Disponível",
+    "tiles": 24
+  },
+  {
+    "layer": "appm",
+    "base": "osm",
+    "markers": 0,
+    "paths": 1,
+    "status": "Disponível",
+    "tiles": 24
+  },
+  {
+    "layer": "apa",
+    "base": "osm",
+    "markers": 0,
+    "paths": 4,
+    "status": "Disponível",
+    "tiles": 24
+  },
+  {
+    "layer": "comunidades",
+    "base": "osm",
+    "markers": 0,
+    "paths": 34,
+    "status": "Disponível",
+    "tiles": 24
+  },
+  {
+    "layer": "sirenes",
+    "base": "osm",
+    "markers": 37,
+    "paths": 0,
+    "status": "Disponível",
+    "tiles": 24
+  },
+  {
+    "layer": "pluviometros",
+    "base": "osm",
+    "markers": 38,
+    "paths": 0,
+    "status": "Disponível",
+    "tiles": 24
+  },
+  {
+    "layer": "nudecs",
+    "base": "osm",
+    "markers": 36,
+    "paths": 0,
+    "status": "Disponível",
+    "tiles": 24
+  },
+  {
+    "layer": "pontos_apoio",
+    "base": "osm",
+    "markers": 27,
+    "paths": 0,
+    "status": "Disponível",
+    "tiles": 24
+  },
+  {
+    "layer": "limite",
+    "base": "ortho",
+    "markers": 0,
+    "paths": 6,
+    "status": "Disponível",
+    "tiles": 6
+  },
+  {
+    "layer": "bairros",
+    "base": "ortho",
+    "markers": 0,
+    "paths": 66,
+    "status": "Disponível",
+    "tiles": 6
+  },
+  {
+    "layer": "hidro",
+    "base": "ortho",
+    "markers": 0,
+    "paths": 307,
+    "status": "Disponível",
+    "tiles": 6
+  },
+  {
+    "layer": "zeis",
+    "base": "ortho",
+    "markers": 0,
+    "paths": 144,
+    "status": "Disponível",
+    "tiles": 6
+  },
+  {
+    "layer": "zeia",
+    "base": "ortho",
+    "markers": 0,
+    "paths": 6,
+    "status": "Disponível",
+    "tiles": 6
+  },
+  {
+    "layer": "appm",
+    "base": "ortho",
+    "markers": 0,
+    "paths": 17,
+    "status": "Disponível",
+    "tiles": 6
+  },
+  {
+    "layer": "apa",
+    "base": "ortho",
+    "markers": 0,
+    "paths": 4,
+    "status": "Disponível",
+    "tiles": 6
+  },
+  {
+    "layer": "comunidades",
+    "base": "ortho",
+    "markers": 0,
+    "paths": 26,
+    "status": "Disponível",
+    "tiles": 6
+  },
+  {
+    "layer": "sirenes",
+    "base": "ortho",
+    "markers": 37,
+    "paths": 0,
+    "status": "Disponível",
+    "tiles": 6
+  },
+  {
+    "layer": "pluviometros",
+    "base": "ortho",
+    "markers": 38,
+    "paths": 0,
+    "status": "Disponível",
+    "tiles": 6
+  },
+  {
+    "layer": "nudecs",
+    "base": "ortho",
+    "markers": 36,
+    "paths": 0,
+    "status": "Disponível",
+    "tiles": 6
+  },
+  {
+    "layer": "pontos_apoio",
+    "base": "ortho",
+    "markers": 27,
+    "paths": 0,
+    "status": "Disponível",
+    "tiles": 6
+  },
+  {
+    "layer": "limite",
+    "base": "recent",
+    "markers": 0,
+    "paths": 13,
+    "status": "Disponível",
+    "tiles": 2
+  },
+  {
+    "layer": "bairros",
+    "base": "recent",
+    "markers": 0,
+    "paths": 66,
+    "status": "Disponível",
+    "tiles": 2
+  },
+  {
+    "layer": "hidro",
+    "base": "recent",
+    "markers": 0,
+    "paths": 631,
+    "status": "Disponível",
+    "tiles": 2
+  },
+  {
+    "layer": "zeis",
+    "base": "recent",
+    "markers": 0,
+    "paths": 144,
+    "status": "Disponível",
+    "tiles": 2
+  },
+  {
+    "layer": "zeia",
+    "base": "recent",
+    "markers": 0,
+    "paths": 6,
+    "status": "Disponível",
+    "tiles": 2
+  },
+  {
+    "layer": "appm",
+    "base": "recent",
+    "markers": 0,
+    "paths": 17,
+    "status": "Disponível",
+    "tiles": 2
+  },
+  {
+    "layer": "apa",
+    "base": "recent",
+    "markers": 0,
+    "paths": 4,
+    "status": "Disponível",
+    "tiles": 2
+  },
+  {
+    "layer": "comunidades",
+    "base": "recent",
+    "markers": 0,
+    "paths": 117,
+    "status": "Disponível",
+    "tiles": 2
+  },
+  {
+    "layer": "sirenes",
+    "base": "recent",
+    "markers": 37,
+    "paths": 0,
+    "status": "Disponível",
+    "tiles": 2
+  },
+  {
+    "layer": "pluviometros",
+    "base": "recent",
+    "markers": 38,
+    "paths": 0,
+    "status": "Disponível",
+    "tiles": 2
+  },
+  {
+    "layer": "nudecs",
+    "base": "recent",
+    "markers": 36,
+    "paths": 0,
+    "status": "Disponível",
+    "tiles": 2
+  },
+  {
+    "layer": "pontos_apoio",
+    "base": "recent",
+    "markers": 27,
+    "paths": 0,
+    "status": "Disponível",
+    "tiles": 2
+  },
+  {
+    "layer": "lotes",
+    "base": "ortho",
+    "paths": 1470,
+    "selected": 1,
+    "status": "Disponível"
+  },
+  {
+    "layer": "lotes",
+    "base": "osm",
+    "paths": 1470,
+    "selected": 1,
+    "status": "Disponível"
+  },
+  {
+    "layer": "lotes",
+    "base": "recent",
+    "paths": 1470,
+    "selected": 1,
+    "status": "Disponível"
+  },
+  {
+    "layer": "limite",
+    "base": "ortho",
+    "device": "390x844",
+    "markers": 0,
+    "overflow": false,
+    "paths": 13,
+    "status": "Disponível"
+  },
+  {
+    "layer": "bairros",
+    "base": "ortho",
+    "device": "390x844",
+    "markers": 0,
+    "overflow": false,
+    "paths": 66,
+    "status": "Disponível"
+  },
+  {
+    "layer": "hidro",
+    "base": "ortho",
+    "device": "390x844",
+    "markers": 0,
+    "overflow": false,
+    "paths": 631,
+    "status": "Disponível"
+  },
+  {
+    "layer": "zeis",
+    "base": "ortho",
+    "device": "390x844",
+    "markers": 0,
+    "overflow": false,
+    "paths": 144,
+    "status": "Disponível"
+  },
+  {
+    "layer": "zeia",
+    "base": "ortho",
+    "device": "390x844",
+    "markers": 0,
+    "overflow": false,
+    "paths": 6,
+    "status": "Disponível"
+  },
+  {
+    "layer": "appm",
+    "base": "ortho",
+    "device": "390x844",
+    "markers": 0,
+    "overflow": false,
+    "paths": 17,
+    "status": "Disponível"
+  },
+  {
+    "layer": "apa",
+    "base": "ortho",
+    "device": "390x844",
+    "markers": 0,
+    "overflow": false,
+    "paths": 4,
+    "status": "Disponível"
+  },
+  {
+    "layer": "comunidades",
+    "base": "ortho",
+    "device": "390x844",
+    "markers": 0,
+    "overflow": false,
+    "paths": 117,
+    "status": "Disponível"
+  },
+  {
+    "layer": "sirenes",
+    "base": "ortho",
+    "device": "390x844",
+    "markers": 37,
+    "overflow": false,
+    "paths": 0,
+    "status": "Disponível"
+  },
+  {
+    "layer": "pluviometros",
+    "base": "ortho",
+    "device": "390x844",
+    "markers": 38,
+    "overflow": false,
+    "paths": 0,
+    "status": "Disponível"
+  },
+  {
+    "layer": "nudecs",
+    "base": "ortho",
+    "device": "390x844",
+    "markers": 36,
+    "overflow": false,
+    "paths": 0,
+    "status": "Disponível"
+  },
+  {
+    "layer": "pontos_apoio",
+    "base": "ortho",
+    "device": "390x844",
+    "markers": 27,
+    "overflow": false,
+    "paths": 0,
+    "status": "Disponível"
+  },
+  {
+    "layer": "limite",
+    "base": "osm",
+    "device": "390x844",
+    "markers": 0,
+    "overflow": false,
+    "paths": 13,
+    "status": "Disponível"
+  },
+  {
+    "layer": "bairros",
+    "base": "osm",
+    "device": "390x844",
+    "markers": 0,
+    "overflow": false,
+    "paths": 66,
+    "status": "Disponível"
+  },
+  {
+    "layer": "hidro",
+    "base": "osm",
+    "device": "390x844",
+    "markers": 0,
+    "overflow": false,
+    "paths": 631,
+    "status": "Disponível"
+  },
+  {
+    "layer": "zeis",
+    "base": "osm",
+    "device": "390x844",
+    "markers": 0,
+    "overflow": false,
+    "paths": 144,
+    "status": "Disponível"
+  },
+  {
+    "layer": "zeia",
+    "base": "osm",
+    "device": "390x844",
+    "markers": 0,
+    "overflow": false,
+    "paths": 6,
+    "status": "Disponível"
+  },
+  {
+    "layer": "appm",
+    "base": "osm",
+    "device": "390x844",
+    "markers": 0,
+    "overflow": false,
+    "paths": 17,
+    "status": "Disponível"
+  },
+  {
+    "layer": "apa",
+    "base": "osm",
+    "device": "390x844",
+    "markers": 0,
+    "overflow": false,
+    "paths": 4,
+    "status": "Disponível"
+  },
+  {
+    "layer": "comunidades",
+    "base": "osm",
+    "device": "390x844",
+    "markers": 0,
+    "overflow": false,
+    "paths": 117,
+    "status": "Disponível"
+  },
+  {
+    "layer": "sirenes",
+    "base": "osm",
+    "device": "390x844",
+    "markers": 37,
+    "overflow": false,
+    "paths": 0,
+    "status": "Disponível"
+  },
+  {
+    "layer": "pluviometros",
+    "base": "osm",
+    "device": "390x844",
+    "markers": 38,
+    "overflow": false,
+    "paths": 0,
+    "status": "Disponível"
+  },
+  {
+    "layer": "nudecs",
+    "base": "osm",
+    "device": "390x844",
+    "markers": 36,
+    "overflow": false,
+    "paths": 0,
+    "status": "Disponível"
+  },
+  {
+    "layer": "pontos_apoio",
+    "base": "osm",
+    "device": "390x844",
+    "markers": 27,
+    "overflow": false,
+    "paths": 0,
+    "status": "Disponível"
+  },
+  {
+    "layer": "limite",
+    "base": "recent",
+    "device": "390x844",
+    "markers": 0,
+    "nasaTiles": 1,
+    "overflow": false,
+    "paths": 13,
+    "status": "Disponível"
+  },
+  {
+    "layer": "bairros",
+    "base": "recent",
+    "device": "390x844",
+    "markers": 0,
+    "nasaTiles": 1,
+    "overflow": false,
+    "paths": 66,
+    "status": "Disponível"
+  },
+  {
+    "layer": "hidro",
+    "base": "recent",
+    "device": "390x844",
+    "markers": 0,
+    "nasaTiles": 1,
+    "overflow": false,
+    "paths": 631,
+    "status": "Disponível"
+  },
+  {
+    "layer": "zeis",
+    "base": "recent",
+    "device": "390x844",
+    "markers": 0,
+    "nasaTiles": 1,
+    "overflow": false,
+    "paths": 144,
+    "status": "Disponível"
+  },
+  {
+    "layer": "zeia",
+    "base": "recent",
+    "device": "390x844",
+    "markers": 0,
+    "nasaTiles": 1,
+    "overflow": false,
+    "paths": 6,
+    "status": "Disponível"
+  },
+  {
+    "layer": "appm",
+    "base": "recent",
+    "device": "390x844",
+    "markers": 0,
+    "nasaTiles": 1,
+    "overflow": false,
+    "paths": 17,
+    "status": "Disponível"
+  },
+  {
+    "layer": "apa",
+    "base": "recent",
+    "device": "390x844",
+    "markers": 0,
+    "nasaTiles": 1,
+    "overflow": false,
+    "paths": 4,
+    "status": "Disponível"
+  },
+  {
+    "layer": "comunidades",
+    "base": "recent",
+    "device": "390x844",
+    "markers": 0,
+    "nasaTiles": 1,
+    "overflow": false,
+    "paths": 117,
+    "status": "Disponível"
+  },
+  {
+    "layer": "sirenes",
+    "base": "recent",
+    "device": "390x844",
+    "markers": 37,
+    "nasaTiles": 1,
+    "overflow": false,
+    "paths": 0,
+    "status": "Disponível"
+  },
+  {
+    "layer": "pluviometros",
+    "base": "recent",
+    "device": "390x844",
+    "markers": 38,
+    "nasaTiles": 1,
+    "overflow": false,
+    "paths": 0,
+    "status": "Disponível"
+  },
+  {
+    "layer": "nudecs",
+    "base": "recent",
+    "device": "390x844",
+    "markers": 36,
+    "nasaTiles": 1,
+    "overflow": false,
+    "paths": 0,
+    "status": "Disponível"
+  },
+  {
+    "layer": "pontos_apoio",
+    "base": "recent",
+    "device": "390x844",
+    "markers": 27,
+    "nasaTiles": 1,
+    "overflow": false,
+    "paths": 0,
+    "status": "Disponível"
+  },
+  {
+    "layer": "lotes",
+    "base": "ortho",
+    "device": "390x844",
+    "overflow": false,
+    "paths": 283,
+    "status": "Disponível"
+  },
+  {
+    "layer": "lotes",
+    "base": "osm",
+    "device": "390x844",
+    "overflow": false,
+    "paths": 283,
+    "status": "Disponível"
+  },
+  {
+    "layer": "lotes",
+    "base": "recent",
+    "device": "390x844",
+    "overflow": false,
+    "paths": 283,
+    "status": "Disponível"
+  }
+]

@@ -30,3 +30,11 @@ Categoria Relevo e Altimetria com oito referências. Padrões de Relevo, Unidade
 ## Próxima validação necessária
 
 Obter o ZIP institucional, registrar SHA-256, inventariar todos os membros sem sobrescrever o original, validar SHP/SHX/DBF/PRJ e codificação, contar feições, listar campos/classes, conferir extensão de Niterói e dados sensíveis. Converter uma cópia para GeoJSON WGS84 preservando os campos e registrar a transformação. Somente então integrar legenda por classes reais, consultas, relatório, busca de unidades e testes visuais nas três bases e nos quatro tamanhos. Não vetorizar o PDF; não importar curvas de São Gonçalo. Ausência de raster impede derivar hipsometria, declividade ou sombreado nesta rodada.
+
+## Verificação local solicitada no último prompt
+
+Nova busca por ZIP, shapefiles e nomes de Niterói no projeto: nenhum pacote vetorial encontrado. O anexo mais recente contém somente `Texto colado.txt`. Para viabilizar a inspeção, o arquivo deve ser colocado exatamente em:
+
+`C:\Users\tar_p\arpias360-piloto\data\raw\cprm\niteroi_padraoderelevo.zip`
+
+O PDF pode receber o caminho `C:\Users\tar_p\arpias360-piloto\data\raw\cprm\mapa_niteroi_rj_geomorf.pdf`. A pasta de destino existe; não foi criado ZIP vazio, substituto ou derivado. Nenhuma nova pesquisa externa foi feita após essa orientação. Integração funcional bloqueada pela ausência local do ZIP.

@@ -1,0 +1,128 @@
+[
+  {
+    "query": "Gragoatá",
+    "expected": "Gragoatá",
+    "result": "Gragoatá",
+    "pass": true
+  },
+  {
+    "query": "gragoata",
+    "expected": "Gragoatá",
+    "result": "Gragoatá",
+    "pass": true
+  },
+  {
+    "query": "Icaraí",
+    "expected": "Icaraí",
+    "result": "Icaraí",
+    "pass": true
+  },
+  {
+    "query": "icarai",
+    "expected": "Icaraí",
+    "result": "Icaraí",
+    "pass": true
+  },
+  {
+    "query": "São Francisco",
+    "expected": "São Francisco",
+    "result": "São Francisco",
+    "pass": true
+  },
+  {
+    "query": "sao francisco",
+    "expected": "São Francisco",
+    "result": "São Francisco",
+    "pass": true
+  },
+  {
+    "query": "Vital Brazil",
+    "expected": "Vital Brazil",
+    "result": "Vital Brazil",
+    "pass": true
+  },
+  {
+    "query": "vital brazil",
+    "expected": "Vital Brazil",
+    "result": "Vital Brazil",
+    "pass": true
+  },
+  {
+    "query": "Engenhoca",
+    "expected": "Engenhoca",
+    "result": "Engenhoca",
+    "pass": true
+  },
+  {
+    "query": "engenhoca",
+    "expected": "Engenhoca",
+    "result": "Engenhoca",
+    "pass": true
+  },
+  {
+    "query": "Rio do Ouro",
+    "expected": "Rio do Ouro",
+    "result": "Rio do Ouro",
+    "pass": true
+  },
+  {
+    "query": "rio do ouro",
+    "expected": "Rio do Ouro",
+    "result": "Rio do Ouro",
+    "pass": true
+  },
+  {
+    "query": "Maria Paula",
+    "expected": "Maria Paula",
+    "result": "Maria Paula",
+    "pass": true
+  },
+  {
+    "query": "maria paula",
+    "expected": "Maria Paula",
+    "result": "Maria Paula",
+    "pass": true
+  },
+  {
+    "query": "Piratininga",
+    "expected": "Piratininga",
+    "result": "Piratininga",
+    "pass": true
+  },
+  {
+    "query": "piratininga",
+    "expected": "Piratininga",
+    "result": "Piratininga",
+    "pass": true
+  },
+  {
+    "query": "  SÃO   FRANCISCO  ",
+    "expected": "São Francisco",
+    "result": "São Francisco",
+    "pass": true
+  },
+  {
+    "query": "francisco",
+    "expected": "São Francisco",
+    "result": "São Francisco",
+    "pass": true
+  },
+  {
+    "query": "vital",
+    "expected": "Vital Brazil",
+    "result": "Vital Brazil",
+    "pass": true
+  },
+  {
+    "query": "ititioca",
+    "expected": "Ititioca",
+    "result": "Ititioca",
+    "pass": true
+  },
+  {
+    "query": "jurujuba",
+    "expected": "Jurujuba",
+    "result": "Jurujuba",
+    "pass": true
+  }
+]
