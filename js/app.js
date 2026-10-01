@@ -111,6 +111,33 @@ limite.on('load',()=>{
 function updateTerritorialLabels(){document.getElementById('map').classList.toggle('show-neighborhood-labels',map.getZoom()>=13);}
 map.on('zoomend',updateTerritorialLabels);updateTerritorialLabels();
 
+// Keep larger territorial captions readable without overlapping one another.
+let labelLayoutFrame;
+function scheduleTerritorialLabelLayout(){
+  cancelAnimationFrame(labelLayoutFrame);
+  labelLayoutFrame=requestAnimationFrame(()=>{
+    const frame=document.getElementById('map').getBoundingClientRect();
+    const labels=[...document.querySelectorAll('#map .territory-label')];
+    labels.forEach(label=>{label.style.visibility='';});
+    const candidates=labels.map(label=>({label,rect:label.getBoundingClientRect()})).filter(item=>item.rect.width&&item.rect.height);
+    candidates.sort((a,b)=>Number(b.label.classList.contains('municipality-label'))-Number(a.label.classList.contains('municipality-label')));
+    const placed=[...document.querySelectorAll('.floating-search,.map-status,.coords,.edge-tools,.leaflet-control-zoom,.leaflet-control-attribution,.leaflet-control-scale,.leaflet-popup,.query-sheet:not([hidden])')]
+      .filter(node=>getComputedStyle(node).visibility!=='hidden')
+      .map(node=>node.getBoundingClientRect()).filter(rect=>rect.width&&rect.height);
+    const names=new Set();
+    candidates.forEach(({label,rect})=>{
+      const name=label.textContent.trim();
+      const outside=rect.left<frame.left+4||rect.right>frame.right-4||rect.top<frame.top+4||rect.bottom>frame.bottom-4;
+      const overlaps=placed.some(other=>rect.left<other.right+5&&rect.right>other.left-5&&rect.top<other.bottom+5&&rect.bottom>other.top-5);
+      if(outside||overlaps||names.has(name)){label.style.visibility='hidden';return;}
+      names.add(name);placed.push(rect);
+    });
+  });
+}
+map.on('moveend zoomend resize tooltipopen popupopen popupclose',scheduleTerritorialLabelLayout);
+bairros.on('load',scheduleTerritorialLabelLayout);
+limite.on('load',scheduleTerritorialLabelLayout);
+
 const overlayDefs=[
   {id:'limite',name:'Limite municipal',layer:limite,group:'Território',desc:'Contorno oficial do município.'},
   {id:'bairros',name:'Bairros oficiais',layer:bairros,group:'Território',desc:'Divisões territoriais do Plano Diretor.'},
@@ -200,7 +227,7 @@ const baseMeta=document.getElementById('baseMeta');
 let previousBaseDef=baseDefs[1];
 let baseGeneration=0;
 let baseTimer;
-function baseState(def,state){def.state=state;if(def.statusNode){def.statusNode.textContent=state==='Disponível'?'● Disponível':state==='Indisponível'?'× Temporariamente indisponível':state;def.statusNode.setAttribute('data-state',state);}}
+function baseState(def,state){def.state=state;if(def.statusNode){def.statusNode.textContent=state==='Disponível'?'● Funcional':state==='Indisponível'?'× Temporariamente indisponível':state;def.statusNode.setAttribute('data-state',state);}}
 function selectBase(def){
   clearTimeout(baseTimer);baseGeneration++;
   if(activeBaseDef!==def)previousBaseDef=activeBaseDef;
@@ -245,7 +272,7 @@ baseDefs.forEach(d=>{
   const text=element('span',undefined,'base-detail');
   const heading=element('span',undefined,'base-name-row');
   const shortNames={ortho:'Foto aérea · 2019',osm:'Ruas',recent:'Satélite'};
-  d.statusNode=element('span','Teste pendente','status');
+  d.statusNode=element('span','◐ Teste de carregamento pendente','status');
   heading.append(element('span',shortNames[d.id],'name'),d.statusNode);text.append(heading);
   text.append(element('small',d.id==='ortho'?'Imagem histórica oficial':d.id==='osm'?'OpenStreetMap':`NASA VIIRS · ${recentDate}`));
   label.append(radio,text);baseControl.append(label);
@@ -386,14 +413,123 @@ civilDefs.forEach(d=>{
   document.getElementById('civilControl').append(row);
 });
 document.getElementById('closeInfo').addEventListener('click',()=>document.getElementById('layerInfo').close());
-readJSON('data/camadas.json').then(meta=>{
-  if(!Array.isArray(meta.parciais)||!Array.isArray(meta.planejadas))throw new Error('Catálogo inválido');
-  meta.parciais.concat(meta.planejadas).filter(x=>x.nome!=='Satélite recente').forEach(x=>{
-    const target=x.nome.startsWith('ITBI')?'marketList':x.nome.includes('ISP')?'securityList':x.nome.includes('Cemaden')||x.nome==='S2ID'?'climateList':'plannedList';
-    const entry=element('div',undefined,'planned-entry');entry.append(element('strong',x.nome),element('small',x.status),element('small',`Fonte: ${x.fonte}`));
-    document.getElementById(target).append(entry);
+const catalogHost=document.getElementById('catalogGroups');
+const catalogSearch=document.getElementById('layerSearch');
+const catalogSearchStatus=document.getElementById('catalogSearchStatus');
+const catalogEntries=[];
+const catalogSections=[];
+function catalogBadge(item){
+  return item.state==='available'?'◐ Dados disponíveis / Em integração':item.state==='unavailable'?'× Indisponível':'○ Integração futura';
+}
+function operationalStatus(text){
+  if(/Indisponível|indisponível/.test(text))return '× Indisponível';
+  if(/Disponível|Funcional/.test(text))return '● Funcional';
+  if(/Carregando/.test(text))return '◐ Carregando';
+  return '◐ Em integração / teste pendente';
+}
+function filterCatalog(){
+  const query=catalogSearch.value;
+  let found=0;
+  catalogEntries.forEach(({item,group,row})=>{
+    row.hidden=!ARPIASCatalog.matches(item,group,query);
+    if(!row.hidden)found++;
   });
-}).catch(error=>{console.error('Catálogo:',error);['marketList','securityList','climateList','plannedList'].forEach(id=>document.getElementById(id).textContent='Catálogo temporariamente indisponível.');});
+  catalogSections.forEach(({section,rows})=>{
+    section.hidden=rows.every(row=>row.hidden);
+    if(query.trim()&&!section.hidden)section.open=true;
+    else if(!query.trim()&&section.dataset.wasOpen!==undefined)section.open=section.dataset.wasOpen==='true';
+  });
+  catalogSearchStatus.textContent=query.trim()?`${found} itens encontrados`:`${catalogSections.length} categorias · ${found} itens no catálogo`;
+}
+catalogSearch.addEventListener('input',()=>{
+  if(catalogSearch.value.trim()&&!catalogSearch.dataset.searching){
+    catalogSections.forEach(({section})=>{section.dataset.wasOpen=String(section.open);});catalogSearch.dataset.searching='true';
+  }
+  filterCatalog();
+  if(!catalogSearch.value.trim()){delete catalogSearch.dataset.searching;catalogSections.forEach(({section})=>{delete section.dataset.wasOpen;});}
+});
+readJSON('data/catalogo.json').then(ARPIASCatalog.validate).then(catalog=>{
+  catalog.groups.flatMap(group=>group.items).filter(item=>item.control).forEach(item=>{
+    if(!document.getElementById(item.control))throw Error(`Controle ausente: ${item.control}`);
+  });
+  const claimed=new Set();
+  const oldSections=[...document.querySelectorAll('.panel-scroll > .accordion:not(#baseAccordion)')];
+  const category={base:'territory',risk:'civil',cadastre:'territory',disaster:'civil'};
+  catalog.groups.forEach(group=>{
+    const isBase=group.id==='base';
+    const section=isBase?document.getElementById('baseAccordion'):element('details',undefined,'accordion');
+    if(!isBase){
+      section.dataset.category=category[group.id]||group.id;section.dataset.group=group.id;section.open=group.id==='risk';
+      const summary=element('summary',group.title);summary.append(element('small',`${group.items.length} itens`));section.append(summary);catalogHost.append(section);
+    }
+    const body=isBase?section.querySelector('.accordion-body'):element('div',undefined,'accordion-body control-list');
+    if(!isBase)section.append(body);
+    const rows=[];
+    group.items.forEach(item=>{
+      let row;
+      const input=item.control?document.getElementById(item.control):null;
+      if(item.state==='integrated'&&!input)throw Error(`Controle ausente: ${item.control}`);
+      if(input&&!claimed.has(item.control)){
+        claimed.add(item.control);row=input.closest('.layer-control,.control-item');
+        row.querySelector('.name').textContent=item.name;input.setAttribute('aria-label',item.name);
+        if(!isBase)body.append(row);
+        const status=row.querySelector('.layer-status');
+        // Presentation follows actual load/error events, without changing layer state.
+        if(status){
+          const badge=element('small',undefined,'catalog-operational');status.after(badge);status.hidden=true;
+          const sync=()=>{badge.textContent=operationalStatus(status.textContent)+(item.count?` · ${item.count} pontos`:'');};
+          new MutationObserver(sync).observe(status,{childList:true,characterData:true,subtree:true});sync();
+        }
+      }else{
+        row=element('div',undefined,'planned-entry catalog-entry');row.append(element('strong',item.name));
+        const badge=element('small',catalogBadge(item),'catalog-badge');row.append(badge);
+        if(input){
+          const original=input.closest('.layer-control,.control-item').querySelector('.layer-status,.status');
+          const button=element('button',undefined,'catalog-select');button.type='button';
+          const sync=()=>{
+            badge.textContent=operationalStatus(original.textContent)+(item.count?` · ${item.count} pontos`:'');
+            button.textContent=input.type==='radio'?(input.checked?'Base selecionada':'Selecionar base'):(input.checked?'Ocultar camada':'Ativar camada');
+            button.setAttribute('aria-pressed',String(input.checked));
+          };
+          new MutationObserver(sync).observe(original,{childList:true,characterData:true,subtree:true});sync();
+          input.addEventListener('change',sync);
+          if(input.type==='radio')document.querySelectorAll('input[name="base"]').forEach(radio=>radio.addEventListener('change',sync));
+          document.getElementById('clearLayersBtn').addEventListener('click',()=>requestAnimationFrame(sync));
+          document.getElementById('clearBtn').addEventListener('click',()=>requestAnimationFrame(sync));
+          button.addEventListener('click',()=>{if(input.type==='radio'){if(!input.checked)input.click();}else input.click();sync();toast(`${item.name}: ${input.checked?'selecionada':'ocultada'}.`);});row.append(button);
+        }
+        row.append(element('small',`Fonte: ${item.source}`),element('small',item.note));
+        const info=element('button','ⓘ Informações','catalog-select');info.type='button';
+        info.addEventListener('click',()=>{
+          const box=content(item.name,[['Status',badge.textContent],['Fonte',item.source],['Referência',item.url]],item.note);box.firstChild.id='infoTitle';
+          document.getElementById('infoBody').replaceChildren(box);document.getElementById('layerInfo').showModal();
+        });row.append(info);body.append(row);
+      }
+      rows.push(row);catalogEntries.push({item,group,row});
+    });
+    catalogSections.push({section,rows});
+    if(group.id==='risk')body.append(civilMessage);
+    // Preserve existing experimental controls as explicit extra entries.
+    if(group.id==='cadastre'||group.id==='planning'){
+      const id=group.id==='cadastre'?'lotes':'comunidades';
+      const row=document.getElementById(`layer_${id}`).closest('.layer-control');body.append(row);
+      const item={name:group.id==='cadastre'?'Lotes · controle experimental':'Comunidades · base pública municipal',keywords:[]};
+      row.querySelector('.name').textContent=item.name;rows.push(row);catalogEntries.push({item,group,row});
+      const status=row.querySelector('.layer-status'),badge=element('small',undefined,'catalog-operational');
+      status.after(badge);status.hidden=true;
+      const sync=()=>{badge.textContent=operationalStatus(status.textContent);};
+      new MutationObserver(sync).observe(status,{childList:true,characterData:true,subtree:true});sync();
+      section.querySelector('summary small').textContent=`${rows.length} itens`;
+    }
+  });
+  oldSections.forEach(section=>section.remove());filterCatalog();
+  // These four implementations were visually validated; preload the unchanged
+  // collections to expose counts and current availability without activating them.
+  civilDefs.forEach(d=>loadCivil(d));
+}).catch(error=>{
+  console.error('Catálogo:',error);catalogSearchStatus.textContent='Catálogo temporariamente indisponível.';
+  catalogHost.replaceChildren(element('p','Falha ao carregar ou validar data/catalogo.json. Os controles existentes foram preservados.','sidebar-note'));
+});
 
 const panel=document.getElementById('panel');
 const shell=document.querySelector('.app-shell');

@@ -33,3 +33,81 @@ button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible{o
 .territory-label{background:#fffffff0;border:1px solid #cbd5c9;border-radius:4px;box-shadow:none;color:var(--forest-950);font:600 12px/1.3 system-ui;padding:3px 6px;white-space:normal;max-width:150px;text-align:center;pointer-events:none}.territory-label::before{display:none}.municipality-label{font-size:14px;font-weight:750}.neighborhood-label{display:none}.show-neighborhood-labels .neighborhood-label{display:block}.layer-panel .sheet-handle,.query-sheet .sheet-handle{touch-action:none;cursor:grab}.app-shell:fullscreen{height:100dvh;width:100vw}.base-name-row{flex-wrap:wrap}.status{white-space:normal}.map-status[data-state="Indisponível"]{border-color:#e8b6a5}.map-status[data-state="Indisponível"] .status-dot{background:#efb6a2}@media(max-width:599px){.map-status[data-state="Indisponível"] small{display:block;max-width:280px}.map-status[data-state="Indisponível"]{bottom:86px}}
 @media(min-width:900px){.sidebar-search,.search-hint{display:none}}
 @media(max-height:600px) and (max-width:899px){.query-sheet:not([hidden]){max-height:82dvh}.layer-panel{max-height:calc(100% - 8px)}.map-status{display:none}}
+
+/* Readable institutional scale and restrained thematic accents. */
+.catalog-search{padding:14px 14px 0}.catalog-search label{display:block;font-size:16px;font-weight:700;margin-bottom:6px}.catalog-search input{width:100%;min-height:48px;padding:10px;border:1px solid #c6d1c8;border-radius:7px;font-size:16px;background:#fff;color:var(--ink)}
+.catalog-search p,.catalog-key{font-size:13px;line-height:1.5;color:var(--muted);margin:8px 0 12px}.catalog-key{padding:0 14px}.catalog-entry{border:1px solid #cad4ca;border-left:3px solid var(--category);border-radius:7px;background:#fff;padding:12px}.catalog-entry strong{display:block;font-size:16px;line-height:1.4;overflow-wrap:anywhere}.catalog-entry small{font-size:13px;line-height:1.5;overflow-wrap:anywhere;color:var(--muted)}.catalog-entry .catalog-badge{color:var(--category);font-weight:650}.catalog-select{display:inline-block;border:1px solid #c6d1c8;border-radius:6px;background:var(--category-soft);color:var(--category);font-size:15px;padding:8px 10px;min-height:44px;margin-top:8px}.catalog-operational{display:block;color:var(--muted);font-size:13px;line-height:1.5;margin-top:4px}
+[hidden]{display:none!important}
+:root {
+  --font-body:16px; --font-layer:16px; --font-category:17px;
+  --font-panel:20px; --font-brand:26px; --font-button:15px; --font-meta:13px;
+  --category-civil:#9b4d17; --category-civil-soft:#fff2e6;
+  --category-territory:#806226; --category-territory-soft:#f7f1e5;
+  --category-planning:#705484; --category-planning-soft:#f2edf6;
+  --category-environment:#376e4d; --category-environment-soft:#edf5ef;
+  --category-climate:#216d79; --category-climate-soft:#eaf4f5;
+  --category-market:#77508a; --category-market-soft:#f5eef8;
+  --category-security:#893b50; --category-security-soft:#f8edf0;
+  --category-social:#4b6487; --category-social-soft:#edf2f8;
+  --category-infrastructure:#536976; --category-infrastructure-soft:#eef2f4;
+  --category-fragility:#a14d63; --category-fragility-soft:#faeef1;
+  --muted:#56675c; --panel-text:var(--ink); --panel-muted:var(--muted);
+  --panel-width:360px; --header-height:84px;
+}
+body{font-size:var(--font-body);line-height:1.5}
+button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible{outline-color:var(--forest-950)}
+.brand-block{max-width:370px}.brand-copy h1{font-size:var(--font-brand);font-weight:750;letter-spacing:.02em}
+.brand-subtitle{font-size:var(--font-meta);line-height:1.35;max-width:280px}.pilot-chip{font-size:var(--font-meta)}
+.tool-button,.more-menu button{font-size:var(--font-button);min-height:48px}.more-menu{width:320px}.more-menu small{font-size:var(--font-meta)}
+.layer-panel{background:var(--surface);color:var(--ink);border-color:var(--line)}
+.panel-title-row{background:var(--paper);border-color:var(--line);padding:16px 18px}.panel-title-row h2{font-size:var(--font-panel);font-weight:750;line-height:1.3}
+.eyebrow,.layer-panel .eyebrow{font-size:var(--font-meta);color:var(--muted);letter-spacing:.08em}
+.layer-panel .close-btn{background:var(--paper);border-color:#c6d1c8;color:var(--ink)}
+.sidebar-search{border:1px solid #c6d1c8}.sidebar-search input,.floating-search input{font-size:16px}.search-hint{font-size:var(--font-meta);line-height:1.5}
+.accordion{--category:var(--category-territory);--category-soft:var(--category-territory-soft);border-color:var(--line)}
+.accordion[data-category="civil"]{--category:var(--category-civil);--category-soft:var(--category-civil-soft)}
+.accordion[data-category="territory"]{--category:var(--category-territory);--category-soft:var(--category-territory-soft)}
+.accordion[data-category="planning"]{--category:var(--category-planning);--category-soft:var(--category-planning-soft)}
+.accordion[data-category="environment"]{--category:var(--category-environment);--category-soft:var(--category-environment-soft)}
+.accordion[data-category="climate"]{--category:var(--category-climate);--category-soft:var(--category-climate-soft)}
+.accordion[data-category="market"]{--category:var(--category-market);--category-soft:var(--category-market-soft)}
+.accordion[data-category="security"]{--category:var(--category-security);--category-soft:var(--category-security-soft)}
+.accordion[data-category="social"]{--category:var(--category-social);--category-soft:var(--category-social-soft)}
+.accordion[data-category="infrastructure"]{--category:var(--category-infrastructure);--category-soft:var(--category-infrastructure-soft)}
+.accordion[data-category="fragility"]{--category:var(--category-fragility);--category-soft:var(--category-fragility-soft)}
+.accordion summary{font-size:var(--font-category);font-weight:750;line-height:1.4;border-left:4px solid var(--category);padding:15px 14px;gap:6px 10px}
+.accordion[open]>summary{background:var(--category-soft)}.accordion summary::after{color:var(--category);font-size:22px}
+.accordion summary small{font-size:var(--font-meta);font-weight:500;color:var(--muted)}
+.accordion-body{padding:12px 12px 16px}.control-list{gap:10px}
+.control-item,.layer-control{background:var(--paper);border-color:#cad4ca;min-height:72px}
+.control-item:hover,.layer-control:hover{background:#f9faf7}
+.control-item:has(input:checked),.layer-control:has(input:checked){border-color:var(--category);background:var(--category-soft)}
+.control-item input{accent-color:var(--category);width:22px;height:22px}.control-item .name,.layer-name .name{font-size:var(--font-layer);font-weight:650;line-height:1.4;overflow-wrap:anywhere}
+.layer-label{gap:10px;min-height:76px;padding:12px 10px}.layer-panel .layer-icon{width:26px;height:26px;color:var(--category)}
+.control-item small,.civil-status,.layer-status,.status,.base-desc,.meta-card,.source-note{font-size:var(--font-meta);line-height:1.5;color:var(--muted)}
+.status[data-state="Disponível"]{color:var(--category-environment)}.status[data-state="Indisponível"]{color:#963c31}.status[data-state="Carregando"]{color:var(--category-civil)}
+.base-name-row{align-items:flex-start;gap:4px 10px}.meta-card{background:var(--paper);border-left-color:var(--category);padding:12px}
+.switch{width:48px;height:28px;margin-bottom:18px}.switch input{width:48px;height:28px}.switch-track{background:#738679;border-color:#64766c}
+.switch-track::before{width:20px;height:20px}.switch input:checked+.switch-track{background:var(--category);border-color:var(--category)}
+.switch input:checked+.switch-track::before{transform:translateX(20px)}.switch-word{font-size:12px;font-weight:650;line-height:1.4;margin-top:32px;color:var(--ink)}
+.switch input:focus-visible+.switch-track{outline-color:var(--forest-950)}.switch-word{font-size:14px}.switch{margin-bottom:24px}
+.info-button{width:44px;height:48px;font-size:20px;color:var(--category)}.info-button:hover{background:var(--category-soft)}
+.sidebar-note{font-size:14px;line-height:1.5}.planned-entry{font-size:15px;border-color:var(--line);padding:12px 0}.planned-entry strong{font-weight:650}.planned-entry small{font-size:var(--font-meta)}
+.future-section p{font-size:15px;color:var(--muted)}.future-badge{font-size:var(--font-meta);line-height:1.5;color:var(--category-fragility);border-color:var(--category-fragility);background:var(--category-fragility-soft)}
+.panel-footer{background:var(--paper);border-color:var(--line)}.quiet-button{font-size:var(--font-button);min-height:48px;border-color:#c6d1c8;color:var(--forest-900)}.quiet-button:hover{background:var(--territory-soft)}.panel-footer small{font-size:var(--font-meta)}
+.layer-panel .sheet-handle{background:#7b8c7e}.floating-search{height:52px;width:min(600px,calc(100% - 144px))}.floating-search button{font-size:var(--font-button)}
+.map-status{max-width:400px;background:var(--forest-900)}.map-status strong{font-size:14px}.map-status small{font-size:13px}.coords{font-size:13px;max-width:320px}
+.leaflet-control-attribution{font-size:11px!important}.leaflet-control-scale-line{font-size:13px!important}
+.leaflet-popup-content{width:320px!important;line-height:1.5}.popup-title{font-size:18px;font-weight:750;line-height:1.4}
+.popup-fields{font-size:15px;grid-template-columns:minmax(90px,.7fr) minmax(0,1.3fr);gap:9px 12px}.popup-fields dt{overflow-wrap:anywhere}.popup-note{font-size:14px}
+.popup-actions a,.popup-actions button{font-size:15px;min-height:50px;line-height:1.4}.popup-actions .share-point:hover{background:var(--forest-800);color:var(--paper)}.share-link{font-size:13px}.leaflet-popup-close-button{width:44px!important;height:44px!important;line-height:44px!important}.popup-title{padding-right:28px}input::placeholder{color:var(--muted);opacity:1}
+.future-module summary{font-size:14px}.future-module .popup-fields{font-size:13px}.about-panel p,.question-card strong{font-size:16px}.question-card span{font-size:13px}.method-note{font-size:14px!important}
+.toast{font-size:15px}.territory-label{font-size:14px;background:#fff;color:var(--forest-950);border-color:#819184;box-shadow:0 1px 4px #142d2540;text-shadow:0 0 2px #fff}
+.territory-label{white-space:nowrap;max-width:none}.municipality-label{font-size:16px;font-weight:750}.sirenes{color:var(--category-civil)}.pluviometros{color:var(--category-climate)}.nudecs{color:var(--category-territory)}.pontos_apoio{color:var(--category-environment)}
+@media(min-width:900px) and (max-width:1199px){:root{--panel-width:320px;--header-height:80px}.brand-block{max-width:300px}.brand-subtitle{max-width:240px}.brand-copy h1{font-size:24px}.tool-button{font-size:15px;padding:8px}.floating-search{width:calc(100% - 110px)}}
+@media(min-width:600px) and (max-width:899px){:root{--header-height:76px}.brand-copy h1{font-size:24px}.tool-button{font-size:15px;padding:8px 7px}.floating-search{width:auto}.layer-label{min-height:80px}}
+@media(max-width:599px){:root{--header-height:72px;--font-brand:24px;--font-category:17px}.brand-copy h1{font-size:24px}.mobile-pilot{font-size:13px}.brand-block{max-width:240px}.topbar{padding:0 12px;gap:6px}.tool-button{padding:8px}.more-menu{width:min(320px,calc(100vw - 24px))}.more-menu button{font-size:15px}.more-menu small{font-size:13px}
+  .floating-search{height:54px;width:auto}.floating-search button{font-size:15px;padding:0 12px}.mobile-actions button{min-height:56px;font-size:15px;line-height:1.35;padding:6px;min-width:0}.mobile-actions span{flex:none}
+  .map-status{bottom:94px}.map-status strong{font-size:14px}.map-status[data-state="Indisponível"]{bottom:94px}.panel-title-row h2{font-size:20px}.layer-label{min-height:88px;padding:12px 10px;gap:10px}.layer-name .name{font-size:16px}.civil-status,.layer-status{font-size:13px}.panel-footer{padding-top:12px;padding-bottom:max(14px,env(safe-area-inset-bottom))}
+  .query-header h2{font-size:18px;font-weight:700}.query-body .popup-title{font-size:18px}.query-body .popup-fields{font-size:15px}.query-body .popup-actions a,.query-body .popup-actions button{font-size:15px;min-height:52px}.query-body .popup-note{font-size:14px}.query-body{padding:16px 16px max(20px,env(safe-area-inset-bottom))}.toast{bottom:98px;font-size:15px}
+}

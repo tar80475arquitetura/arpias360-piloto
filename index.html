@@ -43,16 +43,19 @@
       <div class="panel-scroll">
         <div class="sidebar-search" role="search"><input id="searchInput" type="search" placeholder="Bairro, rua ou coordenada" aria-label="Bairro, rua ou coordenada no painel" aria-describedby="searchHint" enterkeyhint="search" /><button id="searchBtn" aria-label="Buscar no painel">⌕</button></div>
         <p id="searchHint" class="search-hint">Busca por bairros e coordenadas. Ruas em integração futura.</p>
-        <details id="baseAccordion" class="accordion" open><summary>Mapa <small>Uma base por vez</small></summary><div class="accordion-body"><div id="baseControl" class="control-list"></div><div id="baseMeta" class="meta-card"></div><button id="baseFallback" class="quiet-button" hidden>Usar mapa de ruas</button></div></details>
-        <details class="accordion" open><summary>Defesa Civil <small>4 camadas</small></summary><div class="accordion-body"><div id="civilControl" class="control-list"></div><div id="civilMessage" class="sidebar-note" role="status" aria-live="polite"></div><p class="source-note">Prefeitura de Niterói / GeoNit / Defesa Civil</p></div></details>
-        <details class="accordion"><summary>Território</summary><div class="accordion-body"><div id="territoryControl" class="control-list"></div></div></details>
-        <details class="accordion"><summary>Meio Ambiente</summary><div class="accordion-body"><div id="environmentControl" class="control-list"></div></div></details>
-        <details class="accordion"><summary>Áreas Sensíveis</summary><div class="accordion-body"><div id="sensitiveControl" class="control-list"></div></div></details>
-        <details class="accordion"><summary>Mercado Imobiliário <small>Em integração</small></summary><div id="marketList" class="accordion-body planned-list"></div></details>
-        <details class="accordion"><summary>Segurança Pública <small>Em integração</small></summary><div id="securityList" class="accordion-body planned-list"></div></details>
-        <details class="accordion"><summary>Clima e Monitoramento <small>Em integração</small></summary><div id="climateList" class="accordion-body planned-list"></div></details>
-        <details class="accordion"><summary>Integrações futuras</summary><div id="plannedList" class="accordion-body planned-list"></div></details>
-        <details class="accordion future-section"><summary>Pontuação de Fragilidade</summary><div class="accordion-body"><span class="future-badge">Integração futura</span><p>Funcionalidade prevista para integração futura de indicadores territoriais, climáticos, socioespaciais e urbanos em uma leitura integrada de fragilidade.</p></div></details>
+        <div class="catalog-search"><label for="layerSearch">Pesquisar camadas</label><input id="layerSearch" type="search" placeholder="Sirene, chuva, ITBI, lote…" autocomplete="off" /><p id="catalogSearchStatus" role="status" aria-live="polite">Carregando catálogo…</p></div>
+        <p class="catalog-key">● Funcional · ◐ Em integração<br>○ Integração futura · × Indisponível</p>
+        <details id="baseAccordion" class="accordion" data-category="territory" open><summary>Mapas de Referência <small>Uma base por vez</small></summary><div class="accordion-body"><div id="baseControl" class="control-list"></div><div id="baseMeta" class="meta-card"></div><button id="baseFallback" class="quiet-button" hidden>Usar mapa de ruas</button></div></details>
+        <div id="catalogGroups"></div>
+        <details class="accordion" data-category="civil" open><summary>Defesa Civil <small>4 camadas</small></summary><div class="accordion-body"><div id="civilControl" class="control-list"></div><div id="civilMessage" class="sidebar-note" role="status" aria-live="polite"></div><p class="source-note">Prefeitura de Niterói / GeoNit / Defesa Civil</p></div></details>
+        <details class="accordion" data-category="territory"><summary>Território</summary><div class="accordion-body"><div id="territoryControl" class="control-list"></div></div></details>
+        <details class="accordion" data-category="environment"><summary>Meio Ambiente</summary><div class="accordion-body"><div id="environmentControl" class="control-list"></div></div></details>
+        <details class="accordion" data-category="planning"><summary>Áreas Sensíveis</summary><div class="accordion-body"><div id="sensitiveControl" class="control-list"></div></div></details>
+        <details class="accordion" data-category="market"><summary>Mercado Imobiliário <small>Em integração</small></summary><div id="marketList" class="accordion-body planned-list"></div></details>
+        <details class="accordion" data-category="security"><summary>Segurança Pública <small>Em integração</small></summary><div id="securityList" class="accordion-body planned-list"></div></details>
+        <details class="accordion" data-category="climate"><summary>Clima e Monitoramento <small>Em integração</small></summary><div id="climateList" class="accordion-body planned-list"></div></details>
+        <details class="accordion" data-category="infrastructure"><summary>Integrações futuras</summary><div id="plannedList" class="accordion-body planned-list"></div></details>
+        <details class="accordion future-section" data-category="fragility"><summary>Pontuação de Fragilidade</summary><div class="accordion-body"><span class="future-badge">Integração futura</span><p>Funcionalidade prevista para integração futura de indicadores territoriais, climáticos, socioespaciais e urbanos em uma leitura integrada de fragilidade.</p></div></details>
         <p class="sidebar-note panel-method">Protótipo público e experimental. Integra bases públicas com diferentes períodos e escalas. Coincidência espacial não implica causalidade.</p>
       </div>
       <footer class="panel-footer"><button id="clearLayersBtn" class="quiet-button"><span aria-hidden="true">↺</span> Limpar camadas</button><small>Combine camadas para explorar o território.</small></footer>
@@ -73,6 +76,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://unpkg.com/esri-leaflet@3.0.12/dist/esri-leaflet.js"></script>
   <script src="js/location.js?v=20261001-noturno"></script>
+  <script src="js/catalog.js?v=20261001-catalogo"></script>
   <script src="js/app.js?v=20261001-noturno"></script>
 </body>
 </html>
