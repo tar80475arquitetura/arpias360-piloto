@@ -3,9 +3,15 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const catalog=require('../data/catalogo.json');
 const api=require('../js/catalog.js');
-test('catalog has all thirteen non-empty thematic groups and valid source references',()=>{
-  assert.equal(api.validate(catalog),catalog);assert.equal(catalog.groups.length,13);
-  assert.deepEqual(catalog.groups.map(g=>g.id),['base','risk','territory','planning','environment','climate','market','security','social','infrastructure','cadastre','disaster','fragility']);
+test('experimental fragility architecture cannot expose fabricated scores or a map switch',()=>{
+  const model=require('../config/fragilidade.json');const item=catalog.groups.find(g=>g.id==='fragility').items.find(i=>i.analysis==='fragility');
+  assert.ok(item);assert.equal(item.state,'future');assert.equal(item.control,undefined);assert.equal(model.calculationEnabled,false);
+  assert.equal(model.weights,null);assert.equal(model.formula,null);assert.equal(model.normalization,null);assert.equal(model.scale.thresholds,null);
+  assert.equal(model.dimensions.length,7);model.dimensions.forEach(d=>{assert.ok(['available','partial','future'].includes(d.availability));assert.ok(d.source&&d.direction&&d.limitation);assert.equal(d.score,undefined);});
+});
+test('catalog has all fourteen non-empty thematic groups and valid source references',()=>{
+  assert.equal(api.validate(catalog),catalog);assert.equal(catalog.groups.length,14);
+  assert.deepEqual(catalog.groups.map(g=>g.id),['base','risk','territory','planning','environment','climate','market','security','social','infrastructure','cadastre','disaster','fragility','relief']);
 });
 const search=query=>catalog.groups.flatMap(g=>g.items.filter(i=>api.matches(i,g,query)).map(i=>i.name));
 test('APP acronym finds the existing permanent-preservation control without fabricating a layer',()=>assert.ok(search('APP').includes('Áreas de Preservação Permanente')));
