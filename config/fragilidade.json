@@ -1,0 +1,97 @@
+{
+  "name": "Índice ARPIAS de Fragilidade Urbana",
+  "version": "0.1-metodologia",
+  "status": "Em desenvolvimento metodológico",
+  "experimental": true,
+  "calculationEnabled": false,
+  "reviewedAt": "2026-10-01",
+  "territorialUnit": "A definir; bairros oficiais são uma unidade candidata, sujeita à compatibilidade dos indicadores.",
+  "scale": {
+    "proposed": true,
+    "min": 0,
+    "max": 100,
+    "classes": [
+      "Muito baixa",
+      "Baixa",
+      "Moderada",
+      "Alta",
+      "Muito alta"
+    ],
+    "thresholds": null
+  },
+  "weights": null,
+  "normalization": null,
+  "formula": null,
+  "visualizations": [
+    "Polígonos por unidade territorial, após validação",
+    "Mapa de calor complementar, após validação"
+  ],
+  "dimensions": [
+    {
+      "name": "Risco territorial",
+      "availability": "future",
+      "direction": "A definir por indicador",
+      "source": "Alagamentos, encostas e ocorrências ainda não integrados",
+      "year": null,
+      "limitation": "ZEIS, ZEIA e comunidades não são classificações de risco e não podem substituí-las."
+    },
+    {
+      "name": "Clima",
+      "availability": "partial",
+      "direction": "Contextual nesta fase",
+      "source": "Cadastro municipal de pluviômetros / Defesa Civil de Niterói",
+      "year": null,
+      "limitation": "38 localizações; sem série de precipitação, exposição ou eventos extremos. Não é a rede Cemaden."
+    },
+    {
+      "name": "Estrutura urbana",
+      "availability": "partial",
+      "direction": "Contextual nesta fase",
+      "source": "GeoNit / Plano Diretor / cadastro público municipal",
+      "year": null,
+      "limitation": "Bairros, lotes e comunidades disponíveis; sem indicadores comparáveis de infraestrutura ou acessibilidade."
+    },
+    {
+      "name": "Socioespacial",
+      "availability": "future",
+      "direction": "A definir por indicador",
+      "source": "Indicadores de vulnerabilidade ainda não integrados",
+      "year": null,
+      "limitation": "Não inferir vulnerabilidade a partir da localização de comunidades."
+    },
+    {
+      "name": "Segurança",
+      "availability": "future",
+      "direction": "A definir por indicador",
+      "source": "Referências ISP no catálogo; séries agregadas ainda não integradas",
+      "year": null,
+      "limitation": "Unidades, períodos e população de referência precisam ser compatibilizados."
+    },
+    {
+      "name": "Mercado imobiliário",
+      "availability": "future",
+      "direction": "A definir por indicador",
+      "source": "Referências oficiais ITBI 2020–2025 no catálogo; dados analíticos ainda não integrados",
+      "year": null,
+      "limitation": "Preço ou volume de transações não implica fragilidade automaticamente."
+    },
+    {
+      "name": "Proteção e resposta",
+      "availability": "partial",
+      "direction": "Potencial redução, condicionada à validação de capacidade; atualmente contextual",
+      "source": "Defesa Civil de Niterói: 37 sirenes, 36 NUDECs, 27 pontos de apoio e 38 pluviômetros",
+      "year": null,
+      "limitation": "Presença e proximidade não comprovam operação, capacidade, cobertura ou atendimento atual."
+    }
+  ],
+  "warning": "Análise experimental do ARPIAS360. Sem pontuação calculada, classificação oficial, laudo, parecer da Defesa Civil ou diagnóstico conclusivo. Anos não informados permanecem desconhecidos.",
+  "futureGeomorphology": {
+    "source": "CPRM / SGB",
+    "year": 2017,
+    "scale": "1:30.000",
+    "url": "https://rigeo.sgb.gov.br/handle/doc/17483",
+    "availability": "Fonte identificada; vetores ainda não validados",
+    "direction": "Contextual; relação com fragilidade a validar",
+    "calculationEnabled": false
+  }
+}
