@@ -3,107 +3,76 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
-  <meta name="theme-color" content="#26353a" />
+  <meta name="theme-color" content="#203e36" />
   <title>ARPIAS360 | Piloto Niterói/RJ</title>
   <meta name="description" content="WebGIS experimental para leitura integrada de dados territoriais e áreas sensíveis em Niterói/RJ." />
   <link rel="preconnect" href="https://geo.niteroi.rj.gov.br" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <link rel="stylesheet" href="css/style.css?v=20261001-fase1" />
+  <link rel="stylesheet" href="css/style.css?v=20261001-noturno" />
 </head>
 <body>
+  <a class="skip-link" href="#searchMirror">Ir para a busca no mapa</a>
   <header class="topbar">
     <div class="brand-block">
-      <div class="brand-mark">A360</div>
-      <div class="brand-copy"><h1>ARPIAS360</h1><span>Avaliação de Riscos e Planejamento Integrado de Áreas Sensíveis</span></div>
+      <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M6 27 13 9l9 5 11-7-3 25-11-4-13 5zM13 9l6 19m3-14 8 18M6 27l16-13"/></svg></div>
+      <div class="brand-copy"><h1>ARPIAS360</h1><span class="brand-subtitle">Avaliação de Riscos e Planejamento Integrado de Áreas Sensíveis</span><span class="mobile-pilot">Piloto Niterói/RJ</span></div>
     </div>
-
-    <div class="toolbar" aria-label="Ferramentas principais">
-      <button id="homeBtn" class="tool-circle" title="Ver Niterói" aria-label="Ver Niterói">⌂</button>
-      <button id="locateBtn" class="tool-circle" title="Minha localização" aria-label="Minha localização">◎</button>
-      <button id="layersBtn" class="tool-circle active" title="Camadas" aria-label="Camadas">☷</button>
-      <button id="aboutBtn" class="tool-circle" title="Sobre o projeto" aria-label="Sobre o projeto">i</button>
-      <button id="fullBtnTop" class="tool-circle" title="Tela cheia" aria-label="Tela cheia">⛶</button>
-      <button id="clearBtn" class="tool-circle" title="Limpar mapa" aria-label="Limpar mapa">↺</button>
+    <nav class="toolbar" aria-label="Ferramentas principais">
+      <button id="homeBtn" class="tool-button" title="Ver Niterói"><span aria-hidden="true">⌂</span> Ver Niterói</button>
+      <button id="locateBtn" class="tool-button" title="Minha localização"><span aria-hidden="true">◎</span> Minha localização</button>
+      <button id="layersBtn" class="tool-button active" aria-controls="panel" aria-expanded="true"><span aria-hidden="true">☷</span> Camadas</button>
+    </nav>
+    <div class="header-end"><span class="pilot-chip"><span aria-hidden="true">●</span> Piloto Niterói/RJ</span>
+      <div class="more-wrap">
+        <button id="moreBtn" class="tool-button" aria-expanded="false" aria-controls="moreMenu"><span aria-hidden="true">•••</span> Mais</button>
+        <div id="moreMenu" class="more-menu" hidden>
+          <button id="menuHome"><span aria-hidden="true">⌂</span> Ver Niterói</button>
+          <button id="aboutBtn"><span aria-hidden="true">i</span> Sobre o projeto</button>
+          <button id="fragilityBtn"><span aria-hidden="true">◇</span> Pontuação de Fragilidade <small>Integração futura</small></button>
+          <button id="fullBtnTop"><span aria-hidden="true">⛶</span> Tela cheia</button>
+          <button id="clearBtn"><span aria-hidden="true">↺</span> Limpar camadas</button>
+        </div>
+      </div>
     </div>
-    <div class="pilot-chip">Piloto Niterói/RJ</div>
   </header>
-
-  <main class="app-shell">
-    <aside id="panel" class="layer-panel" aria-label="Painel de camadas">
-      <div class="panel-title-row">
-        <h2>Camadas</h2>
-        <button id="closePanel" class="close-btn" title="Recolher painel" aria-label="Recolher painel">×</button>
+  <main class="app-shell layers-open">
+    <button id="panelBackdrop" class="panel-backdrop" aria-label="Fechar painel de camadas" hidden tabindex="-1"></button>
+    <aside id="panel" class="layer-panel" aria-labelledby="panelTitle">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="panel-title-row"><div><span class="eyebrow">Leitura do território</span><h2 id="panelTitle">Camadas</h2></div><button id="closePanel" class="close-btn" aria-label="Fechar camadas">×</button></div>
+      <div class="panel-scroll">
+        <div class="sidebar-search" role="search"><input id="searchInput" type="search" placeholder="Bairro, rua ou coordenada" aria-label="Bairro, rua ou coordenada no painel" aria-describedby="searchHint" enterkeyhint="search" /><button id="searchBtn" aria-label="Buscar no painel">⌕</button></div>
+        <p id="searchHint" class="search-hint">Busca por bairros e coordenadas. Ruas em integração futura.</p>
+        <details id="baseAccordion" class="accordion" open><summary>Mapa <small>Uma base por vez</small></summary><div class="accordion-body"><div id="baseControl" class="control-list"></div><div id="baseMeta" class="meta-card"></div></div></details>
+        <details class="accordion" open><summary>Defesa Civil <small>4 camadas</small></summary><div class="accordion-body"><div id="civilControl" class="control-list"></div><div id="civilMessage" class="sidebar-note" role="status" aria-live="polite"></div><p class="source-note">Prefeitura de Niterói / GeoNit / Defesa Civil</p></div></details>
+        <details class="accordion"><summary>Território</summary><div class="accordion-body"><div id="territoryControl" class="control-list"></div></div></details>
+        <details class="accordion"><summary>Meio Ambiente</summary><div class="accordion-body"><div id="environmentControl" class="control-list"></div></div></details>
+        <details class="accordion"><summary>Áreas Sensíveis</summary><div class="accordion-body"><div id="sensitiveControl" class="control-list"></div></div></details>
+        <details class="accordion"><summary>Mercado Imobiliário <small>Em integração</small></summary><div id="marketList" class="accordion-body planned-list"></div></details>
+        <details class="accordion"><summary>Segurança Pública <small>Em integração</small></summary><div id="securityList" class="accordion-body planned-list"></div></details>
+        <details class="accordion"><summary>Clima e Monitoramento <small>Em integração</small></summary><div id="climateList" class="accordion-body planned-list"></div></details>
+        <details class="accordion"><summary>Integrações futuras</summary><div id="plannedList" class="accordion-body planned-list"></div></details>
+        <details class="accordion future-section"><summary>Pontuação de Fragilidade</summary><div class="accordion-body"><span class="future-badge">Integração futura</span><p>Funcionalidade prevista para integração futura de indicadores territoriais, climáticos, socioespaciais e urbanos em uma leitura integrada de fragilidade.</p></div></details>
+        <p class="sidebar-note panel-method">Protótipo público e experimental. Integra bases públicas com diferentes períodos e escalas. Coincidência espacial não implica causalidade.</p>
       </div>
-
-      <div class="sidebar-search">
-        <input id="searchInput" type="search" placeholder="Pesquisar bairro ou coordenadas" aria-label="Pesquisar bairro ou coordenadas" />
-        <button id="searchBtn" title="Buscar" aria-label="Buscar">⌕</button>
-      </div>
-
-      <details class="accordion" open>
-        <summary>Mapa Base</summary>
-        <div class="accordion-body"><div id="baseControl" class="control-list"></div><div id="baseMeta" class="meta-card"></div></div>
-      </details>
-
-      <details class="accordion" open>
-        <summary>Território e áreas sensíveis</summary>
-        <div class="accordion-body"><div id="layerControl" class="control-list"></div></div>
-      </details>
-
-      <details class="accordion" open>
-        <summary>Defesa Civil</summary>
-        <div class="accordion-body"><div id="civilControl" class="control-list"></div><div id="civilMessage" class="sidebar-note" role="status" aria-live="polite"></div></div>
-      </details>
-      <details class="accordion">
-        <summary>Camadas em integração</summary>
-        <div class="accordion-body"><div id="plannedList" class="planned-list"></div></div>
-      </details>
-
-      <details class="accordion">
-        <summary>Sobre o ARPIAS360</summary>
-        <div class="accordion-body sidebar-note">Protótipo público e experimental. Integra bases públicas com diferentes períodos e escalas. Coincidência espacial não implica causalidade.</div>
-      </details>
+      <footer class="panel-footer"><button id="clearLayersBtn" class="quiet-button"><span aria-hidden="true">↺</span> Limpar camadas</button><small>Combine camadas para explorar o território.</small></footer>
     </aside>
-
-    <section class="mapwrap">
+    <section class="mapwrap" aria-label="Área cartográfica">
       <div id="map" aria-label="Mapa interativo de Niterói"></div>
-
-      <div class="floating-search" role="search">
-        <span class="search-icon">⌕</span>
-        <input id="searchMirror" type="text" placeholder="Pesquisar no mapa" aria-label="Pesquisar no mapa" />
-        <button id="searchMirrorBtn">Buscar</button>
-      </div>
-
-      <div class="edge-tools" aria-label="Ferramentas do mapa">
-        <button id="togglePanel" title="Abrir ou fechar camadas" aria-label="Abrir ou fechar camadas">☰</button>
-      </div>
-
-      <div id="mapStatus" class="map-status">
-        <span class="status-dot"></span>
-        <div><strong id="activeBaseLabel">Ortofoto Niterói 2019</strong><small id="statusMessage">Base cartográfica ativa</small></div>
-      </div>
-
-      <div id="coords" class="coords">Clique no mapa para obter coordenadas</div>
-
-      <aside id="aboutPanel" class="about-panel" aria-label="Sobre o ARPIAS360">
-        <button id="closeAbout" class="close-btn" aria-label="Fechar">×</button>
-        <span class="eyebrow">Protótipo científico e tecnológico</span>
-        <h2>Um território, várias leituras</h2>
-        <p>O ARPIAS360 integra dados públicos territoriais, ambientais, climáticos, imobiliários, de segurança e de riscos em uma única interface cartográfica.</p>
-        <div class="question-card"><span>Pergunta-guia</span><strong>O que os dados de mercado imobiliário, segurança pública, clima e território revelam quando passam a ser vistos juntos em um único mapa?</strong></div>
-        <p class="method-note">Protótipo experimental. Não substitui sistemas oficiais, vistorias, laudos técnicos ou decisões das autoridades competentes.</p>
-      </aside>
+      <div class="floating-search" role="search"><span class="search-icon" aria-hidden="true">⌕</span><input id="searchMirror" type="search" placeholder="Bairro, rua ou coordenada" aria-label="Bairro, rua ou coordenada" aria-describedby="searchHint" enterkeyhint="search" /><button id="searchMirrorBtn">Buscar</button></div>
+      <div class="edge-tools"><button id="togglePanel" aria-label="Abrir camadas" aria-controls="panel" aria-expanded="true" title="Camadas">☷</button></div>
+      <div id="mapStatus" class="map-status"><span class="status-dot" aria-hidden="true"></span><div><strong id="activeBaseLabel">Ortofoto Niterói 2019</strong><small id="statusMessage">Carregando base cartográfica…</small></div></div>
+      <div id="coords" class="coords">Clique no mapa para consultar um local</div>
+      <aside id="aboutPanel" class="about-panel" aria-labelledby="aboutTitle" hidden><button id="closeAbout" class="close-btn" aria-label="Fechar sobre o projeto">×</button><span class="eyebrow">Protótipo científico e tecnológico</span><h2 id="aboutTitle">Um território, várias leituras</h2><p>O ARPIAS360 integra dados públicos territoriais, ambientais, climáticos, imobiliários, de segurança e de riscos em uma única interface cartográfica.</p><div class="question-card"><span>Pergunta-guia</span><strong>O que os dados de mercado imobiliário, segurança pública, clima e território revelam quando passam a ser vistos juntos em um único mapa?</strong></div><p class="method-note">Protótipo experimental. Não substitui sistemas oficiais, vistorias, laudos técnicos ou decisões das autoridades competentes.</p></aside>
     </section>
+    <nav class="mobile-actions" aria-label="Ações do mapa"><button id="mobileLayersBtn" aria-controls="panel" aria-expanded="false"><span aria-hidden="true">☷</span> Camadas</button><button id="mobileLocateBtn"><span aria-hidden="true">◎</span> Minha localização</button></nav>
+    <section id="querySheet" class="query-sheet" aria-labelledby="queryHeading" hidden><div class="sheet-handle" aria-hidden="true"></div><header class="query-header"><h2 id="queryHeading" tabindex="-1">Consulta do ponto</h2><button id="closeQuery" class="close-btn" aria-label="Fechar consulta">×</button></header><div id="queryBody" class="query-body"></div></section>
   </main>
-
   <dialog id="layerInfo" aria-labelledby="infoTitle"><button id="closeInfo" class="close-btn" aria-label="Fechar informações">×</button><div id="infoBody"></div></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://unpkg.com/esri-leaflet@3.0.12/dist/esri-leaflet.js"></script>
-  <script src="js/app.js?v=20261001-fase1"></script>
+  <script src="js/location.js?v=20261001-noturno"></script>
+  <script src="js/app.js?v=20261001-noturno"></script>
 </body>
 </html>

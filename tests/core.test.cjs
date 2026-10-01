@@ -9,10 +9,12 @@ class Element{
   constructor(tag){this.tag=tag;this.children=[];this.listeners={};this.textContent='';}
   append(...nodes){this.children.push(...nodes);}
   addEventListener(name,fn){this.listeners[name]=fn;}
+  setAttribute(name,value){(this.attributes??={})[name]=value;}
+  querySelector(selector){return this.children.find(node=>selector==='.'+node.className)||null;}
 }
 function sandbox(){
   const messages=[];
-  const context=vm.createContext({document:{createElement:tag=>new Element(tag)},navigator:{},toast:m=>messages.push(m),AbortSignal,fetch:async()=>({ok:true,json:async()=>({})}),console:{error(){}},civilMessage:new Element('div')});
+  const context=vm.createContext({document:{createElement:tag=>new Element(tag)},navigator:{},toast:m=>messages.push(m),AbortSignal,matchMedia:()=>({matches:false}),fetch:async()=>({ok:true,json:async()=>({})}),console:{error(){}},civilMessage:new Element('div')});
   for(const [start,end] of [['function element(', 'async function readJSON('],['async function readJSON(', 'const baseControl='],['function civilPopup(', 'async function showCivilInfo('],['function validateCollection(', 'async function loadCivil('],['async function loadCivil(', 'civilDefs.forEach(']]){
     vm.runInContext(source.slice(source.indexOf(start),source.indexOf(end,source.indexOf(start))),context);
   }
@@ -67,4 +69,10 @@ test('satellite failure restores the preceding base without changing inactive ba
   Object.assign(c,{baseDefs:[ortho,osm,sat],activeBaseDef:sat,previousBaseDef:osm,baseState(){},selectBase:d=>selected.push(d),updateStatus(){}});
   const start=source.indexOf('function baseFailure(');vm.runInContext(source.slice(start,source.indexOf('baseDefs.forEach(d=>{',start)),c);
   c.baseFailure(sat);assert.equal(selected[0],osm);selected.length=0;c.activeBaseDef=osm;c.baseFailure(sat);assert.equal(selected.length,0);
+});
+test('sharing awaits clipboard and exposes only a coordinate link',async()=>{
+  const {context:c,messages}=sandbox();c.ARPIASLocation=require('../js/location.js');c.location={href:'https://example.test/arpias/?private=remove#old'};c.map={getZoom:()=>16};
+  let finish,written;c.navigator.clipboard={writeText:text=>{written=text;return new Promise(resolve=>{finish=resolve;});}};
+  const root=new Element('div');const task=c.sharePoint(root,{lat:-22.9,lng:-43.1});assert.deepEqual(messages,[]);finish();await task;
+  assert.equal(written,'https://example.test/arpias/?lat=-22.900000&lon=-43.100000&zoom=16');assert.ok(messages.at(-1).startsWith('Link do ponto copiado.'));assert.equal(root.children[0].readOnly,true);
 });
