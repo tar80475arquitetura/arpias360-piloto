@@ -1,0 +1,22 @@
+{
+  "funcionais": [
+    {"nome":"Ortofoto Niterói 2019","fonte":"Prefeitura Municipal de Niterói / SIGeo","url":"https://geo.niteroi.rj.gov.br/arcgis/rest/services/Imagens/Mosaico_2019_mapservice/MapServer","status":"funcional - base oficial em cache, LOD 0-23"},
+    {"nome":"Limite municipal","fonte":"Prefeitura Municipal de Niterói","url":"https://geo.niteroi.rj.gov.br/arcgis/rest/services/Aplicacoes/LIM_POL_MUN_mapservice/MapServer/70","status":"funcional"},
+    {"nome":"Bairros","fonte":"Prefeitura Municipal de Niterói - Plano Diretor","url":"https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/PlanoDiretor/FeatureServer/310","status":"funcional"},
+    {"nome":"Lotes","fonte":"Prefeitura Municipal de Niterói - Dados Abertos","url":"https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/AS_SMF_CLIN_CULT_EDUC_LIMPOL/MapServer/15","status":"funcional a partir do zoom 16"},
+    {"nome":"Hidrografia","fonte":"Prefeitura Municipal de Niterói - Plano Diretor","url":"https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/PlanoDiretor/FeatureServer/35","status":"funcional"},
+    {"nome":"ZEIS","fonte":"Prefeitura Municipal de Niterói - Plano Diretor","url":"https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/PlanoDiretor/FeatureServer/105","status":"funcional"},
+    {"nome":"Comunidades","fonte":"Prefeitura Municipal de Niterói - Dados Abertos","url":"https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/AS_SMF_CLIN_CULT_EDUC_LIMPOL/MapServer/70","status":"funcional"},
+    {"nome":"Camadas ambientais","fonte":"Prefeitura Municipal de Niterói - Plano Diretor","url":"https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/PlanoDiretor/FeatureServer","status":"funcional - ZEIA, APP municipal e APA municipal"}
+  ],
+  "parciais": [
+    {"nome":"Satélite recente","fonte":"NASA GIBS / VIIRS","url":"https://gibs.earthdata.nasa.gov/","status":"complementar - data automática recente; resolução inferior à ortofoto"},
+    {"nome":"ITBI 2020-2025","fonte":"Secretaria Municipal de Fazenda de Niterói","url":"https://www.fazenda.niteroi.rj.gov.br/site/dados-das-transacoes-imobiliarias/","status":"fonte validada; integração cartográfica exige geocodificação/agregação"}
+  ],
+  "planejadas": [
+    {"nome":"Indicadores ISP","fonte":"ISP Conecta","url":"https://www.ispconecta.rj.gov.br/","status":"planejada - usar recortes agregados"},
+    {"nome":"Pluviômetros/Cemaden","fonte":"Cemaden","url":"https://www2.cemaden.gov.br/pluviometros-automatico/","status":"planejada"},
+    {"nome":"S2ID","fonte":"Sistema Integrado de Informações sobre Desastres","url":"https://s2id.mi.gov.br/","status":"planejada"},
+    {"nome":"IPTU / SINTER / CIB","fonte":"cadastro territorial","url":"","status":"planejada - sem exposição de dados pessoais ou fiscais protegidos"}
+  ]
+}
