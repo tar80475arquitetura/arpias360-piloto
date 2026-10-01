@@ -1,0 +1,46 @@
+{
+  "generated_at": "2026-10-01",
+  "pilot": "Niterói/RJ",
+  "datasets": [
+    {
+      "id": "sirenes",
+      "file": "data/processed/defesa-civil/sirenes.geojson",
+      "count": 37,
+      "geometry": "Point",
+      "source": "Prefeitura de Niterói / GeoNit / Defesa Civil",
+      "crs": "EPSG:4326",
+      "original_crs": "SIRGAS 2000 / UTM 23S (EPSG:31983)",
+      "notes": "Convertido de base pública recuperada; coordenadas transformadas para WGS84."
+    },
+    {
+      "id": "pluviometros",
+      "file": "data/processed/defesa-civil/pluviometros.geojson",
+      "count": 38,
+      "geometry": "Point",
+      "source": "Prefeitura de Niterói / GeoNit / Defesa Civil",
+      "crs": "EPSG:4326",
+      "original_crs": "SIRGAS 2000 / UTM 23S (EPSG:31983)",
+      "notes": "Não inclui leitura pluviométrica atual; apenas localização e identificação das estações."
+    },
+    {
+      "id": "nudecs",
+      "file": "data/processed/defesa-civil/nudecs.geojson",
+      "count": 36,
+      "geometry": "Point",
+      "source": "Prefeitura de Niterói / GeoNit / Defesa Civil",
+      "crs": "EPSG:4326",
+      "original_crs": "SIRGAS 2000 / UTM 23S (EPSG:31983)",
+      "notes": "Campos de contato e telefone foram removidos da cópia pública."
+    },
+    {
+      "id": "pontos_apoio",
+      "file": "data/processed/defesa-civil/pontos-apoio.geojson",
+      "count": 27,
+      "geometry": "Point",
+      "source": "Prefeitura de Niterói / GeoNit / Defesa Civil",
+      "crs": "EPSG:4326",
+      "original_crs": "SIRGAS 2000 / UTM 23S (EPSG:31983)",
+      "notes": "Convertido de shapefile público recuperado."
+    }
+  ]
+}
