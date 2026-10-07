@@ -44,3 +44,30 @@
 .layer-control:has(#reliefClassification) > .popup-note{grid-column:1/-1;margin:8px;font-size:15px}
 .geomorph-warning{font-size:16px;line-height:1.5;color:#243644;background:#f2eee2;border-left:4px solid #806226;padding:10px 12px;margin:8px 0 16px;font-weight:600}
 .opacity-control output{font-size:15px;font-weight:600}
+
+
+/* Rodada operacional 07/10/2026: densidade GIS, estados claros e mapa dominante. */
+:root{--ops-focus:#d3b565;--ops-active:#eef4ea;--ops-panel:#19352d;--ops-panel-2:#203f35}
+.topbar{border-bottom-color:#c5d0c7;box-shadow:0 2px 10px #172f2912}
+.tool-button{border-color:transparent}.tool-button:hover{background:#edf1ed;color:#172f29}.tool-button.active{background:#dfeadf;border-color:#9fb7a3;color:#1d4638;box-shadow:inset 0 -2px 0 #3e7056}
+.layer-panel{background:var(--ops-panel);border-right-color:#0d251e}.panel-title-row{padding:14px 14px 11px}.panel-title-row h2{font-size:20px}.panel-scroll{scrollbar-color:#789085 transparent}
+.accordion summary{min-height:42px;padding:10px 14px;font-size:13px;background:#ffffff03}.accordion[open]>summary{background:#ffffff08}.accordion-body{padding:0 9px 10px}.control-list{gap:5px}
+.layer-control{position:relative;min-height:50px;border-color:#ffffff24;background:#ffffff05;border-radius:7px;padding-right:3px;transition:background var(--motion),border-color var(--motion),box-shadow var(--motion)}
+.layer-label{min-height:50px;padding:7px 8px;gap:8px}.layer-icon{width:20px;height:20px}.layer-name .name{font-size:12px;font-weight:700}.civil-status,.layer-status{font-size:9px;margin-top:2px}
+.layer-control[data-visible="true"]{background:#ffffff10;border-color:#98b89d;box-shadow:inset 3px 0 0 #b9d09f}.layer-control[data-visible="true"] .layer-status{color:#dcebd5}
+.layer-control[data-state="loading"]{border-color:#d6b862;background:#d6b86214}.layer-control[data-state="loading"] .layer-status{color:#f5d98b}
+.layer-control[data-state="error"]{border-color:#dc8d80;background:#a642371c}.layer-control[data-state="error"] .layer-status{color:#ffd2cb}
+.layer-control[data-query-target="true"]{box-shadow:inset 3px 0 0 var(--ops-focus),0 0 0 1px #d3b56566}.layer-control[data-query-target="true"]::after{content:"CONSULTA";position:absolute;right:49px;top:5px;font-size:8px;font-weight:800;letter-spacing:.08em;color:#f0d995}
+.layer-control[data-result-source="true"]{background:#ffffff16;border-color:#d3b565}.layer-control[data-result-source="true"] .name::after{content:" · selecionada";font-size:9px;font-weight:600;color:#f0d995}
+.switch{transform:scale(.9);margin-bottom:7px}.info-button{width:32px;height:40px}
+.catalog-search{padding:10px 12px 7px}.catalog-key{margin:4px 12px 10px;font-size:9px;line-height:1.45}.planned-entry{padding:7px 2px}
+.work-entry{border:1px solid #ffffff1f;border-radius:7px;padding:8px;margin-bottom:6px;background:#ffffff05}.work-entry>label{display:flex;align-items:center;gap:8px;min-height:34px}.work-entry>small{display:block;color:var(--panel-muted);font-size:10px;margin:2px 0 7px}.work-entry button{min-height:34px;margin:2px 3px 2px 0;font-size:11px}.work-entry[data-visible="true"]{border-color:#a6c2a3;background:#ffffff0e;box-shadow:inset 3px 0 0 #a9c58f}.work-entry[data-selected="true"]{border-color:#d3b565;box-shadow:inset 3px 0 0 #d3b565}
+.tool-panel{border:1px solid #9cad9f;border-left:4px solid var(--territory);box-shadow:0 10px 30px #172f2930;background:#fffffff8;backdrop-filter:blur(3px)}
+.tool-state{border-bottom:1px solid #d8e0d9;padding-bottom:6px;margin-bottom:6px}.tool-state strong,.about-panel h2{cursor:grab}.tool-state strong:active,.about-panel h2:active{cursor:grabbing}
+.tool-panel.is-dragging,.about-panel.is-dragging{transition:none!important;box-shadow:0 18px 50px #172f2948}.dragging-panel{user-select:none}
+.about-panel{border-color:#9cad9f}.about-panel h2{padding:4px 44px 4px 0}
+#queryLayer{border-color:#899b8e;background:#fff;color:#172f29;font-weight:650}.tool-panel[data-mode="consult"] #queryLayer{box-shadow:inset 3px 0 0 #d3b565}
+.territorial-panel{box-shadow:-8px 0 28px #172f2926;border-left:1px solid #bdc9bf}.query-header{border-bottom:1px solid #d7dfd8}
+@media(min-width:900px){.layer-panel{width:320px}.layers-open .mapwrap{left:320px}.floating-search{width:min(500px,calc(100% - 160px))}.tool-panel,.about-panel{touch-action:none}}
+@media(min-width:600px) and (max-width:899px){.layer-panel{width:min(350px,86vw)}.layer-control{min-height:54px}.layer-label{min-height:54px}.work-entry button{min-height:40px}}
+@media(max-width:599px){.layer-control{min-height:58px}.layer-label{min-height:58px}.layer-name .name{font-size:14px}.civil-status,.layer-status{font-size:11px}.layer-control[data-query-target="true"]::after{right:52px;top:4px}.work-entry button{min-height:44px}.tool-state strong,.about-panel h2{cursor:default}}

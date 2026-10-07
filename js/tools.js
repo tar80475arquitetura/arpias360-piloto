@@ -35,14 +35,14 @@ const ARPIASUI=(()=>{
   }
   function restore(collection){workGroup.clearLayers();ARPIASWork.validateCollection(collection).features.forEach(feature=>workGroup.addLayer(workLayer(feature)));renderWork();}
   function stopHandler(){if(handler){handler.disable();handler=null;}if(editing){editing.disable();editing=null;}byId('finishDrawing').hidden=true;byId('finishGeometry').hidden=true;}
-  function clearSelection(){generation++;selection=null;if(selectionLayer)map.removeLayer(selectionLayer);selectionLayer=null;if(queryMarker)map.removeLayer(queryMarker);queryMarker=null;map.closePopup();closeTerritorial();byId('shareSelectionBtn').disabled=true;byId('menuReport').disabled=true;byId('coords').textContent='Ative Consultar para investigar um local';}
+  function clearSelection(){generation++;selection=null;document.querySelectorAll('.layer-control[data-result-source="true"]').forEach(row=>row.removeAttribute('data-result-source'));if(selectionLayer)map.removeLayer(selectionLayer);selectionLayer=null;if(queryMarker)map.removeLayer(queryMarker);queryMarker=null;map.closePopup();closeTerritorial();byId('shareSelectionBtn').disabled=true;byId('menuReport').disabled=true;byId('coords').textContent='Ative Consultar para investigar um local';}
   async function request(next){
     if(changing)return false;if(mode===next)return true;changing=true;
     try{
       if(mode==='edit'&&dirty){if(!await confirm('Há alterações não salvas. Deseja descartá-las e encerrar a edição?','Descartar e sair'))return false;stopHandler();trash=JSON.parse(JSON.stringify(backupTrash));restore(backup);dirty=false;}
       if(next==='edit'&&!await confirm('Deseja iniciar uma camada de trabalho? As bases oficiais permanecem somente para leitura.','Iniciar edição'))return false;
       stopHandler();if(mode==='consult'||next==='consult')clearSelection();closeTerritorial();map.closePopup();closeMore();closeLayers();placeResults.hidden=true;
-      mode=next;queryLayer=null;byId('queryLayer').value='';byId('consultControls').hidden=next!=='consult';shell.classList.toggle('consult-active',next==='consult');if(next==='edit'){backup=serialize();backupTrash=JSON.parse(JSON.stringify(trash));}
+      mode=next;queryLayer=null;byId('queryLayer').value='';document.querySelectorAll('.layer-control[data-query-target="true"]').forEach(row=>row.removeAttribute('data-query-target'));byId('consultControls').hidden=next!=='consult';shell.classList.toggle('consult-active',next==='consult');if(next==='edit'){backup=serialize();backupTrash=JSON.parse(JSON.stringify(trash));}
       byId('toolPanel').classList.remove('collapsed');byId('collapseTool').setAttribute('aria-expanded','true');byId('collapseTool').textContent='−';
       byId('toolPanel').hidden=next==='navigate';byId('measureControls').hidden=next!=='measure';byId('editControls').hidden=next!=='edit';
       ['measureDistance','measureArea','clearMeasure'].forEach(id=>byId(id).hidden=false);
@@ -66,6 +66,7 @@ const ARPIASUI=(()=>{
     let m;try{m=geo.metrics(feature);}catch(error){toast('Não foi possível validar a geometria selecionada.');return;}
     clearSelection();const token=++generation;
     selection={feature:JSON.parse(JSON.stringify(feature)),title,meta,metrics:m,ref:L.latLng(m.lat,m.lon),context:{},token};
+    if(meta.layerId){const sourceRow=byId('layer_'+meta.layerId)?.closest('.layer-control');if(sourceRow)sourceRow.dataset.resultSource='true';}
     const selectedStyle=ARPIASCartography.selectionStyle(meta,m.type);
     selectionLayer=L.geoJSON(feature,{renderer:cartographicRenderer,style:selectedStyle,pointToLayer:(f,ll)=>L.circleMarker(ll,{...selectedStyle,renderer:pointRenderer}),interactive:false}).addTo(map);
     byId('shareSelectionBtn').disabled=false;byId('menuReport').disabled=false;byId('coords').textContent=`${m.lat.toFixed(6)}, ${m.lon.toFixed(6)}`;
@@ -111,8 +112,12 @@ const ARPIASUI=(()=>{
   function queryInstruction(){return !queryLayer?'Escolha uma camada para consultar.':queryLayer==='bairros'?'Clique no mapa para selecionar um bairro.':`Clique no mapa para consultar ${[...overlayDefs,...civilDefs,...reliefDefs.filter(d=>d.ready)].find(d=>d.id===queryLayer)?.name||'a camada escolhida'}.`;}
   const querySelect=byId('queryLayer');
   function refreshQueryable(){const selected=querySelect.value;querySelect.querySelectorAll('option:not(:first-child)').forEach(o=>o.remove());[...overlayDefs,...civilDefs,...reliefDefs.filter(d=>d.ready)].forEach(d=>{const option=document.createElement('option');option.value=d.id;option.textContent=d.name;querySelect.append(option);});querySelect.value=selected;}
+  function syncQueryTarget(){
+    document.querySelectorAll('.layer-control[data-query-target="true"]').forEach(row=>row.removeAttribute('data-query-target'));
+    if(queryLayer){const row=byId('layer_'+queryLayer)?.closest('.layer-control');if(row)row.dataset.queryTarget='true';}
+  }
   refreshQueryable();
-  querySelect.addEventListener('change',()=>{clearSelection();queryLayer=querySelect.value||null;byId('toolHint').textContent=queryInstruction();});
+  querySelect.addEventListener('change',()=>{clearSelection();queryLayer=querySelect.value||null;syncQueryTarget();byId('toolHint').textContent=queryInstruction();});
   async function query(latlng,hit){
     if(mode!=='consult'||!queryLayer)return;
     clearSelection();const token=++generation,id=queryLayer;
@@ -197,11 +202,11 @@ const ARPIASUI=(()=>{
   function renderWork(){
     const list=byId('workList');list.replaceChildren();byId('workCount').textContent=`${workGroup.getLayers().length} feições`;byId('restoreWork').disabled=!trash.length;
     workGroup.eachLayer(layer=>{
-      const row=element('div',undefined,'work-entry');const p=layer.feature?.properties||{};
+      const row=element('div',undefined,'work-entry');const p=layer.feature?.properties||{};row.dataset.visible=String(map.hasLayer(layer));
       const label=element('label');const visible=element('input');visible.type='checkbox';visible.checked=map.hasLayer(layer);visible.setAttribute('aria-label',`Exibir ${p.titulo}`);
-      visible.addEventListener('change',()=>{if(visible.checked)layer.addTo(map);else map.removeLayer(layer);});label.append(visible,element('strong',p.titulo));row.append(label);
+      visible.addEventListener('change',()=>{if(visible.checked)layer.addTo(map);else map.removeLayer(layer);row.dataset.visible=String(visible.checked);});label.append(visible,element('strong',p.titulo));row.append(label);
       row.append(element('small',`Camada de trabalho · ${p.categoria||'Sem categoria'}`));
-      row.append(action('Consultar',()=>select(layer.toGeoJSON(false),p.titulo,{source:p.source||'Camada de trabalho do usuário',work:true})),action('Renomear / editar atributos',async()=>{if(await request('edit'))openForm(layer,false);}),action('Excluir',async()=>{
+      row.append(action('Consultar',()=>{document.querySelectorAll('.work-entry[data-selected="true"]').forEach(item=>item.removeAttribute('data-selected'));row.dataset.selected='true';select(layer.toGeoJSON(false),p.titulo,{source:p.source||'Camada de trabalho do usuário',work:true});}),action('Renomear / editar atributos',async()=>{if(await request('edit'))openForm(layer,false);}),action('Excluir',async()=>{
         if(!await request('edit'))return;if(!await confirm(`Excluir a feição de trabalho “${p.titulo}”? Ela poderá ser restaurada.`, 'Excluir feição'))return;
         trash.push(ARPIASWork.record(layer.toGeoJSON(false),'delete'));workGroup.removeLayer(layer);map.removeLayer(layer);dirty=true;renderWork();
       }));if(layer.feature?.arpiasOrigin)row.append(action('Restaurar geometria original',async()=>{if(!await request('edit'))return;const original=ARPIASWork.restoreOriginal(layer.toGeoJSON(false));workGroup.removeLayer(layer);map.removeLayer(layer);workGroup.addLayer(workLayer(original));dirty=true;renderWork();}));list.append(row);
