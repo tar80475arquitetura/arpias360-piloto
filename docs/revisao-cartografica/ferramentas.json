@@ -1,0 +1,76 @@
+[
+  {
+    "device": "mobile",
+    "base": "ortho",
+    "label": "Medição mantida · Área: 44.914.285,81 m² (4.491,43 ha) · perímetro: 31,58 km",
+    "measure": 0,
+    "overflow": false
+  },
+  {
+    "device": "mobile",
+    "base": "osm",
+    "dash": "12 4 2 4",
+    "label": "Medição mantida · Área: 44.914.285,81 m² (4.491,43 ha) · perímetro: 31,58 km",
+    "measure": 1,
+    "overflow": false
+  },
+  {
+    "device": "mobile",
+    "base": "recent",
+    "dash": "12 4 2 4",
+    "label": "Medição mantida · Área: 44.914.285,81 m² (4.491,43 ha) · perímetro: 31,58 km",
+    "measure": 1,
+    "overflow": false
+  },
+  {
+    "tool": "work",
+    "device": "desktop",
+    "base": "ortho",
+    "paths": 2,
+    "points": 1,
+    "status": "Disponível"
+  },
+  {
+    "tool": "work",
+    "device": "desktop",
+    "base": "osm",
+    "paths": 2,
+    "points": 1,
+    "status": "Disponível"
+  },
+  {
+    "tool": "work",
+    "device": "desktop",
+    "base": "recent",
+    "paths": 2,
+    "points": 1,
+    "status": "Disponível"
+  },
+  {
+    "tool": "work",
+    "device": "mobile",
+    "base": "ortho",
+    "overflow": false,
+    "paths": 2,
+    "points": 1,
+    "status": "Disponível"
+  },
+  {
+    "tool": "work",
+    "device": "mobile",
+    "base": "osm",
+    "overflow": false,
+    "paths": 2,
+    "points": 1,
+    "status": "Disponível"
+  },
+  {
+    "tool": "work",
+    "device": "mobile",
+    "base": "recent",
+    "overflow": false,
+    "paths": 2,
+    "points": 1,
+    "status": "Disponível"
+  }
+]

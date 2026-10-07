@@ -1,0 +1,22 @@
+name: Testes ARPIAS360
+on:
+  push:
+    branches: [codex/arpias360-next, main]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: node --check js/app.js
+      - run: node --check js/tools.js
+      - run: node -e "JSON.parse(require('fs').readFileSync('data/camadas.json','utf8')); JSON.parse(require('fs').readFileSync('data/catalogo.json','utf8'));"
+      - run: npm test

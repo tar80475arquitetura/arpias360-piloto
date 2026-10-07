@@ -1,0 +1,429 @@
+{
+  "source": "CPRM / Serviço Geológico do Brasil",
+  "year": 2017,
+  "scale": "1:30.000",
+  "url": "https://rigeo.sgb.gov.br/handle/doc/17483",
+  "sha256": "d3ed15b364d452436178b612268e9d7de201fbce2ad3cd1e472dbd7caff99b95",
+  "files": [
+    {
+      "name": "niteroi_padraoderelevo/",
+      "bytes": 0
+    },
+    {
+      "name": "niteroi_padraoderelevo/limite_niteroi.cpg",
+      "bytes": 5
+    },
+    {
+      "name": "niteroi_padraoderelevo/limite_niteroi.dbf",
+      "bytes": 1167
+    },
+    {
+      "name": "niteroi_padraoderelevo/limite_niteroi.prj",
+      "bytes": 418
+    },
+    {
+      "name": "niteroi_padraoderelevo/limite_niteroi.sbn",
+      "bytes": 132
+    },
+    {
+      "name": "niteroi_padraoderelevo/limite_niteroi.sbx",
+      "bytes": 116
+    },
+    {
+      "name": "niteroi_padraoderelevo/limite_niteroi.shp",
+      "bytes": 115552
+    },
+    {
+      "name": "niteroi_padraoderelevo/limite_niteroi.shp.xml",
+      "bytes": 30902
+    },
+    {
+      "name": "niteroi_padraoderelevo/limite_niteroi.shx",
+      "bytes": 108
+    },
+    {
+      "name": "niteroi_padraoderelevo/niteroi_padraoderelevo.lyr",
+      "bytes": 14336
+    },
+    {
+      "name": "niteroi_padraoderelevo/Niterói.cpg",
+      "bytes": 5
+    },
+    {
+      "name": "niteroi_padraoderelevo/Niterói.dbf",
+      "bytes": 778165
+    },
+    {
+      "name": "niteroi_padraoderelevo/Niterói.prj",
+      "bytes": 151
+    },
+    {
+      "name": "niteroi_padraoderelevo/Niterói.sbn",
+      "bytes": 4148
+    },
+    {
+      "name": "niteroi_padraoderelevo/Niterói.sbx",
+      "bytes": 468
+    },
+    {
+      "name": "niteroi_padraoderelevo/Niterói.shp",
+      "bytes": 3580056
+    },
+    {
+      "name": "niteroi_padraoderelevo/Niterói.shp.xml",
+      "bytes": 52154
+    },
+    {
+      "name": "niteroi_padraoderelevo/Niterói.shx",
+      "bytes": 3292
+    }
+  ],
+  "layers": [
+    {
+      "name": "limite_niteroi.shp",
+      "derivative": "data/processed/cprm/limite-pacote.geojson",
+      "shapeType": "POLYGON",
+      "features": 1,
+      "crs": 31983,
+      "crsWkt": "PROJCS[\"SIRGAS_2000_UTM_Zone_23S\",GEOGCS[\"GCS_SIRGAS_2000\",DATUM[\"D_SIRGAS_2000\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000.0],PARAMETER[\"False_Northing\",10000000.0],PARAMETER[\"Central_Meridian\",-45.0],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0.0],UNIT[\"Meter\",1.0]]",
+      "encoding": "UTF-8",
+      "fields": [
+        [
+          "nm_municip",
+          "C",
+          60,
+          0
+        ],
+        [
+          "cd_geocmu",
+          "C",
+          7,
+          0
+        ],
+        [
+          "geometriaa",
+          "C",
+          3,
+          0
+        ],
+        [
+          "anoderefer",
+          "F",
+          19,
+          11
+        ],
+        [
+          "uf",
+          "C",
+          2,
+          0
+        ],
+        [
+          "tipo",
+          "C",
+          25,
+          0
+        ],
+        [
+          "fonte",
+          "C",
+          254,
+          0
+        ],
+        [
+          "shape_Leng",
+          "F",
+          19,
+          11
+        ],
+        [
+          "EXECUCAO",
+          "C",
+          50,
+          0
+        ],
+        [
+          "CONSISTIDO",
+          "C",
+          50,
+          0
+        ],
+        [
+          "Carta_Susc",
+          "C",
+          5,
+          0
+        ],
+        [
+          "Shape_Le_1",
+          "F",
+          19,
+          11
+        ],
+        [
+          "Shape_Area",
+          "F",
+          19,
+          11
+        ],
+        [
+          "encarterel",
+          "C",
+          5,
+          0
+        ],
+        [
+          "Mesorregio",
+          "C",
+          80,
+          0
+        ],
+        [
+          "ORDEM",
+          "C",
+          3,
+          0
+        ]
+      ],
+      "sourceExtent": [
+        690922.6991196041,
+        7456334.818538761,
+        709974.5845313119,
+        7471433.277193621
+      ],
+      "targetExtent": [
+        -43.13908662174984,
+        -22.989758335079024,
+        -42.95284549672165,
+        -22.853767011938007
+      ],
+      "invalidGeometries": 0,
+      "vertices": 7209,
+      "maxVerticesPerFeature": 7209,
+      "transformation": "Inverse of UTM zone 23S + SIRGAS 2000 to WGS 84 (1) + axis order change (2D)",
+      "accuracyMeters": 1.0,
+      "simplification": false,
+      "sha256": "89b9a68bfce14a7c572de1c976f915b551db1b98af80695f31328333b73d7cd3"
+    },
+    {
+      "name": "Niterói.shp",
+      "derivative": "data/processed/cprm/padroes-relevo.geojson",
+      "shapeType": "POLYGONM",
+      "features": 399,
+      "crs": 4674,
+      "crsWkt": "GEOGCS[\"GCS_SIRGAS_2000\",DATUM[\"D_SIRGAS_2000\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]]",
+      "encoding": "UTF-8",
+      "fields": [
+        [
+          "GEOMETRIA",
+          "C",
+          5,
+          0
+        ],
+        [
+          "MUNICIPIO",
+          "C",
+          50,
+          0
+        ],
+        [
+          "UF",
+          "C",
+          2,
+          0
+        ],
+        [
+          "UnMorfoest",
+          "C",
+          254,
+          0
+        ],
+        [
+          "UnMorfoesc",
+          "C",
+          254,
+          0
+        ],
+        [
+          "UnGeomorf",
+          "C",
+          254,
+          0
+        ],
+        [
+          "PADRAO",
+          "C",
+          100,
+          0
+        ],
+        [
+          "COD_REL",
+          "C",
+          10,
+          0
+        ],
+        [
+          "OBS",
+          "C",
+          200,
+          0
+        ],
+        [
+          "Amplitude",
+          "C",
+          254,
+          0
+        ],
+        [
+          "Declividad",
+          "C",
+          254,
+          0
+        ],
+        [
+          "Declivid_1",
+          "C",
+          254,
+          0
+        ],
+        [
+          "Shape_Leng",
+          "F",
+          19,
+          11
+        ],
+        [
+          "Shape_Area",
+          "F",
+          19,
+          11
+        ],
+        [
+          "AREA_KM2",
+          "F",
+          19,
+          11
+        ]
+      ],
+      "sourceExtent": [
+        -43.13695410999998,
+        -22.98209105099994,
+        -42.95284549699995,
+        -22.85376701099998
+      ],
+      "targetExtent": [
+        -43.13695410999998,
+        -22.98209105099994,
+        -42.95284549699994,
+        -22.853767010999945
+      ],
+      "invalidGeometries": 0,
+      "vertices": 147964,
+      "maxVerticesPerFeature": 16518,
+      "transformation": "axis order change (2D) + SIRGAS 2000 to WGS 84 (1) + axis order change (2D)",
+      "accuracyMeters": 1.0,
+      "simplification": false,
+      "sha256": "a348e50c745c50a25aa8f0835f7427aecb4f96789ca8cdf03e7b2b23ad2bd782",
+      "classes": {
+        "COD_REL": [
+          "R1a",
+          "R1c1",
+          "R1c2",
+          "R1d1",
+          "R1d2",
+          "R1e",
+          "R1f1",
+          "R1h1",
+          "R1h2",
+          "R1h3",
+          "R1h4",
+          "R3a3",
+          "R3b",
+          "R4a1",
+          "R4a2",
+          "R4a3",
+          "R4b1",
+          "R4b2",
+          "R4c1",
+          "R4h",
+          "Água"
+        ],
+        "PADRAO": [
+          "Campos de Dunas (dunas fixas)",
+          "Colinas",
+          "Cristas Isoladas e Serras Baixas",
+          "Depósitos Tecnogênicos (aterros sanitários)",
+          "Depósitos Tecnogênicos (aterros sobre corpos d’água)",
+          "Domínio Serrano",
+          "Formações Tecnogênicas (terrenos alterados pela atividade de mineração)",
+          "Formações tecnogênicas (esplanadas)",
+          "Ilhas Costeiras",
+          "Inselbergs e Outros Relevos Residuais (cristas isoladas, morros residuais, pontões, monólitos)",
+          "Lajes, Lajedões e Plataformas de Abrasão",
+          "Massa d'água",
+          "Morros Altos",
+          "Morros Baixos",
+          "Morrotes",
+          "Planícies Fluviomarinhas (brejos)",
+          "Planícies Fluviomarinhas (mangues)",
+          "Planícies Marinhas (restingas)",
+          "Planícies de Inundação (várzeas)",
+          "Rampas de Alúvio-Colúvio",
+          "Rampas de Colúvio/Depósito de Tálus"
+        ],
+        "UnGeomorf": [
+          "Baixada da Baía de Guanabara",
+          "Baixada da Região Oceânica de Niterói",
+          "Maciços da Região dos Lagos (serras da Tiririca, do Cantagalo e da Viração)",
+          "Massa d'água",
+          "Morraria de Niterói-São Gonçalo",
+          "Patamar de Pendotiba - Rio do Ouro - Várzea das Moças"
+        ],
+        "UnMorfoest": [
+          "Cinturão Orogênico do Atlântico (alto estrutural)",
+          "Coberturas Sedimentares Quaternárias",
+          "Formações Antropocênicas",
+          "Massa d'água"
+        ],
+        "UnMorfoesc": [
+          "Maciços Costeiros",
+          "Massa d'água",
+          "Planaltos Residuais",
+          "Planícies Costeiras",
+          "Planícies Fluviomarinhas (Baixadas)"
+        ]
+      },
+      "classCounts": {
+        "R1a": 12,
+        "R1c1": 82,
+        "R1c2": 143,
+        "R1d1": 4,
+        "R1d2": 4,
+        "R1e": 13,
+        "R1f1": 1,
+        "R1h1": 4,
+        "R1h2": 1,
+        "R1h3": 11,
+        "R1h4": 1,
+        "R3a3": 3,
+        "R3b": 1,
+        "R4a1": 69,
+        "R4a2": 33,
+        "R4a3": 2,
+        "R4b1": 9,
+        "R4b2": 3,
+        "R4c1": 1,
+        "R4h": 1,
+        "Água": 1
+      },
+      "areaKm2AllZero": true
+    }
+  ],
+  "territorialCheck": {
+    "allMunicipalityNiteroi": true,
+    "outsidePackageBoundaryAreaDegrees2": 1.936607974145519e-05,
+    "note": "Comparação com limite IBGE 2015 do próprio pacote; diferenças cartográficas não foram recortadas nem corrigidas."
+  },
+  "privacy": "Campos técnicos e administrativos; sem nomes pessoais, CPF, contatos ou proprietários.",
+  "processing": "CRS lido de cada PRJ; transformação para EPSG:4326 com always_xy; sem arredondamento, simplificação, recorte ou reparo. GeoJSON 2D não representa a medida M de PolygonM."
+}

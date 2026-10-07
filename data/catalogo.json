@@ -1,0 +1,1192 @@
+{
+  "version": 2,
+  "groups": [
+    {
+      "id": "base",
+      "title": "Mapas de Referência",
+      "items": [
+        {
+          "name": "Foto Aérea 2019",
+          "state": "integrated",
+          "source": "Prefeitura Municipal de Niterói / SIGeo",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/Imagens/Mosaico_2019_mapservice/MapServer",
+          "note": "Controle cartográfico existente; o status operacional acompanha o carregamento real.",
+          "control": "base_ortho",
+          "keywords": []
+        },
+        {
+          "name": "OpenStreetMap",
+          "state": "integrated",
+          "source": "OpenStreetMap",
+          "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+          "note": "Controle cartográfico existente; o status operacional acompanha o carregamento real.",
+          "control": "base_osm",
+          "keywords": []
+        },
+        {
+          "name": "Satélite recente",
+          "state": "integrated",
+          "source": "NASA GIBS / VIIRS",
+          "url": "https://gibs.earthdata.nasa.gov/",
+          "note": "Controle cartográfico existente; o status operacional acompanha o carregamento real.",
+          "control": "base_recent",
+          "keywords": []
+        }
+      ]
+    },
+    {
+      "id": "risk",
+      "title": "Riscos e Proteção Civil",
+      "items": [
+        {
+          "name": "Sirenes de Alerta",
+          "state": "integrated",
+          "source": "Prefeitura de Niterói / GeoNit / Defesa Civil",
+          "url": "data/processed/defesa-civil/sirenes.geojson",
+          "note": "Controle cartográfico existente; o status operacional acompanha o carregamento real.",
+          "control": "layer_sirenes",
+          "count": 37,
+          "keywords": []
+        },
+        {
+          "name": "Rede Municipal de Pluviometria",
+          "state": "integrated",
+          "source": "Prefeitura de Niterói / GeoNit / Defesa Civil",
+          "url": "data/processed/defesa-civil/pluviometros.geojson",
+          "note": "Controle cartográfico existente; o status operacional acompanha o carregamento real.",
+          "control": "layer_pluviometros",
+          "count": 38,
+          "keywords": [
+            "chuva",
+            "pluviômetro",
+            "pluviometria"
+          ]
+        },
+        {
+          "name": "NUDECs",
+          "state": "integrated",
+          "source": "Prefeitura de Niterói / GeoNit / Defesa Civil",
+          "url": "data/processed/defesa-civil/nudecs.geojson",
+          "note": "Controle cartográfico existente; o status operacional acompanha o carregamento real.",
+          "control": "layer_nudecs",
+          "count": 36,
+          "keywords": []
+        },
+        {
+          "name": "Pontos de Apoio Emergencial",
+          "state": "integrated",
+          "source": "Prefeitura de Niterói / GeoNit / Defesa Civil",
+          "url": "data/processed/defesa-civil/pontos-apoio.geojson",
+          "note": "Controle cartográfico existente; o status operacional acompanha o carregamento real.",
+          "control": "layer_pontos_apoio",
+          "count": 27,
+          "keywords": []
+        },
+        {
+          "name": "Obras de Contenção / Obras de Encosta",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não foi localizado arquivo real ou endpoint específico comprovado no repositório. Integração futura até comprovação da fonte.",
+          "keywords": []
+        },
+        {
+          "name": "Áreas Interditadas",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Ocorrências de Inundação e Alagamento",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": [
+            "alagáveis",
+            "enchente"
+          ]
+        },
+        {
+          "name": "Áreas Alagáveis",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": [
+            "alagamento",
+            "inundação"
+          ]
+        },
+        {
+          "name": "Movimentos de Massa",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Danos Informados",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não foi localizado arquivo real ou endpoint específico comprovado no repositório. Integração futura até comprovação da fonte.",
+          "keywords": []
+        },
+        {
+          "name": "Classes de Declividade",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        }
+      ]
+    },
+    {
+      "id": "territory",
+      "title": "Estrutura Territorial",
+      "items": [
+        {
+          "name": "Limite Municipal",
+          "state": "integrated",
+          "source": "Prefeitura Municipal de Niterói",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/Aplicacoes/LIM_POL_MUN_mapservice/MapServer/70",
+          "note": "Controle cartográfico existente; o status operacional acompanha o carregamento real.",
+          "control": "layer_limite",
+          "keywords": []
+        },
+        {
+          "name": "Limites de Bairros",
+          "state": "integrated",
+          "source": "Prefeitura Municipal de Niterói / Plano Diretor",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/PlanoDiretor/FeatureServer/310",
+          "note": "Controle cartográfico existente; o status operacional acompanha o carregamento real.",
+          "control": "layer_bairros",
+          "keywords": []
+        },
+        {
+          "name": "Regiões Administrativas",
+          "state": "available",
+          "source": "Prefeitura de Niterói / GeoNit",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/PlanoDiretor/FeatureServer/305",
+          "note": "Fonte real identificada; não representa uma camada adicional já testada no mapa.",
+          "keywords": []
+        },
+        {
+          "name": "Malha de Logradouros",
+          "state": "available",
+          "source": "Prefeitura de Niterói / GeoNit",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/PlanoDiretor/FeatureServer/30",
+          "note": "Fonte real identificada; não representa uma camada adicional já testada no mapa.",
+          "keywords": []
+        },
+        {
+          "name": "Parcelas / Lotes Cadastrais",
+          "state": "available",
+          "source": "Prefeitura de Niterói / GeoNit",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/AS_SMF_CLIN_CULT_EDUC_LIMPOL/MapServer/15",
+          "note": "Fonte identificada. Controle cadastral experimental existente a partir do zoom 16, sem promoção a funcional nesta fase.",
+          "keywords": [
+            "lote"
+          ]
+        },
+        {
+          "name": "Edificações",
+          "state": "future",
+          "source": "Prefeitura de Niterói / GeoNit",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/SMARHS_SMDCG_SMS_SMU/MapServer/200",
+          "note": "Integração futura. Referência identificada, sem nova camada integrada nesta fase.",
+          "keywords": []
+        },
+        {
+          "name": "Setores Cadastrais",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Quadras Cadastrais",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Hidrografia",
+          "state": "integrated",
+          "source": "Prefeitura Municipal de Niterói / Plano Diretor",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/PlanoDiretor/FeatureServer/35",
+          "note": "Controle cartográfico existente; o status operacional acompanha o carregamento real.",
+          "control": "layer_hidro",
+          "keywords": []
+        },
+        {
+          "name": "Curvas de Nível",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        }
+      ]
+    },
+    {
+      "id": "planning",
+      "title": "Planejamento e Ordenamento Urbano",
+      "items": [
+        {
+          "name": "Plano Diretor",
+          "state": "available",
+          "source": "Prefeitura de Niterói / GeoNit",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/PlanoDiretor/FeatureServer",
+          "note": "Fonte real identificada; não representa uma camada adicional já testada no mapa.",
+          "keywords": []
+        },
+        {
+          "name": "Macrozoneamento",
+          "state": "future",
+          "source": "Prefeitura de Niterói / GeoNit",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/PlanoDiretor/FeatureServer/180",
+          "note": "Integração futura. Referência identificada, sem nova camada integrada nesta fase.",
+          "keywords": []
+        },
+        {
+          "name": "ZEIS",
+          "state": "integrated",
+          "source": "Prefeitura Municipal de Niterói / Plano Diretor",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/PlanoDiretor/FeatureServer/105",
+          "note": "Controle cartográfico existente; o status operacional acompanha o carregamento real.",
+          "control": "layer_zeis",
+          "keywords": []
+        },
+        {
+          "name": "ZEIA",
+          "state": "integrated",
+          "source": "Prefeitura Municipal de Niterói / Plano Diretor",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/PlanoDiretor/FeatureServer/115",
+          "note": "Controle cartográfico existente; o status operacional acompanha o carregamento real.",
+          "control": "layer_zeia",
+          "keywords": []
+        },
+        {
+          "name": "Uso e Cobertura do Solo",
+          "state": "available",
+          "source": "Prefeitura de Niterói / GeoNit",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/SMARHS_SMDCG_SMS_SMU/MapServer/175",
+          "note": "Fonte real identificada; não representa uma camada adicional já testada no mapa.",
+          "keywords": []
+        },
+        {
+          "name": "Zoneamento de Uso e Ocupação do Solo",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Coeficiente de Aproveitamento",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Taxa de Ocupação",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Taxa de Permeabilidade",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Gabarito / Altura Máxima",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Parâmetros Urbanísticos",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        }
+      ]
+    },
+    {
+      "id": "environment",
+      "title": "Meio Ambiente",
+      "items": [
+        {
+          "name": "Áreas de Preservação Permanente",
+          "state": "integrated",
+          "source": "Prefeitura Municipal de Niterói / Plano Diretor",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/PlanoDiretor/FeatureServer/270",
+          "note": "Controle cartográfico existente; o status operacional acompanha o carregamento real.",
+          "control": "layer_appm",
+          "keywords": []
+        },
+        {
+          "name": "APP de Topo de Morro",
+          "state": "available",
+          "source": "Prefeitura de Niterói / GeoNit",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/SMARHS_SMDCG_SMS_SMU/MapServer/40",
+          "note": "Fonte real identificada; não representa uma camada adicional já testada no mapa.",
+          "keywords": []
+        },
+        {
+          "name": "Áreas de Proteção Ambiental",
+          "state": "integrated",
+          "source": "Prefeitura Municipal de Niterói / Plano Diretor",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/PlanoDiretor/FeatureServer/275",
+          "note": "Controle cartográfico existente; o status operacional acompanha o carregamento real.",
+          "control": "layer_apa",
+          "keywords": []
+        },
+        {
+          "name": "Bacias Hidrográficas",
+          "state": "available",
+          "source": "Prefeitura de Niterói / GeoNit",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/SMARHS_SMDCG_SMS_SMU/MapServer/10",
+          "note": "Fonte real identificada; não representa uma camada adicional já testada no mapa.",
+          "keywords": []
+        },
+        {
+          "name": "Hidrografia",
+          "state": "integrated",
+          "source": "Prefeitura Municipal de Niterói / Plano Diretor",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/PlanoDiretor/FeatureServer/35",
+          "note": "Controle cartográfico existente; o status operacional acompanha o carregamento real.",
+          "control": "layer_hidro",
+          "keywords": []
+        },
+        {
+          "name": "Uso e Cobertura do Solo",
+          "state": "available",
+          "source": "Prefeitura de Niterói / GeoNit",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/SMARHS_SMDCG_SMS_SMU/MapServer/175",
+          "note": "Fonte real identificada; não representa uma camada adicional já testada no mapa.",
+          "keywords": []
+        },
+        {
+          "name": "Áreas Verdes",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Unidades de Conservação",
+          "state": "future",
+          "source": "Prefeitura de Niterói / GeoNit",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/SMARHS_SMDCG_SMS_SMU/MapServer/70",
+          "note": "Integração futura. Referência identificada, sem nova camada integrada nesta fase.",
+          "keywords": []
+        },
+        {
+          "name": "Cobertura Vegetal",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Suscetibilidade Ambiental",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        }
+      ]
+    },
+    {
+      "id": "climate",
+      "title": "Clima e Monitoramento",
+      "items": [
+        {
+          "name": "Satélite recente",
+          "state": "integrated",
+          "source": "NASA GIBS / VIIRS",
+          "url": "https://gibs.earthdata.nasa.gov/",
+          "note": "Controle cartográfico existente; o status operacional acompanha o carregamento real.",
+          "control": "base_recent",
+          "keywords": []
+        },
+        {
+          "name": "Rede Municipal de Pluviometria",
+          "state": "integrated",
+          "source": "Prefeitura de Niterói / GeoNit / Defesa Civil",
+          "url": "data/processed/defesa-civil/pluviometros.geojson",
+          "note": "Controle cartográfico existente; o status operacional acompanha o carregamento real.",
+          "control": "layer_pluviometros",
+          "count": 38,
+          "keywords": [
+            "chuva",
+            "pluviômetro",
+            "pluviometria"
+          ]
+        },
+        {
+          "name": "Radar Meteorológico de Niterói",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Cemaden",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": [
+            "chuva",
+            "pluviômetro"
+          ]
+        },
+        {
+          "name": "Alertas Meteorológicos",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Acumulado de Chuva",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Precipitação",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": [
+            "chuva"
+          ]
+        },
+        {
+          "name": "Temperatura",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Clima Urbano / Ilhas de Calor",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Fonte e integração cartográfica ainda pendentes.",
+          "keywords": [
+            "temperatura"
+          ]
+        },
+        {
+          "name": "Eventos Extremos",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        }
+      ]
+    },
+    {
+      "id": "market",
+      "title": "Mercado Imobiliário",
+      "items": [
+        {
+          "name": "Transações Imobiliárias / ITBI 2020",
+          "state": "available",
+          "source": "Secretaria Municipal de Fazenda de Niterói",
+          "url": "https://www.fazenda.niteroi.rj.gov.br/site/dados-das-transacoes-imobiliarias/",
+          "note": "Portal oficial identificado. A disponibilidade e o conteúdo de cada arquivo anual ainda precisam ser conferidos; sem dados anuais integrados.",
+          "keywords": []
+        },
+        {
+          "name": "Transações Imobiliárias / ITBI 2021",
+          "state": "available",
+          "source": "Secretaria Municipal de Fazenda de Niterói",
+          "url": "https://www.fazenda.niteroi.rj.gov.br/site/dados-das-transacoes-imobiliarias/",
+          "note": "Portal oficial identificado. A disponibilidade e o conteúdo de cada arquivo anual ainda precisam ser conferidos; sem dados anuais integrados.",
+          "keywords": []
+        },
+        {
+          "name": "Transações Imobiliárias / ITBI 2022",
+          "state": "available",
+          "source": "Secretaria Municipal de Fazenda de Niterói",
+          "url": "https://www.fazenda.niteroi.rj.gov.br/site/dados-das-transacoes-imobiliarias/",
+          "note": "Portal oficial identificado. A disponibilidade e o conteúdo de cada arquivo anual ainda precisam ser conferidos; sem dados anuais integrados.",
+          "keywords": []
+        },
+        {
+          "name": "Transações Imobiliárias / ITBI 2023",
+          "state": "available",
+          "source": "Secretaria Municipal de Fazenda de Niterói",
+          "url": "https://www.fazenda.niteroi.rj.gov.br/site/dados-das-transacoes-imobiliarias/",
+          "note": "Portal oficial identificado. A disponibilidade e o conteúdo de cada arquivo anual ainda precisam ser conferidos; sem dados anuais integrados.",
+          "keywords": []
+        },
+        {
+          "name": "Transações Imobiliárias / ITBI 2024",
+          "state": "available",
+          "source": "Secretaria Municipal de Fazenda de Niterói",
+          "url": "https://www.fazenda.niteroi.rj.gov.br/site/dados-das-transacoes-imobiliarias/",
+          "note": "Portal oficial identificado. A disponibilidade e o conteúdo de cada arquivo anual ainda precisam ser conferidos; sem dados anuais integrados.",
+          "keywords": []
+        },
+        {
+          "name": "Transações Imobiliárias / ITBI 2025",
+          "state": "available",
+          "source": "Secretaria Municipal de Fazenda de Niterói",
+          "url": "https://www.fazenda.niteroi.rj.gov.br/site/dados-das-transacoes-imobiliarias/",
+          "note": "Portal oficial identificado. A disponibilidade e o conteúdo de cada arquivo anual ainda precisam ser conferidos; sem dados anuais integrados.",
+          "keywords": []
+        },
+        {
+          "name": "Quantidade de Transações",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Valor Médio",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Fonte e integração cartográfica ainda pendentes.",
+          "keywords": []
+        },
+        {
+          "name": "Valor Mediano",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Distribuição Territorial",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Fonte e integração cartográfica ainda pendentes.",
+          "keywords": []
+        },
+        {
+          "name": "Evolução Temporal",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Indicadores Imobiliários",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Fonte e integração cartográfica ainda pendentes.",
+          "keywords": []
+        }
+      ]
+    },
+    {
+      "id": "security",
+      "title": "Segurança Pública",
+      "items": [
+        {
+          "name": "Circunscrições Integradas de Segurança Pública",
+          "state": "available",
+          "source": "Prefeitura de Niterói / GeoNit",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/SEXEC_SEPLAG_SIGEO/MapServer/15",
+          "note": "Fonte real identificada; não representa uma camada adicional já testada no mapa.",
+          "keywords": []
+        },
+        {
+          "name": "Unidades de Segurança Pública",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não foi localizado arquivo real ou endpoint específico comprovado no repositório. Integração futura até comprovação da fonte.",
+          "keywords": []
+        },
+        {
+          "name": "Delegacias",
+          "state": "available",
+          "source": "Prefeitura de Niterói / GeoNit",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/SEXEC_SEPLAG_SIGEO/MapServer/5",
+          "note": "Fonte real identificada; não representa uma camada adicional já testada no mapa.",
+          "keywords": []
+        },
+        {
+          "name": "Indicadores ISP",
+          "state": "available",
+          "source": "ISP",
+          "url": "https://www.ispconecta.rj.gov.br/",
+          "note": "Fonte real identificada; não representa uma camada adicional já testada no mapa.",
+          "keywords": []
+        },
+        {
+          "name": "Ocorrências agregadas por território",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Evolução temporal",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Crimes contra o patrimônio",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Crimes contra a pessoa",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Violência contra a mulher",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Apreensão de armas",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        }
+      ]
+    },
+    {
+      "id": "social",
+      "title": "Indicadores Socioespaciais",
+      "items": [
+        {
+          "name": "IBGE",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Fonte e integração cartográfica ainda pendentes.",
+          "keywords": []
+        },
+        {
+          "name": "População Residente",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Densidade Demográfica",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Faixas Etárias",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Renda",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Rendimento Domiciliar",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Escolaridade",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Condições Habitacionais",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Infraestrutura Domiciliar",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Indicadores Sociais",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        }
+      ]
+    },
+    {
+      "id": "infrastructure",
+      "title": "Infraestrutura e Serviços",
+      "items": [
+        {
+          "name": "Rede Viária",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Equipamentos de Saúde",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Equipamentos Educacionais",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Transporte Público",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Equipamentos Públicos",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Serviços de Emergência",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Infraestrutura Urbana",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Saneamento",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Drenagem",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        }
+      ]
+    },
+    {
+      "id": "cadastre",
+      "title": "Cadastro Territorial",
+      "items": [
+        {
+          "name": "Logradouros",
+          "state": "available",
+          "source": "Prefeitura de Niterói / GeoNit",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/PlanoDiretor/FeatureServer/30",
+          "note": "Fonte real identificada; não representa uma camada adicional já testada no mapa.",
+          "keywords": []
+        },
+        {
+          "name": "Lotes Cadastrais",
+          "state": "available",
+          "source": "Prefeitura de Niterói / GeoNit",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/AS_SMF_CLIN_CULT_EDUC_LIMPOL/MapServer/15",
+          "note": "Fonte identificada. Controle cadastral experimental existente a partir do zoom 16, sem promoção a funcional nesta fase.",
+          "keywords": [
+            "lote",
+            "parcela"
+          ]
+        },
+        {
+          "name": "Edificações",
+          "state": "future",
+          "source": "Prefeitura de Niterói / GeoNit",
+          "url": "https://geo.niteroi.rj.gov.br/arcgis/rest/services/dadosabertos/SMARHS_SMDCG_SMS_SMU/MapServer/200",
+          "note": "Integração futura. Referência identificada, sem nova camada integrada nesta fase.",
+          "keywords": []
+        },
+        {
+          "name": "Quadras",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Setores",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Inscrição Imobiliária Municipal",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "CIB / SINTER",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Identificador ARPIAS",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        }
+      ]
+    },
+    {
+      "id": "disaster",
+      "title": "Gestão de Desastres",
+      "items": [
+        {
+          "name": "S2ID",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Registros Históricos de Desastres",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Decretos de Situação de Emergência",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Danos e Prejuízos",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Eventos Registrados",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Áreas Recorrentes de Ocorrência",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        }
+      ]
+    },
+    {
+      "id": "fragility",
+      "title": "Fragilidade Urbana",
+      "items": [
+        {
+          "name": "Índice ARPIAS de Fragilidade Urbana",
+          "state": "future",
+          "source": "ARPIAS360 · arquitetura analítica experimental",
+          "url": null,
+          "note": "Análise experimental; sem pontuação, pesos ou classificação calculados. Depende de metodologia e indicadores validados.",
+          "keywords": [
+            "índice",
+            "pontuação",
+            "metodologia",
+            "experimental"
+          ],
+          "analysis": "fragility",
+          "displayStatus": "Em desenvolvimento metodológico"
+        },
+        {
+          "name": "Fragilidade Socioespacial",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Fragilidade Ambiental-Climática",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Fragilidade Institucional",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Fragilidade Imobiliária",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        },
+        {
+          "name": "Violência / Segurança Territorial",
+          "state": "future",
+          "source": "Fonte ainda não incorporada",
+          "url": null,
+          "note": "Não há geometria integrada. Depende de fonte e validação oficiais.",
+          "keywords": []
+        }
+      ]
+    },
+    {
+      "id": "relief",
+      "title": "Relevo e Altimetria",
+      "items": [
+        {
+          "name": "Padrões de Relevo",
+          "state": "integrated",
+          "source": "CPRM / Serviço Geológico do Brasil · carta de Niterói · 2017 · 1:30.000",
+          "url": "https://rigeo.sgb.gov.br/handle/doc/17483",
+          "note": "399 polígonos validados; 21 padrões. Quatro classificações reutilizam as mesmas geometrias. Referência de 2017; não é classificação de risco.",
+          "keywords": [
+            "geomorfologia",
+            "CPRM",
+            "SGB",
+            "TOPODATA",
+            "altimetria"
+          ],
+          "control": "layer_relevo"
+        },
+        {
+          "name": "Unidades Geomorfológicas",
+          "state": "available",
+          "displayStatus": "Classificação disponível em Padrões de Relevo",
+          "source": "CPRM / Serviço Geológico do Brasil · carta de Niterói · 2017 · 1:30.000",
+          "url": "https://rigeo.sgb.gov.br/handle/doc/17483",
+          "note": "Selecionar UnGeomorf no controle de classificação. Mesmos 399 polígonos; seis unidades reais.",
+          "keywords": [
+            "geomorfologia",
+            "CPRM",
+            "SGB",
+            "TOPODATA",
+            "altimetria"
+          ]
+        },
+        {
+          "name": "Hipsometria",
+          "state": "available",
+          "displayStatus": "Fonte identificada / em integração",
+          "source": "CPRM / Serviço Geológico do Brasil · carta de Niterói · 2017 · 1:30.000",
+          "url": "https://rigeo.sgb.gov.br/handle/doc/17483",
+          "note": "Sem dado espacial validado para ativação. Referência geomorfológica; não é classificação de risco. TOPODATA/INPE é referência metodológica, sem raster integrado.",
+          "keywords": [
+            "geomorfologia",
+            "CPRM",
+            "SGB",
+            "TOPODATA",
+            "altimetria"
+          ]
+        },
+        {
+          "name": "Declividade",
+          "state": "available",
+          "displayStatus": "Fonte identificada / em integração",
+          "source": "CPRM / Serviço Geológico do Brasil · carta de Niterói · 2017 · 1:30.000",
+          "url": "https://rigeo.sgb.gov.br/handle/doc/17483",
+          "note": "Sem dado espacial validado para ativação. Referência geomorfológica; não é classificação de risco. TOPODATA/INPE é referência metodológica, sem raster integrado.",
+          "keywords": [
+            "geomorfologia",
+            "CPRM",
+            "SGB",
+            "TOPODATA",
+            "altimetria"
+          ]
+        },
+        {
+          "name": "Curvas de Nível — 40 m",
+          "state": "available",
+          "displayStatus": "Fonte identificada / em integração",
+          "source": "CPRM / Serviço Geológico do Brasil · carta de Niterói · 2017 · 1:30.000",
+          "url": "https://rigeo.sgb.gov.br/handle/doc/17483",
+          "note": "Sem dado espacial validado para ativação. Referência geomorfológica; não é classificação de risco. TOPODATA/INPE é referência metodológica, sem raster integrado.",
+          "keywords": [
+            "geomorfologia",
+            "CPRM",
+            "SGB",
+            "TOPODATA",
+            "altimetria"
+          ]
+        },
+        {
+          "name": "Pontos Cotados",
+          "state": "available",
+          "displayStatus": "Fonte identificada / em integração",
+          "source": "CPRM / Serviço Geológico do Brasil · carta de Niterói · 2017 · 1:30.000",
+          "url": "https://rigeo.sgb.gov.br/handle/doc/17483",
+          "note": "Sem dado espacial validado para ativação. Referência geomorfológica; não é classificação de risco. TOPODATA/INPE é referência metodológica, sem raster integrado.",
+          "keywords": [
+            "geomorfologia",
+            "CPRM",
+            "SGB",
+            "TOPODATA",
+            "altimetria"
+          ]
+        },
+        {
+          "name": "Relevo Sombreado",
+          "state": "available",
+          "displayStatus": "Fonte identificada / em integração",
+          "source": "CPRM / Serviço Geológico do Brasil · carta de Niterói · 2017 · 1:30.000",
+          "url": "https://rigeo.sgb.gov.br/handle/doc/17483",
+          "note": "Sem dado espacial validado para ativação. Referência geomorfológica; não é classificação de risco. TOPODATA/INPE é referência metodológica, sem raster integrado.",
+          "keywords": [
+            "geomorfologia",
+            "CPRM",
+            "SGB",
+            "TOPODATA",
+            "altimetria"
+          ]
+        },
+        {
+          "name": "Modelo Digital de Elevação — TOPODATA / INPE",
+          "state": "available",
+          "displayStatus": "Fonte identificada / em integração",
+          "source": "CPRM / Serviço Geológico do Brasil · carta de Niterói · 2017 · 1:30.000",
+          "url": "https://rigeo.sgb.gov.br/handle/doc/17483",
+          "note": "Sem dado espacial validado para ativação. Referência geomorfológica; não é classificação de risco. TOPODATA/INPE é referência metodológica, sem raster integrado.",
+          "keywords": [
+            "geomorfologia",
+            "CPRM",
+            "SGB",
+            "TOPODATA",
+            "altimetria"
+          ]
+        }
+      ]
+    }
+  ]
+}

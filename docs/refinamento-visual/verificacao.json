@@ -1,0 +1,269 @@
+{
+  "resolutions": [
+    {
+      "fonts": {
+        "body": "16px",
+        "brand": "24px",
+        "category": "17px",
+        "layer": "16px",
+        "panel": "20px"
+      },
+      "height": 844,
+      "horizontalOverflow": [],
+      "panelOpen": true,
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "fonts": {
+        "body": "16px",
+        "brand": "24px",
+        "category": "17px",
+        "layer": "16px",
+        "panel": "20px"
+      },
+      "height": 1024,
+      "horizontalOverflow": [],
+      "panelOpen": true,
+      "scrollWidth": 768,
+      "width": 768
+    },
+    {
+      "fonts": {
+        "body": "16px",
+        "brand": "26px",
+        "category": "17px",
+        "layer": "16px",
+        "panel": "20px"
+      },
+      "height": 768,
+      "horizontalOverflow": [],
+      "panelOpen": true,
+      "scrollWidth": 1366,
+      "width": 1366
+    },
+    {
+      "fonts": {
+        "body": "16px",
+        "brand": "26px",
+        "category": "17px",
+        "layer": "16px",
+        "panel": "20px"
+      },
+      "height": 1080,
+      "horizontalOverflow": [],
+      "panelOpen": true,
+      "scrollWidth": 1920,
+      "width": 1920
+    }
+  ],
+  "contrasts": [
+    {
+      "category": "civil",
+      "color": "#9b4d17",
+      "background": "#fff2e6",
+      "onWhite": 6.055999431478929,
+      "onSoft": 5.506774067246794
+    },
+    {
+      "category": "territory",
+      "color": "#806226",
+      "background": "#f7f1e5",
+      "onWhite": 5.686587817076128,
+      "onSoft": 5.0552083292050005
+    },
+    {
+      "category": "planning",
+      "color": "#705484",
+      "background": "#f2edf6",
+      "onWhite": 6.382460674167392,
+      "onSoft": 5.537510412166311
+    },
+    {
+      "category": "environment",
+      "color": "#376e4d",
+      "background": "#edf5ef",
+      "onWhite": 6.000031684211122,
+      "onSoft": 5.402390560223399
+    },
+    {
+      "category": "climate",
+      "color": "#216d79",
+      "background": "#eaf4f5",
+      "onWhite": 5.952013993582827,
+      "onSoft": 5.316359566550688
+    },
+    {
+      "category": "market",
+      "color": "#77508a",
+      "background": "#f5eef8",
+      "onWhite": 6.365859378430394,
+      "onSoft": 5.598249481589588
+    },
+    {
+      "category": "security",
+      "color": "#893b50",
+      "background": "#f8edf0",
+      "onWhite": 7.486373982007539,
+      "onSoft": 6.546377927825277
+    },
+    {
+      "category": "social",
+      "color": "#4b6487",
+      "background": "#edf2f8",
+      "onWhite": 6.048572371420802,
+      "onSoft": 5.373787718836549
+    },
+    {
+      "category": "infrastructure",
+      "color": "#536976",
+      "background": "#eef2f4",
+      "onWhite": 5.7533753995825645,
+      "onSoft": 5.107521089043465
+    },
+    {
+      "category": "fragility",
+      "color": "#a14d63",
+      "background": "#faeef1",
+      "onWhite": 5.58936559911788,
+      "onSoft": 4.9412088455875995
+    },
+    {
+      "category": "texto",
+      "color": "#24382f",
+      "background": "#f4f5f1",
+      "ratio": 11.403587711935051
+    },
+    {
+      "category": "metadados",
+      "color": "#56675c",
+      "background": "#f4f5f1",
+      "ratio": 5.494544199279859
+    }
+  ],
+  "search": [
+    {
+      "query": "sirene",
+      "error": false,
+      "status": "1 itens encontrados",
+      "visible": [
+        "Sirenes de Alerta"
+      ]
+    },
+    {
+      "query": "chuva",
+      "error": false,
+      "status": "5 itens encontrados",
+      "visible": [
+        "Rede Municipal de Pluviometria",
+        "Rede Municipal de Pluviometria",
+        "Cemaden",
+        "Acumulado de Chuva",
+        "Precipitação"
+      ]
+    },
+    {
+      "query": "lote",
+      "error": false,
+      "status": "3 itens encontrados",
+      "visible": [
+        "Parcelas / Lotes Cadastrais",
+        "Lotes Cadastrais",
+        "Lotes · controle experimental"
+      ]
+    },
+    {
+      "query": "ITBI",
+      "error": false,
+      "status": "6 itens encontrados",
+      "visible": [
+        "Transações Imobiliárias / ITBI 2020",
+        "Transações Imobiliárias / ITBI 2021",
+        "Transações Imobiliárias / ITBI 2022",
+        "Transações Imobiliárias / ITBI 2023",
+        "Transações Imobiliárias / ITBI 2024",
+        "Transações Imobiliárias / ITBI 2025"
+      ]
+    },
+    {
+      "query": "segurança",
+      "error": false,
+      "status": "11 itens encontrados",
+      "visible": [
+        "Circunscrições Integradas de Segurança Pública",
+        "Unidades de Segurança Pública",
+        "Delegacias",
+        "Indicadores ISP",
+        "Ocorrências agregadas por território",
+        "Evolução temporal",
+        "Crimes contra o patrimônio",
+        "Crimes contra a pessoa",
+        "Violência contra a mulher",
+        "Apreensão de armas",
+        "Violência / Segurança Territorial"
+      ]
+    },
+    {
+      "query": "curva",
+      "error": false,
+      "status": "1 itens encontrados",
+      "visible": [
+        "Curvas de Nível"
+      ]
+    },
+    {
+      "query": "alag",
+      "error": false,
+      "status": "2 itens encontrados",
+      "visible": [
+        "Ocorrências de Inundação e Alagamento",
+        "Áreas Alagáveis"
+      ]
+    },
+    {
+      "query": "inexistente",
+      "error": false,
+      "status": "0 itens encontrados",
+      "visible": []
+    }
+  ],
+  "labels": {
+    "fonts": [
+      "14px",
+      "16px"
+    ],
+    "markers": 138,
+    "names": [
+      "Varzea das Moças",
+      "Muriqui",
+      "Rio do Ouro",
+      "Serra Grande",
+      "Cafubá",
+      "Engenho do Mato",
+      "Jacaré",
+      "Maria Paula",
+      "Matapaca",
+      "Badu",
+      "Sapê",
+      "Ititioca",
+      "Caramujo",
+      "Baldeador",
+      "Engenhoca",
+      "Fonseca",
+      "Cubango",
+      "São Francisco",
+      "Viradouro",
+      "Cachoeira",
+      "Icaraí",
+      "Piratininga",
+      "Charitas",
+      "Jardim Imbui",
+      "Maravista",
+      "Itaipu",
+      "Niteroi"
+    ],
+    "overlaps": 0,
+    "visible": 27
+  },
+  "automatedTests": 26
+}
