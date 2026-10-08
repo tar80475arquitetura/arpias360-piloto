@@ -1,0 +1,19 @@
+{
+  "passed": [
+    "working layer, 37 real sirens, visibility, opacity, bounds, query priority, copy, durable selection and base changes",
+    "automatic visible-feature query and explicit 503 query failure without fabricated result",
+    "reload restores layer visibility, opacity, base, working layer and category expansion",
+    "coordinate search and simulated geolocation with replaceable marker",
+    "distance, area, clear measurement and Escape cancellation",
+    "reset affects only map preferences",
+    "secondary-panel drag, saved position and clamping after resize",
+    "1920×1080: Camadas / Info / touch targets / no horizontal overflow",
+    "1366×768: Camadas / Info / touch targets / no horizontal overflow",
+    "1024×768: Camadas / Info / touch targets / no horizontal overflow",
+    "768×1024: Camadas / Info / touch targets / no horizontal overflow",
+    "390×844: Camadas / Info / touch targets / no horizontal overflow",
+    "320×568: Camadas / Info / touch targets / no horizontal overflow",
+    "malformed preferences do not stop catalog or working-layer controls"
+  ],
+  "external_services": "simulated 503, not live validation"
+}

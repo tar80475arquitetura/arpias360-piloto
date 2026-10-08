@@ -8,9 +8,9 @@
   <meta name="description" content="WebGIS experimental para leitura integrada de dados territoriais e áreas sensíveis em Niterói/RJ." />
   <link rel="preconnect" href="https://geo.niteroi.rj.gov.br" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <link rel="stylesheet" href="css/style.css?v=20261007-operacional" />
+  <link rel="stylesheet" href="css/style.css?v=20261007-operacional2" />
   <link rel="stylesheet" href="js/vendor/leaflet-draw/leaflet.draw.css" />
-  <link rel="stylesheet" href="css/ux.css?v=20261007-operacional" />
+  <link rel="stylesheet" href="css/ux.css?v=20261007-operacional2" />
 </head>
 <body>
   <a class="skip-link" href="#searchMirror">Ir para a busca no mapa</a>
@@ -36,6 +36,7 @@
           <button id="measureBtn"><span aria-hidden="true">📏</span> Medir</button>
           <button id="editBtn"><span aria-hidden="true">✎</span> Editar mapa</button>
           <button id="legendBtn">Legenda</button>
+          <button id="showSelectionBtn" disabled>Reabrir resultado</button>
           <button id="shareSelectionBtn" disabled>Compartilhar seleção</button>
           <button id="menuReport" disabled>Gerar relatório</button>
           <button id="helpBtn">Ajuda</button>
@@ -45,6 +46,7 @@
           <button id="aboutBtn"><span aria-hidden="true">i</span> Sobre o projeto</button>
           <button id="fragilityBtn"><span aria-hidden="true">◇</span> Índice ARPIAS de Fragilidade Urbana <small>Em desenvolvimento metodológico</small></button>
           <button id="fullBtnTop"><span aria-hidden="true">⛶</span> Tela cheia</button>
+          <button id="resetPreferences">Restaurar preferências</button>
           <button id="clearBtn"><span aria-hidden="true">↺</span> Limpar camadas</button>
         </div>
       </div>
@@ -61,6 +63,17 @@
         <div class="catalog-search"><label for="layerSearch">Pesquisar camadas</label><input id="layerSearch" type="search" placeholder="Sirene, chuva, ITBI, lote…" autocomplete="off" /><p id="catalogSearchStatus" role="status" aria-live="polite">Carregando catálogo…</p></div>
         <p class="catalog-key">● DISPONÍVEL NO MAPA<br>FONTE IDENTIFICADA · EM INTEGRAÇÃO<br>METODOLOGIA EM DESENVOLVIMENTO</p>
         <details id="baseAccordion" class="accordion" data-category="territory" open><summary>Mapas de Referência <small>Uma base por vez</small></summary><div class="accordion-body"><div id="baseControl" class="control-list"></div><div id="baseMeta" class="meta-card"></div><button id="baseFallback" class="quiet-button" hidden>Usar mapa de ruas</button></div></details>
+        <section id="workingLayerPanel" class="working-layer-panel" aria-labelledby="workingLayerHeading">
+          <h3 id="workingLayerHeading">Camada de trabalho</h3>
+          <p id="workingLayerHint">Selecione o nome de uma camada para consultar, ajustar opacidade ou enquadrar.</p>
+          <div id="workingLayerControls" hidden>
+            <strong id="workingLayerName"></strong>
+            <p id="workingLayerStatus" role="status" aria-live="polite"></p>
+            <div class="working-layer-actions"><button id="workingVisibility">Ativar</button><button id="workingConsult">Consultar</button><button id="workingFit">Enquadrar</button><button id="workingInfo">Informações</button></div>
+            <div id="workingOpacity"></div>
+            <button id="clearWorkingLayer" class="quiet-button">Desmarcar camada de trabalho</button>
+          </div>
+        </section>
         <div id="catalogGroups"></div>
         <details id="workAccordion" class="accordion" data-category="planning"><summary>Minhas camadas <small id="workCount">0 feições</small></summary><div class="accordion-body"><p class="source-note">Dados salvos neste dispositivo. Camadas oficiais permanecem somente para leitura.</p><div id="workList" class="control-list"></div><button id="workExportGeo" class="quiet-button">Exportar GeoJSON</button><button id="workExportCSV" class="quiet-button">Exportar CSV</button><button id="restoreWork" class="quiet-button" disabled>Restaurar última exclusão</button></div></details>
         <details class="accordion" data-category="civil" open><summary>Defesa Civil <small>4 camadas</small></summary><div class="accordion-body"><div id="civilControl" class="control-list"></div><div id="civilMessage" class="sidebar-note" role="status" aria-live="polite"></div><p class="source-note">Prefeitura de Niterói / GeoNit / Defesa Civil</p></div></details>
@@ -108,9 +121,11 @@
   <script src="js/search.js"></script>
   <script src="js/cartography.js"></script>
   <script src="js/geomorphology.js"></script>
-  <script src="js/app.js?v=20261007-operacional"></script>
+  <script src="js/app.js?v=20261007-operacional2"></script>
   <script src="js/reference-labels.js"></script>
-  <script src="js/tools.js?v=20261007-operacional"></script>
+  <script src="js/tools.js?v=20261007-operacional2"></script>
+  <script src="js/preferences.js"></script>
+  <script src="js/operations.js"></script>
   <script src="js/report.js"></script>
 </body>
 </html>

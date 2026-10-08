@@ -184,16 +184,28 @@ function content(title,rows,note){
   return root;
 }
 function validCoordinates(lat,lng){return Number.isFinite(lat)&&Number.isFinite(lng)&&lat>=-90&&lat<=90&&lng>=-180&&lng<=180;}
+function applyLayerOpacity(d,value,isBase=false){
+  if(typeof value!=='number'||!Number.isFinite(value)||value<0||value>1)return false;
+  d.opacity=value;
+  if(!d.layer)return true;
+  if(isBase)d.layer.setOpacity(value);
+  else if(civilDefs.includes(d))d.layer.eachLayer(layer=>layer.setOpacity(value));
+  else if(d.id==='relevo')d.layer.setStyle(reliefStyle);
+  else{
+    if(!d.originalStyle)d.originalStyle=d.layer.options.style;
+    d.layer.setStyle(f=>{const style=typeof d.originalStyle==='function'?d.originalStyle(f):d.originalStyle||{};return {...style,opacity:(style.opacity??1)*value,fillOpacity:(style.fillOpacity??.2)*value};});
+  }
+  return true;
+}
 function appendOpacity(box,d,isBase=false){
   const label=element('label',undefined,'opacity-control');label.append(element('span','Opacidade da camada'));
   const range=element('input');range.type='range';range.min='0';range.max='100';range.value=String(Math.round((d.opacity??1)*100));range.setAttribute('aria-label',`Opacidade: ${d.name}`);
   const output=element('output',`${range.value}%`);label.append(range,output);box.append(label);
-  if(!isBase&&!d.originalStyle)d.originalStyle=d.layer.options.style;
   range.addEventListener('input',()=>{
-    d.opacity=Number(range.value)/100;output.textContent=`${range.value}%`;
-    if(isBase)d.layer.setOpacity(d.opacity);
-    else if(d.id==='relevo')d.layer.setStyle(reliefStyle);
-    else d.layer.setStyle(f=>{const style=typeof d.originalStyle==='function'?d.originalStyle(f):d.originalStyle||{};return {...style,opacity:d.opacity,fillOpacity:(style.fillOpacity??.2)*d.opacity};});
+    if(applyLayerOpacity(d,Number(range.value)/100,isBase)){
+      output.textContent=`${range.value}%`;
+      document.dispatchEvent(new CustomEvent('arpias:opacity',{detail:d.id}));
+    }
   });
 }
 function showOverlayInfo(d){
@@ -349,9 +361,12 @@ function symbol(id){
 function layerControl(d,state,onChange,info){
   const row=element('div',undefined,'layer-control');d.row=row;
   row.dataset.visible=String(!!d.layer&&map.hasLayer(d.layer));
-  const label=element('label',undefined,'layer-label');
+  const label=element('div',undefined,'layer-label');
   const icon=element('span',undefined,`layer-icon ${d.symbolId||d.id}`);icon.append(symbol(d.symbolId||d.id));
-  const text=element('span',undefined,'layer-name');text.append(element('span',d.name,'name'));
+  const text=element('span',undefined,'layer-name');
+  const choose=element('button',d.name,'name layer-target');choose.type='button';choose.setAttribute('aria-pressed','false');choose.title='Selecionar como camada de trabalho';
+  choose.addEventListener('click',()=>document.dispatchEvent(new CustomEvent('arpias:working-layer',{detail:d.symbolId||d.id})));text.append(choose);
+  row.dataset.layerId=d.symbolId||d.id;
   d.status=element('small',state,'layer-status');text.append(d.status);
   const control=element('span',undefined,'switch');
   d.input=element('input');d.input.type='checkbox';d.input.id=`layer_${d.id}`;
@@ -604,6 +619,7 @@ readJSON('data/catalogo.json').then(ARPIASCatalog.validate).then(catalog=>{
     }
   });
   oldSections.forEach(section=>section.remove());filterCatalog();
+  document.dispatchEvent(new Event('arpias:catalog-ready'));
   // These four unchanged implementations and collections were visually validated.
   // Preserve lazy loading; current request failures still override their status.
   civilDefs.forEach(d=>{d.status.textContent='Disponível';});
@@ -641,9 +657,17 @@ function enableDesktopDrag(node,handle){
     if(!drag)return;const frame=mapwrap.getBoundingClientRect(),p=clamp(e.clientX-frame.left-drag.dx,e.clientY-frame.top-drag.dy);
     node.style.left=`${p.x}px`;node.style.top=`${p.y}px`;
   });
-  const stop=e=>{if(!drag)return;drag=null;node.classList.remove('is-dragging');document.body.classList.remove('dragging-panel');try{handle.releasePointerCapture(e.pointerId);}catch(error){}};
+  const stop=e=>{if(!drag)return;drag=null;node.classList.remove('is-dragging');document.body.classList.remove('dragging-panel');try{handle.releasePointerCapture(e.pointerId);}catch(error){}document.dispatchEvent(new CustomEvent('arpias:panel-moved',{detail:node.id}));};
   handle.addEventListener('pointerup',stop);handle.addEventListener('pointercancel',stop);
-  window.addEventListener('resize',()=>{if(compactMedia.matches){node.style.removeProperty('left');node.style.removeProperty('top');node.style.removeProperty('right');node.style.removeProperty('bottom');node.style.removeProperty('transform');return;}if(node.hidden)return;const rect=node.getBoundingClientRect(),frame=mapwrap.getBoundingClientRect(),p=clamp(rect.left-frame.left,rect.top-frame.top);node.style.left=`${p.x}px`;node.style.top=`${p.y}px`;});
+  const keepInside=()=>{
+    if(compactMedia.matches){['left','top','right','bottom','transform'].forEach(key=>node.style.removeProperty(key));return;}
+    if(node.hidden||!node.style.left)return;
+    const rect=node.getBoundingClientRect(),frame=mapwrap.getBoundingClientRect(),p=clamp(rect.left-frame.left,rect.top-frame.top);
+    node.style.left=`${p.x}px`;node.style.top=`${p.y}px`;
+  };
+  window.addEventListener('resize',keepInside);
+  new ResizeObserver(keepInside).observe(mapwrap);
+  new ResizeObserver(keepInside).observe(node);
 }
 enableDesktopDrag(document.getElementById('toolPanel'),document.querySelector('#toolPanel .tool-state strong'));
 enableDesktopDrag(aboutPanel,aboutPanel.querySelector('h2'));
@@ -671,7 +695,7 @@ function configurePanel(){
 function closeAbout(){aboutPanel.hidden=true;document.getElementById('aboutBtn').classList.remove('active');}
 function openLayers(){
   panelOpener=document.activeElement;closeMore();closeAbout();
-  if(mobileMedia.matches)map.closePopup();
+  if(matchMedia('(max-width:1199px)').matches){map.closePopup();if(typeof ARPIASUI!=='undefined')ARPIASUI.closeTerritorial();}
   panel.classList.remove('hidden');configurePanel();
   if(compactMedia.matches)document.getElementById('closePanel').focus({preventScroll:true});
 }
@@ -691,7 +715,7 @@ dismissSheetOnSwipe(querySheet.querySelector('.sheet-handle'),()=>map.closePopup
 ['closePanel','panelBackdrop'].forEach(id=>document.getElementById(id).addEventListener('click',()=>closeLayers(true)));
 panel.addEventListener('keydown',e=>{
   if(e.key!=='Tab'||!compactMedia.matches)return;
-  const nodes=[...panel.querySelectorAll('button,input,a[href],summary')].filter(node=>!node.disabled&&node.getClientRects().length);
+  const nodes=[...panel.querySelectorAll('button,input,select,a[href],summary')].filter(node=>!node.disabled&&node.getClientRects().length);
   const first=nodes[0],last=nodes.at(-1);
   if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
   else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}

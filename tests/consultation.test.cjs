@@ -11,3 +11,10 @@ test('empty and failed queries never fabricate a selected point and have distinc
 test('a stale response after changing the target is ignored',async()=>{const h=harness();h.c.queryService=async()=>{h.c.queryLayer='lotes';return [{properties:{}}]};await h.c.run({lat:0,lng:0});assert.equal(h.selections.length,0)});
 test('lot consultation requires cadastral zoom before requesting data',async()=>{const h=harness({target:'lotes',zoom:13});await h.c.run({lat:0,lng:0});assert.equal(h.requests.length,0);assert.match(h.hint.textContent,/zoom 16/)});
 test('local relief query uses actual polygons even when a different overlay receives the click',async()=>{const h=harness({target:'relevo'}),f={type:'Feature',properties:{PADRAO:'Colinas'},geometry:{type:'Polygon',coordinates:[[[-43,-23],[-42.99,-23],[-42.99,-22.99],[-43,-23]]]}};h.c.reliefDefs=[{id:'relevo',ready:true,name:'Relevo',source:'CPRM',data:{features:[f]}}];h.c.ARPIASTurf=require('@turf/turf');await h.c.run({lat:-22.999,lng:-42.995},{layerId:'bairros',feature:{properties:{nome:'Outro'}}});assert.equal(h.requests.length,0);assert.equal(h.selections[0].f,f);assert.equal(h.selections[0].m.source,'CPRM')});
+test('automatic consultation uses the clicked visible feature and keeps automatic mode',async()=>{
+ const f={properties:{nome:'Bairro clicado'},geometry:{type:'Polygon'}};const h=harness({target:'auto'});
+ await h.c.run({lat:0,lng:0},{layerId:'bairros',feature:f});assert.equal(h.requests.length,0);assert.equal(h.selections[0].f,f);assert.equal(h.c.queryLayer,'auto');
+});
+test('automatic consultation on an empty map click requests an explicit choice',async()=>{
+ const h=harness({target:'auto'});await h.c.run({lat:0,lng:0});assert.equal(h.requests.length,0);assert.equal(h.selections.length,0);assert.match(h.hint.textContent,/feição visível/);
+});
