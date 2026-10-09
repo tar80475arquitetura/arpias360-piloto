@@ -20,3 +20,39 @@ jobs:
       - run: node --check js/tools.js
       - run: node -e "JSON.parse(require('fs').readFileSync('data/camadas.json','utf8')); JSON.parse(require('fs').readFileSync('data/catalogo.json','utf8'));"
       - run: npm test
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      ARPIAS_CHROMIUM: ""
+      ARPIAS_TEST_OUTPUT: /tmp/arpias-browser
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install playwright==1.62.0
+      - run: python -m playwright install --with-deps chromium
+      - name: Testes de navegador com fontes externas controladas
+        shell: bash
+        run: |
+          node scripts/serve.cjs --port=8080 > /tmp/arpias-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:8080/ > /dev/null; then break; fi
+            sleep 1
+          done
+          python tests/browser-operations.py
+          python tests/browser-round2.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: navegador-${{ github.sha }}
+          path: |
+            /tmp/arpias-browser
+            /tmp/arpias-server.log
+          if-no-files-found: warn

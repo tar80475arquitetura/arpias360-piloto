@@ -210,7 +210,7 @@ function appendOpacity(box,d,isBase=false){
 }
 function showOverlayInfo(d){
   let count=0,geometry=null;d.layer.eachFeature(layer=>{count++;geometry??=layer.feature?.geometry?.type;});
-  const box=content(d.name,[['Fonte','Prefeitura Municipal de Niterói / GeoNit'],['Geometria',geometry||'Ainda não carregada'],['Quantidade carregada',count],['Status',d.status.textContent],['Atualização','Não informada no catálogo'],['Referência',d.layer.options.url]],`${d.desc} Quantidade refere-se às feições carregadas, não ao total do serviço.`);
+  const box=content(d.name,[['Fonte','Prefeitura Municipal de Niterói / GeoNit'],['Geometria',geometry||'Ainda não carregada'],['Quantidade carregada',count],['Maturidade e operação',layerPresentation('layer_'+d.id)],['Atualização','Não informada no catálogo'],['Referência',d.layer.options.url]],`${d.desc} Quantidade refere-se às feições carregadas, não ao total do serviço.`);
   appendOpacity(box,d);box.firstChild.id='infoTitle';document.getElementById('infoBody').replaceChildren(box);document.getElementById('layerInfo').showModal();
 }
 async function copyCoordinates(latlng){
@@ -268,7 +268,7 @@ const baseMeta=document.getElementById('baseMeta');
 let previousBaseDef=baseDefs[1];
 let baseGeneration=0;
 let baseTimer;
-function baseState(def,state){def.state=state;if(def.statusNode){def.statusNode.textContent=state==='Disponível'?'● DISPONÍVEL NO MAPA':state==='Indisponível'?'× Temporariamente indisponível':state;def.statusNode.setAttribute('data-state',state);}}
+function baseState(def,state){def.state=state;if(def.statusNode){def.statusNode.textContent=ARPIASCatalog.layerStatus(state,map.hasLayer(def.layer),def.opacity??1,{state:'integrated',control:'base_'+def.id});def.statusNode.setAttribute('data-state',state);}}
 function selectBase(def){
   clearTimeout(baseTimer);baseGeneration++;
   if(activeBaseDef!==def)previousBaseDef=activeBaseDef;
@@ -313,7 +313,7 @@ baseDefs.forEach(d=>{
   const text=element('span',undefined,'base-detail');
   const heading=element('span',undefined,'base-name-row');
   const shortNames={ortho:'Foto aérea · 2019',osm:'Ruas',recent:'Satélite'};
-  d.statusNode=element('span','DISPONÍVEL NO MAPA','status');
+  d.statusNode=element('span','EM INTEGRAÇÃO · Aguardando carregamento','status');
   heading.append(element('span',shortNames[d.id],'name'),d.statusNode);text.append(heading);
   text.append(element('small',d.id==='ortho'?'Imagem histórica oficial':d.id==='osm'?'OpenStreetMap':`NASA VIIRS · ${recentDate}`));
   label.append(radio,text);baseControl.append(label);
@@ -377,9 +377,9 @@ function layerControl(d,state,onChange,info){
   control.append(d.input,track,word);label.append(icon,text,control);row.append(label);
   if(info){const button=element('button','ⓘ','info-button');button.type='button';button.setAttribute('aria-label',`Informações: ${d.name}`);button.addEventListener('click',info);row.append(button);}
   const syncOperationalState=()=>{
-    row.dataset.visible=String(d.input.checked);
+    row.dataset.visible=String(!!d.layer&&map.hasLayer(d.layer));
     const value=(d.status?.textContent||'').toLowerCase();
-    row.dataset.state=value.includes('carreg')?'loading':value.includes('indispon')||value.includes('erro')?'error':d.input.checked?'active':'ready';
+    row.dataset.state=value.includes('indispon')||value.includes('erro')||value.includes('falha')?'error':/^carregando/.test(value)?'loading':d.input.checked?'active':'ready';
   };
   d.input.addEventListener('change',()=>{onChange();syncOperationalState();});
   new MutationObserver(syncOperationalState).observe(d.status,{childList:true,characterData:true,subtree:true});
@@ -388,15 +388,15 @@ function layerControl(d,state,onChange,info){
 }
 overlayDefs.forEach(d=>{
   const target=d.group==='Ambiente'?'environmentControl':d.group==='Áreas sensíveis'?'sensitiveControl':'territoryControl';
-  const row=layerControl(d,'DISPONÍVEL NO MAPA',()=>{
+  const row=layerControl(d,'Aguardando carregamento',()=>{
     if(d.input.checked){d.status.textContent='Carregando';d.layer.addTo(map);toast(`${d.name} ativada.`);}
     else{map.removeLayer(d.layer);toast(`${d.name} ocultada.`);}
   },()=>showOverlayInfo(d));
   document.getElementById(target).append(row);
-  d.layer.on('loading',()=>{d.status.textContent='Carregando';row.setAttribute('aria-busy','true');});
-  d.layer.on('load',()=>{d.status.textContent='Disponível';row.setAttribute('aria-busy','false');});
+  d.layer.on('loading',()=>{d.loadFailed=false;d.status.textContent='Carregando';row.setAttribute('aria-busy','true');});
+  d.layer.on('load',()=>{if(d.loadFailed)return;d.status.textContent='Disponível';row.setAttribute('aria-busy','false');});
   d.layer.on('requesterror',()=>{
-    d.status.textContent='Indisponível';d.input.checked=false;row.setAttribute('aria-busy','false');map.removeLayer(d.layer);toast('Não foi possível carregar esta camada.');
+    d.loadFailed=true;d.status.textContent='Indisponível';d.input.checked=false;row.setAttribute('aria-busy','false');map.removeLayer(d.layer);toast('Não foi possível carregar esta camada.');
   });
 });
 const civilDefs=[
@@ -424,7 +424,7 @@ function civilPopup(d,f,latlng){
 async function showCivilInfo(d){
   const dialog=document.getElementById('layerInfo');const body=document.getElementById('infoBody');
   const m=await metadataPromise;const meta=m?.datasets.find(x=>x.id===d.id);
-  const box=content(d.name,meta?[['Fonte',meta.source],['Registros',meta.count],['Geometria',meta.geometry],['Status',d.status.textContent],['Atualização','Não informada no catálogo'],['Sistema de coordenadas',meta.crs],['Sistema original',meta.original_crs],['Observações',meta.notes]]:[],meta?'Cadastro de localização; não confirma operação atual. Conferência ponto a ponto contra o limite administrativo oficial pendente.':'Metadados temporariamente indisponíveis.');
+  const box=content(d.name,meta?[['Fonte',meta.source],['Registros',meta.count],['Geometria',meta.geometry],['Maturidade e operação',layerPresentation('layer_'+d.id)],['Atualização','Não informada no catálogo'],['Sistema de coordenadas',meta.crs],['Sistema original',meta.original_crs],['Observações',meta.notes]]:[],meta?'Cadastro de localização; não confirma operação atual. Conferência ponto a ponto contra o limite administrativo oficial pendente.':'Metadados temporariamente indisponíveis.');
   box.firstChild.id='infoTitle';body.replaceChildren(box);if(!dialog.open)dialog.showModal();
 }
 function validateCollection(g,d){
@@ -462,7 +462,7 @@ async function loadCivil(d){
   return d.loading;
 }
 civilDefs.forEach(d=>{
-  const row=layerControl(d,'DISPONÍVEL NO MAPA',()=>{
+  const row=layerControl(d,'Aguardando carregamento',()=>{
     if(d.input.checked){if(d.layer){d.layer.addTo(map);toast(`${d.name}: camada ativada · ${d.count} pontos`);}else loadCivil(d);}
     else{if(d.layer)map.removeLayer(d.layer);toast(`${d.name}: camada ocultada`);}
   },()=>showCivilInfo(d));
@@ -472,14 +472,14 @@ document.getElementById('closeInfo').addEventListener('click',()=>document.getEl
 const reliefDefs=[{id:'relevo',name:'Padrões de Relevo',source:ARPIASGeomorphology.source,field:'PADRAO',ready:false}];
 symbols.relevo='M2 20L8 7l5 9 4-12 5 16H2';
 const relief=reliefDefs[0];
-const reliefRow=layerControl(relief,'DISPONÍVEL NO MAPA',async()=>{
+const reliefRow=layerControl(relief,'Aguardando carregamento',async()=>{
   if(!relief.input.checked){if(relief.layer)map.removeLayer(relief.layer);return;}
   const layer=await loadRelief();if(layer&&relief.input.checked)layer.addTo(map);
 },showReliefInfo);
 const reliefMessage=element('p',undefined,'popup-note');reliefMessage.hidden=true;reliefMessage.setAttribute('role','alert');reliefRow.append(reliefMessage);
 function reliefStyle(f){return ARPIASGeomorphology.style(relief.data,relief.field,f,relief.opacity??1);}
 function showReliefInfo(){
-  infoModal('Padrões de Relevo — CPRM/SGB',[['Fonte',relief.source],['Autores','Marcelo E. Dantas; Lais Costa'],['Publicação','Fevereiro de 2017 · escala 1:30.000'],['Polígonos','399'],['CRS original','SIRGAS 2000 · EPSG:4674'],['Derivado','EPSG:4326 · sem simplificação'],['Campos',Object.keys(relief.data?.features[0].properties||ARPIASGeomorphology.fields).join(', ')],['Arquivo','niteroi_padraoderelevo.zip'],['Referência',ARPIASGeomorphology.url]],ARPIASGeomorphology.warning);
+  ARPIASUI.infoModal('Padrões de Relevo — CPRM/SGB',[['Fonte',relief.source],['Autores','Marcelo E. Dantas; Lais Costa'],['Publicação','Fevereiro de 2017 · escala 1:30.000'],['Polígonos','399'],['Classificações','4 classificações da mesma coleção; não são altimetria ou mapa de risco'],['CRS original','SIRGAS 2000 · EPSG:4674'],['Derivado','EPSG:4326 · sem simplificação'],['Campos',Object.keys(relief.data?.features[0].properties||ARPIASGeomorphology.fields).join(', ')],['Arquivo','niteroi_padraoderelevo.zip'],['Referência',ARPIASGeomorphology.url]],ARPIASGeomorphology.warning);
   if(relief.layer)appendOpacity(document.getElementById('infoBody'),relief);
 }
 const classification=element('select');classification.id='reliefClassification';classification.setAttribute('aria-label','Classificação do relevo');
@@ -496,8 +496,8 @@ async function loadRelief(){
   relief.layer=L.geoJSON(data,{renderer:cartographicRenderer,bubblingMouseEvents:false,style:reliefStyle,onEachFeature:(f,layer)=>{
     layer.on('click',e=>{L.DomEvent.stopPropagation(e.originalEvent);if(typeof ARPIASUI!=='undefined')ARPIASUI.query(e.latlng,{layerId:'relevo',feature:f});});
     layer.on('mouseover',()=>layer.setStyle({weight:3}));layer.on('mouseout',()=>layer.setStyle(reliefStyle(f)));
-  }});relief.ready=true;classification.disabled=false;relief.status.textContent='DISPONÍVEL NO MAPA';if(typeof ARPIASUI!=='undefined')ARPIASUI.refreshQueryable();return relief.layer;
-}).catch(error=>{relief.status.textContent='EM INTEGRAÇÃO';relief.input.checked=false;reliefMessage.textContent='Não foi possível carregar a camada de relevo.';reliefMessage.hidden=false;toast(reliefMessage.textContent);console.error('Relevo:',error);return null;}).finally(()=>{relief.loading=null;reliefRow.setAttribute('aria-busy','false');});
+  }});relief.ready=true;classification.disabled=false;relief.status.textContent='Disponível';if(typeof ARPIASUI!=='undefined')ARPIASUI.refreshQueryable();return relief.layer;
+}).catch(error=>{relief.status.textContent='Falha de carregamento';relief.input.checked=false;reliefMessage.textContent='Não foi possível carregar a camada de relevo.';reliefMessage.hidden=false;toast(reliefMessage.textContent);console.error('Relevo:',error);return null;}).finally(()=>{relief.loading=null;reliefRow.setAttribute('aria-busy','false');});
   return relief.loading;
 }
 const catalogHost=document.getElementById('catalogGroups');
@@ -511,6 +511,23 @@ function catalogBadge(item){
 function operationalStatus(text){
   return ARPIASCatalog.operationalStatus(text);
 }
+function layerPresentation(control){
+  const d=[...overlayDefs,...civilDefs,...reliefDefs,...baseDefs].find(d=>control===`layer_${d.id}`||control===`base_${d.id}`);
+  if(!d)return 'EM INTEGRAÇÃO';
+  return ARPIASCatalog.layerStatus(d.status?.textContent||d.state||'Aguardando carregamento',!!d.layer&&map.hasLayer(d.layer),d.opacity??1,{state:'integrated',control})+(d.count?` · ${d.count} pontos`:'');
+}
+function refreshCatalogStates(){
+  baseDefs.forEach(d=>baseState(d,d.state||'Aguardando carregamento'));
+  document.querySelectorAll('.layer-control[data-layer-id]').forEach(row=>{
+    const control='layer_'+row.dataset.layerId;
+    const target=row.querySelector('.catalog-operational')|| (row.dataset.layerId.startsWith('alias_')?row.querySelector('.layer-status'):null);
+    if(target)target.textContent=layerPresentation(control);
+  });
+  catalogEntries.filter(e=>e.item.control?.startsWith('base_')).forEach(({item,row})=>{const badge=row.querySelector('.catalog-badge');if(badge)badge.textContent=layerPresentation(item.control);});
+}
+document.addEventListener('arpias:opacity',refreshCatalogStates);
+map.on('layeradd layerremove',()=>queueMicrotask(refreshCatalogStates));
+document.addEventListener('arpias:catalog-ready',refreshCatalogStates);
 function filterCatalog(){
   const query=catalogSearch.value;
   let found=0;
@@ -561,16 +578,18 @@ readJSON('data/catalogo.json').then(ARPIASCatalog.validate).then(catalog=>{
         // Presentation follows actual load/error events, without changing layer state.
         if(status){
           const badge=element('small',undefined,'catalog-operational');status.after(badge);status.hidden=true;
-          const sync=()=>{badge.textContent=operationalStatus(status.textContent)+(item.count?` · ${item.count} pontos`:'');};
+          const sync=()=>{badge.textContent=layerPresentation(input.id);};
           new MutationObserver(sync).observe(status,{childList:true,characterData:true,subtree:true});sync();
         }
       }else{
         if(input&&input.type!=='radio'){
           const originalRow=input.closest('.layer-control');
           const original=originalRow.querySelector('.layer-status');
-          const proxy={id:`alias_${group.id}_${item.control}`,symbolId:item.control.replace('layer_',''),name:item.name};
-          const sync=()=>{proxy.input.checked=input.checked;proxy.status.textContent=operationalStatus(original.textContent)+(item.count?` · ${item.count} pontos`:'');proxy.row.setAttribute('aria-busy',originalRow.getAttribute('aria-busy')||'false');};
+          const proxy={layer:[...overlayDefs,...civilDefs,...reliefDefs].find(d=>'layer_'+d.id===item.control)?.layer,id:`alias_${group.id}_${item.control}`,symbolId:item.control.replace('layer_',''),name:item.name};
+          const sync=()=>{proxy.layer=[...overlayDefs,...civilDefs,...reliefDefs].find(d=>'layer_'+d.id===item.control)?.layer;proxy.input.checked=input.checked;proxy.status.textContent=original.textContent+(item.count?` · ${item.count} pontos`:'');proxy.row.setAttribute('aria-busy',originalRow.getAttribute('aria-busy')||'false');};
           row=layerControl(proxy,'◐ Em integração',()=>{if(proxy.input.checked!==input.checked)input.click();sync();},()=>originalRow.querySelector('.info-button')?.click());
+          proxy.status.hidden=true;const badge=element('small',undefined,'catalog-operational');proxy.status.after(badge);
+          const presentation=()=>{badge.textContent=layerPresentation(item.control);};new MutationObserver(presentation).observe(proxy.status,{childList:true});presentation();
           new MutationObserver(sync).observe(original,{childList:true,characterData:true,subtree:true});
           new MutationObserver(sync).observe(originalRow,{attributes:true,attributeFilter:['aria-busy']});
           input.addEventListener('change',sync);['clearBtn','clearLayersBtn'].forEach(id=>document.getElementById(id).addEventListener('click',()=>requestAnimationFrame(sync)));sync();body.append(row);
@@ -582,7 +601,7 @@ readJSON('data/catalogo.json').then(ARPIASCatalog.validate).then(catalog=>{
           const original=input.closest('.layer-control,.control-item').querySelector('.layer-status,.status');
           const button=element('button',undefined,'catalog-select');button.type='button';
           const sync=()=>{
-            badge.textContent=operationalStatus(original.textContent)+(item.count?` · ${item.count} pontos`:'');
+            badge.textContent=layerPresentation(input.id);
             button.textContent=input.type==='radio'?(input.checked?'Base selecionada':'Selecionar base'):(input.checked?'Ocultar camada':'Ativar camada');
             button.setAttribute('aria-pressed',String(input.checked));
           };
@@ -613,16 +632,14 @@ readJSON('data/catalogo.json').then(ARPIASCatalog.validate).then(catalog=>{
       row.querySelector('.name').textContent=item.name;rows.push(row);catalogEntries.push({item,group,row});
       const status=row.querySelector('.layer-status'),badge=element('small',undefined,'catalog-operational');
       status.after(badge);status.hidden=true;
-      const sync=()=>{badge.textContent=operationalStatus(status.textContent);};
+      const sync=()=>{badge.textContent=layerPresentation('layer_'+id);};
       new MutationObserver(sync).observe(status,{childList:true,characterData:true,subtree:true});sync();
       section.querySelector('summary small').textContent=`${rows.length} itens`;
     }
   });
   oldSections.forEach(section=>section.remove());filterCatalog();
   document.dispatchEvent(new Event('arpias:catalog-ready'));
-  // These four unchanged implementations and collections were visually validated.
-  // Preserve lazy loading; current request failures still override their status.
-  civilDefs.forEach(d=>{d.status.textContent='Disponível';});
+  // Loading evidence comes exclusively from each loader, never from catalogue setup.
 }).catch(error=>{
   console.error('Catálogo:',error);catalogSearchStatus.textContent='Catálogo temporariamente indisponível.';
   catalogHost.replaceChildren(element('p','Não foi possível carregar o catálogo. Tente novamente.','sidebar-note'));
@@ -818,9 +835,9 @@ function neighborhoodSearchData(){
 function chooseNeighborhood(result,generation){
   if(generation!==searchGeneration)return;
   placeResults.hidden=true;clearHighlights();closeLayers();
-  const fc={type:'FeatureCollection',features:result.features};
-  const shape=L.geoJSON(fc);map.fitBounds(shape.getBounds(),{padding:[28,28],maxZoom:15});
-  if(typeof ARPIASUI!=='undefined')ARPIASUI.select(result.features[0],result.name,{source:'Prefeitura Municipal de Niterói / GeoNit',layerId:'bairros',origin:'search'});
+  let feature;try{feature=ARPIASSearch.selectionFeature(result);}catch(error){toast('Não foi possível selecionar o bairro: '+error.message);return;}
+  const shape=L.geoJSON(feature);map.fitBounds(shape.getBounds(),{padding:[28,28],maxZoom:15});
+  if(typeof ARPIASUI!=='undefined')ARPIASUI.select(feature,result.name,{source:'Prefeitura Municipal de Niterói / GeoNit',layerId:'bairros',origin:'search'});
   else L.popup(popupOptions()).setLatLng(shape.getBounds().getCenter()).setContent(content(result.name,[['Seleção','Bairro'],['Fonte','Prefeitura Municipal de Niterói']])).openOn(map);
 }
 function clearHighlights(){highlights.forEach(l=>map.removeLayer(l));highlights.clear();}

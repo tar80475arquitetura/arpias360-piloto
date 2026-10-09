@@ -297,5 +297,5 @@ const ARPIASUI=(()=>{
   window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
   try{restore(ARPIASWork.read(localStorage));const raw=localStorage.getItem('arpias360.workspace.trash.v1');if(raw)trash=ARPIASWork.validateCollection(JSON.parse(raw)).features;renderWork();}catch(error){toast('Não foi possível ler as camadas locais. Os dados existentes não foram sobrescritos.');}
   const linked=ARPIASLocation.parse(new URLSearchParams(location.search));if(linked&&!linked.error)select({type:'Feature',geometry:{type:'Point',coordinates:[linked.lon,linked.lat]},properties:{}},'Local compartilhado',{},L.latLng(linked.lat,linked.lon));
-  return {refreshQueryable,setQueryLayer,mode:()=>mode,request,select,query,clearSelection,selection:()=>selection,fitSelection,measurementRows,areaLabel,distanceLabel,publicAttributes:geo.publicAttributes,confirm,workGroup,measureGroup,showTerritorial,closeTerritorial,visibleLegend};
+  return {infoModal,selectionBounds:()=>selectionLayer?.getBounds(),refreshQueryable,setQueryLayer,mode:()=>mode,request,select,query,clearSelection,selection:()=>selection,fitSelection,measurementRows,areaLabel,distanceLabel,publicAttributes:geo.publicAttributes,confirm,workGroup,measureGroup,showTerritorial,closeTerritorial,visibleLegend};
 })();
