@@ -28,7 +28,7 @@ const ARPIASOperations=(()=>{
     if(!working)return;
     byId('workingVisibility').textContent=working.input.checked?'Ocultar camada':'Ativar camada';
     byId('workingVisibility').setAttribute('aria-pressed',String(working.input.checked));
-    byId('workingLayerStatus').textContent=working.status.textContent+(working.input.checked?' · visível':' · oculta');
+    byId('workingLayerStatus').textContent=layerPresentation('layer_'+working.id);
     const range=byId('workingOpacity').querySelector('input');
     if(range){range.value=String(Math.round((working.opacity??1)*100));byId('workingOpacity').querySelector('output').textContent=range.value+'%';}
   }
@@ -80,11 +80,12 @@ const ARPIASOperations=(()=>{
     if(working===d)ARPIASUI.setQueryLayer(d.id);
   });
   definitions.forEach(d=>new MutationObserver(sync).observe(d.status,{childList:true,subtree:true,characterData:true}));
-  document.addEventListener('arpias:opacity',()=>{sync();scheduleSave();});
-  panel.addEventListener('change',()=>{sync();scheduleSave();});
+  document.addEventListener('arpias:opacity',()=>{sync();refreshCatalogStates();scheduleSave();});
+  panel.addEventListener('change',()=>{sync();refreshCatalogStates();scheduleSave();});
   panel.addEventListener('toggle',e=>{if(e.target.matches('.accordion'))scheduleSave();},true);
   new MutationObserver(scheduleSave).observe(panel,{attributes:true,attributeFilter:['class']});
   ['clearBtn','clearLayersBtn'].forEach(id=>byId(id).addEventListener('click',()=>{sync();scheduleSave();}));
+  map.on('layerremove',()=>{sync();refreshCatalogStates();});
   map.on('layeradd',e=>{
     if(baseDefs.some(item=>item.layer===e.layer))scheduleSave();
     const d=definitions.find(item=>item.layer===e.layer);

@@ -8,8 +8,8 @@ test('initial app setup only declares a loader and a failure leaves the map usab
   assert.equal(ctx.relief.loading,undefined);assert.equal(await ctx.loadRelief(),null);assert.equal(ctx.relief.input.checked,false);assert.match(ctx.reliefMessage.textContent,/Não foi possível carregar/);assert.equal(ctx.reliefRow.attributes['aria-busy'],'false');
 });
 test('public catalog states never advertise an item without a control as a map layer',()=>{
-  for(const item of require('../data/catalogo.json').groups.flatMap(g=>g.items)){const state=catalog.publicStatus(item);assert.ok(['DISPONÍVEL NO MAPA','FONTE IDENTIFICADA','EM INTEGRAÇÃO','METODOLOGIA EM DESENVOLVIMENTO'].includes(state));if(state==='DISPONÍVEL NO MAPA')assert.ok(item.control&&item.state==='integrated');}
-  assert.equal(catalog.publicStatus({state:'integrated'}),'EM INTEGRAÇÃO');assert.equal(catalog.operationalStatus('Dados em carregamento'),'◐ EM INTEGRAÇÃO');
+  for(const item of require('../data/catalogo.json').groups.flatMap(g=>g.items)){const state=catalog.publicStatus(item);assert.equal(state,item.state==='future'?'PLANEJADO':'EM INTEGRAÇÃO');}
+  assert.equal(catalog.publicStatus({state:'integrated'}),'EM INTEGRAÇÃO');assert.equal(catalog.operationalStatus('Carregando'),'Carregando');
   assert.doesNotMatch(app,/teste no mapa pendente|Teste pendente|Teste de carregamento pendente|Dados em validação|Ver fachada|● Funcional/);
 });
 function legend(field='PADRAO',visible=true,opacity=1){const layer={},d={layer,data,field,opacity,name:'Padrões de Relevo'},ctx={element,document:{createElementNS:(ns,tag)=>element(tag)},ARPIASCartography:require('../js/cartography.js'),ARPIASGeomorphology:geom,overlayDefs:[],civilDefs:[],reliefDefs:[d],map:{hasLayer:l=>visible&&l===layer},workGroup:{getLayers:()=>[]},measureGroup:{getLayers:()=>[]},selection:null};vm.createContext(ctx);vm.runInContext(tools.slice(tools.indexOf('  function styleSwatch('),tools.indexOf("  byId('legendBtn')"))+'\nthis.render=visibleLegend;',ctx);return ctx.render();}

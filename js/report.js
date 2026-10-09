@@ -7,20 +7,25 @@ const ARPIASReport=(()=>{
     const canvas=document.createElement('canvas');canvas.width=Math.round(frame.width*factor);canvas.height=Math.round(frame.height*factor);
     const ctx=canvas.getContext('2d');ctx.scale(factor,factor);ctx.fillStyle='#e7eee7';ctx.fillRect(0,0,frame.width,frame.height);
     const tiles=[...document.querySelectorAll('#map img.leaflet-tile-loaded')].filter(image=>{const r=image.getBoundingClientRect();return image.complete&&image.naturalWidth&&r.right>frame.left&&r.left<frame.right&&r.bottom>frame.top&&r.top<frame.bottom;});
+    if(!tiles.length)throw Error('Mapa-base sem imagem carregada; nenhum mapa vazio foi exportado.');
     const loaded=await Promise.all(tiles.map(async tile=>({tile,image:await loadImage(tile.currentSrc||tile.src,true)})));
     loaded.forEach(({tile,image})=>{const r=tile.getBoundingClientRect();ctx.drawImage(image,r.left-frame.left,r.top-frame.top,r.width,r.height);});
-    for(const node of document.querySelectorAll('#map .leaflet-overlay-pane canvas,#map .leaflet-overlay-pane svg')){
+    const vectors=[...document.querySelectorAll('#map .leaflet-overlay-pane canvas,#map .leaflet-overlay-pane svg')];
+    const selected=[...map.getPane('arpiasSelection').querySelectorAll('canvas,svg')];
+    async function paintVectors(nodes){for(const node of new Set(nodes)){
       const r=node.getBoundingClientRect();if(!r.width||!r.height)continue;
       let image=node;
-      if(node.tagName.toLowerCase()!=='canvas'){const copy=node.cloneNode(true);const originalPaths=node.querySelectorAll('path');copy.querySelectorAll('path').forEach((path,index)=>{path.style.filter=getComputedStyle(originalPaths[index]).filter;});image=await loadImage('data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(copy)));}
+      if(node.tagName.toLowerCase()!=='canvas'){const copy=node.cloneNode(true);copy.style.transform='none';copy.style.left='0';copy.style.top='0';const originalPaths=node.querySelectorAll('path');copy.querySelectorAll('path').forEach((path,index)=>{path.style.filter=getComputedStyle(originalPaths[index]).filter;});image=await loadImage('data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(copy)));}
       ctx.drawImage(image,r.left-frame.left,r.top-frame.top,r.width,r.height);
-    }
+    }}
+    await paintVectors(vectors);
     for(const marker of document.querySelectorAll('#map .civil-marker,#map .work-point')){
       const r=marker.getBoundingClientRect();if(!r.width||!r.height||r.right<frame.left||r.left>frame.right||r.bottom<frame.top||r.top>frame.bottom)continue;
       const color=getComputedStyle(marker).color;ctx.fillStyle='#fff';ctx.strokeStyle=color;ctx.lineWidth=2;
       ctx.beginPath();if(marker.classList.contains('work-point'))ctx.rect(r.left-frame.left+1,r.top-frame.top+1,r.width-2,r.height-2);else ctx.arc(r.left-frame.left+r.width/2,r.top-frame.top+r.height/2,r.width/2-1,0,Math.PI*2);ctx.fill();ctx.stroke();
       const svg=marker.querySelector('svg');if(svg){const copy=svg.cloneNode(true);copy.setAttribute('color',color);copy.setAttribute('width','24');copy.setAttribute('height','24');copy.setAttribute('fill','none');copy.setAttribute('stroke',color);copy.setAttribute('stroke-width','1.8');const image=await loadImage('data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(copy)));ctx.drawImage(image,r.left-frame.left+4,r.top-frame.top+4,r.width-8,r.height-8);}else{ctx.fillStyle=color;ctx.font='16px system-ui';ctx.fillText('✎',r.left-frame.left+5,r.top-frame.top+21);}
     }
+    await paintVectors(selected);
     for(const label of document.querySelectorAll('#map .territory-label')){
       const r=label.getBoundingClientRect();if(!r.width||!r.height||getComputedStyle(label).visibility==='hidden')continue;
       ctx.fillStyle='#fff';ctx.fillRect(r.left-frame.left,r.top-frame.top,r.width,r.height);ctx.fillStyle='#172f29';ctx.font=getComputedStyle(label).font;ctx.fillText(label.textContent,r.left-frame.left+6,r.top-frame.top+r.height-6);
@@ -55,9 +60,11 @@ const ARPIASReport=(()=>{
     const s=ARPIASUI.selection();if(!s){toast('Selecione um local para gerar a ficha técnica.');return;}
     if(byId('technicalReport').open)return;
     const body=byId('reportBody');body.replaceChildren(element('p','Preparando mapa e dados reais da seleção…'));byId('printReport').disabled=true;byId('technicalReport').showModal();
-    ARPIASUI.fitSelection();await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
     if(activeBaseDef.layer.isLoading())await Promise.race([new Promise(resolve=>activeBaseDef.layer.once('load',resolve)),new Promise(resolve=>setTimeout(resolve,6000))]);
     try{
+      const bounds=ARPIASUI.selectionBounds?.();
+      if(bounds&&!map.getBounds().contains(bounds))throw Error('Enquadre a seleção antes de gerar o relatório; o mapa não foi alterado.');
       const [image,nearest]=await Promise.all([mapImage(),nearby(s)]);
       if(ARPIASUI.selection()!==s){byId('technicalReport').close();toast('A seleção mudou. Gere novamente o relatório.');return;}
       const date=new Date().toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo'});
@@ -66,6 +73,7 @@ const ARPIASReport=(()=>{
       body.append(content('Identificação',[
         ['Seleção',s.title],['Município',s.context.municipio||'Não confirmado · piloto Niterói/RJ'],['Bairro',s.context.bairro||'Não identificado'],['Região administrativa',s.context.regiao||'Não identificada'],['Mapa-base',activeBaseDef.name],['Inscrição municipal','Dado ainda não integrado'],['Identificador ARPIAS','Integração futura']
       ]),content('Geometria e localização',ARPIASUI.measurementRows(s.metrics),'Estimativas geográficas por Turf 7.2.0, sem precisão cadastral certificada. Centroide dos polígonos: centro de massa, ponderado por área nas geometrias multipartes.'));
+      if(s.feature.geometry.type==='MultiPolygon')body.append(element('p','Geometria composta sem união: área e perímetro são somas das partes, incluindo anéis internos; limites compartilhados não são dissolvidos.'));
       ARPIASUI.publicAttributes(s.feature.properties).forEach(group=>body.append(content(group.title,group.rows)));
       if(s.meta.layerId==='relevo')body.append(content('Referência geomorfológica',[['Fonte',ARPIASGeomorphology.source]],ARPIASGeomorphology.warning));
       if(s.meta.work)body.append(content('Geometria de trabalho / não oficial',[['Referência original',s.feature.arpiasOrigin?`${s.feature.arpiasOrigin.layer} · ${s.feature.arpiasOrigin.id}`:'Desenho do usuário'],['Persistência','Local neste dispositivo; sem sincronização com servidor']]));
@@ -81,7 +89,7 @@ const ARPIASReport=(()=>{
       const share=ARPIASLocation.build(location.href,s.metrics.lat,s.metrics.lon,map.getZoom());body.append(element('p',`Referência compartilhável: ${share}`,'report-link'));
       body.append(element('footer','Documento gerado pelo protótipo experimental ARPIAS360. As informações devem ser verificadas junto às fontes oficiais antes de uso administrativo, jurídico ou decisório.'));
       byId('printReport').disabled=false;
-    }catch(error){console.error('Relatório:',error);body.replaceChildren(element('p','Não foi possível capturar o mapa para o relatório. Verifique a disponibilidade e as permissões CORS da fonte e tente novamente.'));toast('Não foi possível gerar a ficha técnica com imagem.');}
+    }catch(error){console.error('Relatório:',error);body.replaceChildren(element('p','Não foi possível capturar o mapa para o relatório. '+error.message+' Verifique o enquadramento, a disponibilidade e as permissões CORS da fonte.'));toast('Não foi possível gerar a ficha técnica com imagem.');}
   }
   byId('closeReport').addEventListener('click',()=>byId('technicalReport').close());
   byId('printReport').addEventListener('click',()=>{

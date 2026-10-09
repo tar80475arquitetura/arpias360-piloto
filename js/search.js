@@ -13,5 +13,17 @@
     });
     const exact=groups.get(query);return exact?[exact]:[...groups.values()].sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'));
   }
-  const api={normalize,matches,displayName};if(typeof module==='object'&&module.exports)module.exports=api;else root.ARPIASSearch=api;
+  function selectionFeature(result){
+    const geo=typeof module==='object'&&module.exports?require('./geometry.js'):root.ARPIASGeometry;
+    if(!result?.features?.length)throw Error('Bairro sem geometria');
+    const features=JSON.parse(JSON.stringify(result.features));
+    features.forEach(f=>{if(f.type!=='Feature'||!['Polygon','MultiPolygon'].includes(f.geometry?.type))throw Error('Geometria de bairro não suportada');geo.validateGeometry(f.geometry);});
+    if(features.length===1)return features[0];
+    // Preserve every ring/component. No union, clipping or changes to source data.
+    const coordinates=features.flatMap(f=>f.geometry.type==='Polygon'?[f.geometry.coordinates]:f.geometry.coordinates);
+    const properties=Object.fromEntries(Object.entries(features[0].properties||{}).filter(([key,value])=>features.every(f=>JSON.stringify(f.properties?.[key])===JSON.stringify(value))));
+    const feature={type:'Feature',properties,geometry:{type:'MultiPolygon',coordinates}};
+    geo.validateGeometry(feature.geometry);return feature;
+  }
+  const api={normalize,matches,displayName,selectionFeature};if(typeof module==='object'&&module.exports)module.exports=api;else root.ARPIASSearch=api;
 })(typeof window==='object'?window:globalThis);

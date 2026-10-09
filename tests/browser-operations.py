@@ -8,6 +8,8 @@ import json
 import os
 from pathlib import Path
 import urllib.request
+import subprocess
+from datetime import datetime, timezone
 from playwright.async_api import async_playwright
 
 OUT=Path(os.environ.get('ARPIAS_TEST_OUTPUT','/tmp/arpias-operations'))
@@ -17,6 +19,13 @@ for path in ['leaflet@1.9.4/dist/leaflet.js','leaflet@1.9.4/dist/leaflet.css','e
     url='https://unpkg.com/'+path
     with urllib.request.urlopen(url,timeout=30) as response:
         CDN[url]=(response.headers.get('Content-Type'),response.read())
+
+
+def evidence():
+    return {'sha':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
+            'dirty':bool(subprocess.check_output(['git','status','--porcelain'],text=True)),
+            'recorded_at':datetime.now(timezone.utc).isoformat(),
+            'github_run_id':os.environ.get('GITHUB_RUN_ID')}
 
 async def external(route):
     url=route.request.url
@@ -44,7 +53,7 @@ async def choose_sirens(page):
 async def main():
     results=[]
     async with async_playwright() as p:
-        browser=await p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox'])
+        browser=await p.chromium.launch(executable_path=os.environ.get('ARPIAS_CHROMIUM','/usr/bin/chromium') or None,headless=True,args=['--no-sandbox'])
         context=await browser.new_context(viewport={'width':1366,'height':768},permissions=['geolocation','clipboard-read','clipboard-write'],geolocation={'latitude':-22.9,'longitude':-43.1})
         await context.route('https://**/*',external)
         page=await context.new_page();errors=[]
@@ -188,7 +197,8 @@ async def main():
         await choose_sirens(pg);assert await pg.locator('#workingLayerControls').is_visible()
         results.append('malformed preferences do not stop catalog or working-layer controls')
         await c.close();await browser.close()
-    (OUT/'results.json').write_text(json.dumps({'passed':results,'external_services':'simulated 503, not live validation'},ensure_ascii=False,indent=2))
+    (OUT/'results.json').write_text(json.dumps({'evidence':evidence(),'passed':results,'external_services':'simulated 503, not live validation'},ensure_ascii=False,indent=2))
     print(json.dumps({'passed':len(results),'groups':results,'output':str(OUT)},ensure_ascii=False,indent=2))
 
-asyncio.run(main())
+if __name__=='__main__':
+    asyncio.run(main())
