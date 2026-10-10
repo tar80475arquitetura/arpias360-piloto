@@ -8,9 +8,9 @@
   <meta name="description" content="WebGIS experimental para leitura integrada de dados territoriais e áreas sensíveis em Niterói/RJ." />
   <link rel="preconnect" href="https://geo.niteroi.rj.gov.br" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <link rel="stylesheet" href="css/style.css?v=20261007-operacional2" />
+  <link rel="stylesheet" href="css/style.css?v=20261009-fe01a" />
   <link rel="stylesheet" href="js/vendor/leaflet-draw/leaflet.draw.css" />
-  <link rel="stylesheet" href="css/ux.css?v=20261007-operacional2" />
+  <link rel="stylesheet" href="css/ux.css?v=20261009-fe01a" />
 </head>
 <body>
   <a class="skip-link" href="#searchMirror">Ir para a busca no mapa</a>
@@ -20,21 +20,21 @@
       <div class="brand-copy"><h1>ARPIAS360</h1><span class="brand-subtitle">Avaliação de Riscos e Planejamento Integrado de Áreas Sensíveis</span><span class="mobile-pilot">Piloto Niterói/RJ</span></div>
     </div>
     <nav class="toolbar" aria-label="Ferramentas principais">
-      <button id="homeBtn" class="tool-button" title="Ver Niterói" hidden><span aria-hidden="true">⌂</span> Ver Niterói</button>
-      <button id="headerSearchBtn" class="tool-button" aria-controls="searchMirror"><span aria-hidden="true">⌕</span> Buscar</button>
-      <button id="layersBtn" class="tool-button active" aria-controls="panel" aria-expanded="true"><span aria-hidden="true">☷</span> Camadas</button>
-      <button id="consultBtn" class="tool-button" aria-pressed="false"><span aria-hidden="true">ⓘ</span> Consultar</button>
-      <button id="locateBtn" class="tool-button" title="Minha localização"><span aria-hidden="true">◎</span> Minha localização</button>
+      <button id="homeBtn" class="tool-button" title="Ver Niterói" hidden><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 11l9-8 9 8M5 10v11h14V10M10 21v-7h4v7"/></svg> Ver Niterói</button>
+      <button id="headerSearchBtn" class="tool-button" aria-controls="searchMirror"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 3a7 7 0 1 0 0 14a7 7 0 1 0 0-14M15 15l6 6"/></svg> Buscar</button>
+      <button id="layersBtn" class="tool-button active" aria-controls="panel" aria-expanded="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 7l9-5 9 5-9 5-9-5M3 12l9 5 9-5M3 17l9 5 9-5"/></svg> Camadas</button>
+      <button id="consultBtn" class="tool-button" aria-pressed="false"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2a10 10 0 1 0 0 20a10 10 0 1 0 0-20M12 10v7M12 6v1"/></svg> Consultar</button>
+      <button id="locateBtn" class="tool-button" title="Minha localização"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2v4M12 18v4M2 12h4M18 12h4M12 6a6 6 0 1 0 0 12a6 6 0 1 0 0-12M12 10a2 2 0 1 0 0 4a2 2 0 1 0 0-4"/></svg> Minha localização</button>
     </nav>
     <div class="header-end"><span class="pilot-chip"><span aria-hidden="true">●</span> Piloto Niterói/RJ</span>
       <div class="more-wrap">
-        <button id="moreBtn" class="tool-button" aria-expanded="false" aria-controls="moreMenu"><span aria-hidden="true">•••</span> Mais</button>
+        <button id="moreBtn" class="tool-button" aria-expanded="false" aria-controls="moreMenu"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 11v2M12 11v2M19 11v2"/></svg> Mais</button>
         <div id="moreMenu" class="more-menu" hidden>
-          <button id="menuHome"><span aria-hidden="true">⌂</span> Ver Niterói</button>
-          <button id="menuLocate" class="menu-location">Minha localização</button>
+          <button id="menuHome"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 11l9-8 9 8M5 10v11h14V10M10 21v-7h4v7"/></svg> Ver Niterói</button>
+          <button id="menuLocate" class="menu-location"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2v4M12 18v4M2 12h4M18 12h4M12 6a6 6 0 1 0 0 12a6 6 0 1 0 0-12M12 10a2 2 0 1 0 0 4a2 2 0 1 0 0-4"/></svg> Minha localização</button>
           <button id="menuBase"><span aria-hidden="true">▱</span> Mapa Base</button>
-          <button id="measureBtn"><span aria-hidden="true">📏</span> Medir</button>
-          <button id="editBtn"><span aria-hidden="true">✎</span> Editar mapa</button>
+          <button id="measureBtn"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 15L15 3l6 6L9 21zM7 11l3 3M11 7l3 3M15 11l3 3"/></svg> Medir</button>
+          <button id="editBtn"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 16L16 4l4 4L8 20H4zM13 7l4 4"/></svg> Editar mapa</button>
           <button id="legendBtn">Legenda</button>
           <button id="showSelectionBtn" disabled>Reabrir resultado</button>
           <button id="shareSelectionBtn" disabled>Compartilhar seleção</button>
@@ -56,16 +56,16 @@
     <button id="panelBackdrop" class="panel-backdrop" aria-label="Fechar painel de camadas" hidden tabindex="-1"></button>
     <aside id="panel" class="layer-panel" aria-labelledby="panelTitle">
       <div class="sheet-handle" aria-hidden="true"></div>
-      <div class="panel-title-row"><div><span class="eyebrow">Leitura do território</span><h2 id="panelTitle">Camadas</h2></div><button id="closePanel" class="close-btn" aria-label="Fechar camadas">×</button></div>
+      <div class="panel-title-row"><div><span class="eyebrow">Leitura do território</span><h2 id="panelTitle">Camadas</h2></div><button id="closePanel" class="close-btn" aria-label="Fechar camadas"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>
       <div class="panel-scroll">
-        <div class="sidebar-search" role="search"><input id="searchInput" type="search" placeholder="Buscar bairro, local ou coordenada" aria-label="Buscar bairro, local ou coordenada no painel" aria-describedby="searchHint" enterkeyhint="search" /><button id="searchBtn" aria-label="Buscar no painel">⌕</button></div>
+        <div class="sidebar-search" role="search"><input id="searchInput" type="search" placeholder="Buscar bairro, local ou coordenada" aria-label="Buscar bairro, local ou coordenada no painel" aria-describedby="searchHint" enterkeyhint="search" /><button id="searchBtn" aria-label="Buscar no painel"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 3a7 7 0 1 0 0 14a7 7 0 1 0 0-14M15 15l6 6"/></svg></button></div>
         <p id="searchHint" class="search-hint">Busca por bairros e coordenadas. Ruas em integração futura.</p>
         <div class="catalog-search"><label for="layerSearch">Pesquisar camadas</label><input id="layerSearch" type="search" placeholder="Sirene, chuva, ITBI, lote…" autocomplete="off" /><p id="catalogSearchStatus" role="status" aria-live="polite">Carregando catálogo…</p></div>
-        <p class="catalog-key">Maturidade: DISPONÍVEL · EM INTEGRAÇÃO · PLANEJADO<br>Carregamento e visibilidade são estados independentes.</p>
+        <p class="catalog-key">Maturidade: DISPONÍVEL · EM INTEGRAÇÃO · PLANEJADO<br>Carregamento, visibilidade e camada de trabalho são independentes.</p>
         <details id="baseAccordion" class="accordion" data-category="territory" open><summary>Mapas de Referência <small>Uma base por vez</small></summary><div class="accordion-body"><div id="baseControl" class="control-list"></div><div id="baseMeta" class="meta-card"></div><button id="baseFallback" class="quiet-button" hidden>Usar mapa de ruas</button></div></details>
         <section id="workingLayerPanel" class="working-layer-panel" aria-labelledby="workingLayerHeading">
           <h3 id="workingLayerHeading">Camada de trabalho</h3>
-          <p id="workingLayerHint">Selecione o nome de uma camada para consultar, ajustar opacidade ou enquadrar.</p>
+          <p id="workingLayerHint">Clique no nome ou no marcador de trabalho para escolher uma camada. O botão de visibilidade liga ou desliga sua exibição no mapa.</p>
           <div id="workingLayerControls" hidden>
             <strong id="workingLayerName"></strong>
             <p id="workingLayerStatus" role="status" aria-live="polite"></p>
@@ -75,7 +75,7 @@
           </div>
         </section>
         <div id="catalogGroups"></div>
-        <details id="workAccordion" class="accordion" data-category="planning"><summary>Minhas camadas <small id="workCount">0 feições</small></summary><div class="accordion-body"><p class="source-note">Dados salvos neste dispositivo. Camadas oficiais permanecem somente para leitura.</p><div id="workList" class="control-list"></div><button id="workExportGeo" class="quiet-button">Exportar GeoJSON</button><button id="workExportCSV" class="quiet-button">Exportar CSV</button><button id="restoreWork" class="quiet-button" disabled>Restaurar última exclusão</button></div></details>
+        <details id="workAccordion" class="accordion" data-category="planning"><summary>Minhas camadas <small id="workCount">0 feições</small></summary><div class="accordion-body"><p class="source-note">Dados salvos neste dispositivo. Camadas oficiais permanecem somente para leitura.</p><div id="workList" class="control-list"></div><button id="workExportGeo" class="quiet-button"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3v12M7 10l5 5 5-5M4 16v5h16v-5"/></svg> Exportar GeoJSON</button><button id="workExportCSV" class="quiet-button"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3v12M7 10l5 5 5-5M4 16v5h16v-5"/></svg> Exportar CSV</button><button id="restoreWork" class="quiet-button" disabled>Restaurar última exclusão</button></div></details>
         <details class="accordion" data-category="civil" open><summary>Defesa Civil <small>4 camadas</small></summary><div class="accordion-body"><div id="civilControl" class="control-list"></div><div id="civilMessage" class="sidebar-note" role="status" aria-live="polite"></div><p class="source-note">Prefeitura de Niterói / GeoNit / Defesa Civil</p></div></details>
         <details class="accordion" data-category="territory"><summary>Território</summary><div class="accordion-body"><div id="territoryControl" class="control-list"></div></div></details>
         <details class="accordion" data-category="environment"><summary>Meio Ambiente</summary><div class="accordion-body"><div id="environmentControl" class="control-list"></div></div></details>
@@ -87,23 +87,23 @@
         <details class="accordion future-section" data-category="fragility"><summary>Pontuação de Fragilidade</summary><div class="accordion-body"><span class="future-badge">Integração futura</span><p>Funcionalidade prevista para integração futura de indicadores territoriais, climáticos, socioespaciais e urbanos em uma leitura integrada de fragilidade.</p></div></details>
         <p class="sidebar-note panel-method">Protótipo público e experimental. Integra bases públicas com diferentes períodos e escalas. Coincidência espacial não implica causalidade.</p>
       </div>
-      <footer class="panel-footer"><button id="clearLayersBtn" class="quiet-button"><span aria-hidden="true">↺</span> Limpar camadas</button><small>Combine camadas para explorar o território.</small></footer>
+      <footer class="panel-footer"><button id="clearLayersBtn" class="quiet-button"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 6h14M9 6V3h6v3M7 6v15h10V6M10 10v7M14 10v7"/></svg> Limpar camadas</button><small>Combine camadas para explorar o território.</small></footer>
     </aside>
     <section class="mapwrap" aria-label="Área cartográfica">
       <div id="map" aria-label="Mapa interativo de Niterói"></div>
-      <div class="floating-search" role="search"><span class="search-icon" aria-hidden="true">⌕</span><input id="searchMirror" type="search" placeholder="Buscar bairro, local ou coordenada" aria-label="Buscar bairro, local ou coordenada" aria-describedby="searchHint" enterkeyhint="search" /><button id="searchMirrorBtn">Buscar</button></div>
+      <div class="floating-search" role="search"><span class="search-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" focusable="false"><path d="M10 3a7 7 0 1 0 0 14a7 7 0 1 0 0-14M15 15l6 6"/></svg></span><input id="searchMirror" type="search" placeholder="Buscar bairro, local ou coordenada" aria-label="Buscar bairro, local ou coordenada" aria-describedby="searchHint" enterkeyhint="search" /><button id="searchMirrorBtn"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 3a7 7 0 1 0 0 14a7 7 0 1 0 0-14M15 15l6 6"/></svg> Buscar</button></div>
       <section id="placeResults" class="place-results" aria-label="Resultados da busca territorial" aria-live="polite" hidden></section>
-      <div class="edge-tools"><button id="togglePanel" aria-label="Abrir camadas" aria-controls="panel" aria-expanded="true" title="Camadas">☷</button></div>
+      <div class="edge-tools"><button id="togglePanel" aria-label="Abrir camadas" aria-controls="panel" aria-expanded="true" title="Camadas"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 7l9-5 9 5-9 5-9-5M3 12l9 5 9-5M3 17l9 5 9-5"/></svg></button></div>
       <div id="mapStatus" class="map-status"><span class="status-dot" aria-hidden="true"></span><div><strong id="activeBaseLabel">Foto Aérea 2019</strong><small id="statusMessage">Carregando base cartográfica…</small></div></div>
       <div id="coords" class="coords">Ative Consultar para investigar um local</div>
-      <section id="toolPanel" class="tool-panel" aria-label="Ferramenta ativa" hidden><div class="tool-state"><strong id="toolTitle"></strong><button id="collapseTool" class="close-btn" aria-label="Recolher ferramenta" aria-expanded="true">−</button><button id="exitTool" class="close-btn" aria-label="Encerrar ferramenta">×</button></div><div id="consultControls" hidden><label for="queryLayer">Camada para consulta:</label><select id="queryLayer"><option value="">Escolha uma camada</option></select></div><p id="toolHint" role="status" aria-live="polite"></p><div id="measureControls" class="tool-actions" hidden><button id="measureDistance">Medir distância</button><button id="measureArea">Medir área</button><button id="finishDrawing" hidden>Finalizar desenho</button><button id="keepMeasure" hidden>Manter no mapa</button><button id="clearMeasure">Limpar medição</button></div><div id="editControls" class="tool-actions" hidden><button id="drawPoint">Ponto</button><button id="drawLine">Linha</button><button id="drawPolygon">Polígono</button><button id="editGeometry">Editar geometria / vértices</button><button id="finishGeometry" hidden>Concluir ajuste</button><button id="saveWork">Salvar neste dispositivo</button><button id="cancelWork">Cancelar edição</button></div><p id="toolResult" class="tool-result"></p></section>
+      <section id="toolPanel" class="tool-panel" aria-label="Ferramenta ativa" hidden><div class="tool-state"><strong id="toolTitle"></strong><button id="collapseTool" class="close-btn" aria-label="Recolher ferramenta" aria-expanded="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14"/></svg></button><button id="exitTool" class="close-btn" aria-label="Encerrar ferramenta"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div><div id="consultControls" hidden><label for="queryLayer">Camada para consulta:</label><select id="queryLayer"><option value="">Escolha uma camada</option></select></div><p id="toolHint" role="status" aria-live="polite"></p><div id="measureControls" class="tool-actions" hidden><button id="measureDistance">Medir distância</button><button id="measureArea">Medir área</button><button id="finishDrawing" hidden>Finalizar desenho</button><button id="keepMeasure" hidden>Manter no mapa</button><button id="clearMeasure">Limpar medição</button></div><div id="editControls" class="tool-actions" hidden><button id="drawPoint"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18M12 10v4M10 12h4"/></svg> Ponto</button><button id="drawLine"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 19L9 5l7 10 5-12"/></svg> Linha</button><button id="drawPolygon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 8l9-5 9 9-7 9-11-4z"/></svg> Polígono</button><button id="editGeometry"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 16L16 4l4 4L8 20H4zM13 7l4 4"/></svg> Editar geometria / vértices</button><button id="finishGeometry" hidden>Concluir ajuste</button><button id="saveWork">Salvar neste dispositivo</button><button id="cancelWork">Cancelar edição</button></div><p id="toolResult" class="tool-result"></p></section>
       <aside id="aboutPanel" class="about-panel" aria-labelledby="aboutTitle" hidden><button id="closeAbout" class="close-btn" aria-label="Fechar sobre o projeto">×</button><span class="eyebrow">Protótipo científico e tecnológico</span><h2 id="aboutTitle">Um território, várias leituras</h2><p>O ARPIAS360 integra dados públicos territoriais, ambientais, climáticos, imobiliários, de segurança e de riscos em uma única interface cartográfica.</p><div class="question-card"><span>Pergunta-guia</span><strong>O que os dados de mercado imobiliário, segurança pública, clima e território revelam quando passam a ser vistos juntos em um único mapa?</strong></div><p class="method-note">Protótipo experimental. Não substitui sistemas oficiais, vistorias, laudos técnicos ou decisões das autoridades competentes.</p></aside>
     </section>
     <aside id="territorialPanel" class="territorial-panel" aria-labelledby="territorialTitle" hidden><header class="query-header"><h2 id="territorialTitle">Ficha territorial</h2><button id="closeTerritorial" class="close-btn" aria-label="Fechar ficha territorial">×</button></header><div id="territorialBody" class="territorial-body"></div></aside>
-    <nav class="mobile-actions" aria-label="Ações do mapa"><button id="mobileLayersBtn" aria-controls="panel" aria-expanded="false"><span aria-hidden="true">☷</span> Camadas</button><button id="mobileConsultBtn" aria-pressed="false"><span aria-hidden="true">ⓘ</span> Consultar</button><button id="mobileLocateBtn"><span aria-hidden="true">◎</span> Minha localização</button></nav>
+    <nav class="mobile-actions" aria-label="Ações do mapa"><button id="mobileLayersBtn" aria-controls="panel" aria-expanded="false"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 7l9-5 9 5-9 5-9-5M3 12l9 5 9-5M3 17l9 5 9-5"/></svg> Camadas</button><button id="mobileConsultBtn" aria-pressed="false"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2a10 10 0 1 0 0 20a10 10 0 1 0 0-20M12 10v7M12 6v1"/></svg> Consultar</button><button id="mobileLocateBtn"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2v4M12 18v4M2 12h4M18 12h4M12 6a6 6 0 1 0 0 12a6 6 0 1 0 0-12M12 10a2 2 0 1 0 0 4a2 2 0 1 0 0-4"/></svg> Minha localização</button></nav>
     <section id="querySheet" class="query-sheet" aria-labelledby="queryHeading" hidden><div class="sheet-handle" aria-hidden="true"></div><header class="query-header"><h2 id="queryHeading" tabindex="-1">Consulta do ponto</h2><button id="closeQuery" class="close-btn" aria-label="Fechar consulta">×</button></header><div id="queryBody" class="query-body"></div></section>
   </main>
-  <dialog id="layerInfo" aria-labelledby="infoTitle"><button id="closeInfo" class="close-btn" aria-label="Fechar informações">×</button><div id="infoBody"></div></dialog>
+  <dialog id="layerInfo" aria-labelledby="infoTitle"><button id="closeInfo" class="close-btn" aria-label="Fechar informações"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg></button><div id="infoBody"></div></dialog>
   <dialog id="confirmAction" aria-labelledby="confirmTitle"><h2 id="confirmTitle">Confirmar ação</h2><p id="confirmText"></p><div class="dialog-actions"><button id="confirmCancel">Cancelar</button><button id="confirmAccept">Confirmar</button></div></dialog>
   <dialog id="workFormDialog" aria-labelledby="workFormTitle"><h2 id="workFormTitle">Feição de trabalho</h2><form id="workForm"><label>Título<input name="titulo" required maxlength="160" /></label><label>Categoria<input name="categoria" maxlength="160" /></label><label>Descrição<textarea name="descricao" maxlength="2000"></textarea></label><label>Data<input name="data" type="date" /></label><label>Status<select name="status"><option>Rascunho</option><option>Em análise</option><option>Concluído</option></select></label><label>Prioridade<select name="prioridade"><option>Não definida</option><option>Baixa</option><option>Média</option><option>Alta</option></select></label><label>Fonte<input name="source" maxlength="160" placeholder="Informe a origem da anotação" /></label><label>Observações<textarea name="observacoes" maxlength="2000"></textarea></label><div class="dialog-actions"><button id="cancelWorkForm" type="button">Cancelar</button><button type="submit">Aplicar à camada de trabalho</button></div></form></dialog>
   <dialog id="shareDialog" aria-labelledby="shareTitle"><h2 id="shareTitle">Compartilhar seleção</h2><p id="shareHint">Link com as coordenadas e o zoom da seleção.</p><input id="selectionLink" readonly aria-label="Link da seleção" /><img id="selectionQR" alt="QR Code para abrir a seleção no ARPIAS360" /><div class="dialog-actions"><button id="copySelectionLink">Copiar link</button><button id="closeShare">Fechar</button></div></dialog>
@@ -121,9 +121,9 @@
   <script src="js/search.js"></script>
   <script src="js/cartography.js"></script>
   <script src="js/geomorphology.js"></script>
-  <script src="js/app.js?v=20261007-operacional2"></script>
+  <script src="js/app.js?v=20261009-fe01a"></script>
   <script src="js/reference-labels.js"></script>
-  <script src="js/tools.js?v=20261007-operacional2"></script>
+  <script src="js/tools.js?v=20261009-fe01a"></script>
   <script src="js/preferences.js"></script>
   <script src="js/operations.js"></script>
   <script src="js/report.js"></script>
