@@ -9,6 +9,7 @@ import os
 from pathlib import Path
 import urllib.request
 import subprocess
+import sys
 from datetime import datetime, timezone
 from playwright.async_api import async_playwright
 
@@ -202,3 +203,5 @@ async def main():
 
 if __name__=='__main__':
     asyncio.run(main())
+    # Keep FE-01A presentation regressions in the existing CI browser job.
+    subprocess.run([sys.executable,str(Path(__file__).with_name('browser-fe01a.py'))],check=True)

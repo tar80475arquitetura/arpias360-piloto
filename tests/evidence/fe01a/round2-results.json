@@ -1,0 +1,23 @@
+{
+  "evidence": {
+    "sha": "ed2854c6587c26b1765729b0714ca0458ed39632",
+    "dirty": true,
+    "recorded_at": "2026-10-10T01:30:09.263074+00:00",
+    "github_run_id": null
+  },
+  "passed": [
+    "relief information button before loading, after failure and after all four classifications",
+    "catalogue aliases, loading, failure, hidden layer, zero opacity and independent maturity",
+    "Point, origin visible=True: real pixels, single selection, public attributes, stable map and report",
+    "Point, origin visible=False: real pixels, single selection, public attributes, stable map and report",
+    "LineString, origin visible=True: real pixels, single selection, public attributes, stable map and report",
+    "LineString, origin visible=False: real pixels, single selection, public attributes, stable map and report",
+    "Polygon, origin visible=True: real pixels, single selection, public attributes, stable map and report",
+    "Polygon, origin visible=False: real pixels, single selection, public attributes, stable map and report",
+    "MultiPolygon, origin visible=True: real pixels, single selection, public attributes, stable map and report",
+    "MultiPolygon, origin visible=False: real pixels, single selection, public attributes, stable map and report",
+    "capture failure is explicit and printing stays disabled"
+  ],
+  "external_services": "controlled failures; no real GIS validation",
+  "fixtures": "synthetic geometry and tile for capture assertions"
+}

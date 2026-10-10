@@ -1,0 +1,84 @@
+{
+  "base_sha": "ed2854c6587c26b1765729b0714ca0458ed39632",
+  "branch": "codex/frontend-fe01a",
+  "recorded_at": "2026-10-09T22:41:22.345311-03:00",
+  "scope": "FE-01A local controlled browser validation, no production deployment",
+  "files": {
+    "index.html": "c4f890373866250e74ee4b27f3a37724677dfbe21a02d7f7b224960e23e52bdd",
+    "css/style.css": "5971e1d74a26275001fd9c549dced608bc488b6995f381ae3a83bcf4b6234d54",
+    "css/ux.css": "c0db237c2381e0de5cb1991c4d0125d60e50e595d6d40fdbd7865501c6b81f58",
+    "js/app.js": "6ecc684ebba9dc5fde43082ca16ecdb0224eb7823a5733df9f3d3ccc3773e0ea",
+    "js/tools.js": "d7f2589c505cb37ff1ff24e51d35560082b171921f8b6e8a8db05996eed49747",
+    "tests/browser-operations.py": "e65e9df83aa4dd7c59b4dfa9ccafd4957fa474f7f705a484eb9a95503b1c033f",
+    "tests/browser-fe01a.py": "1abd138634746a7bdcc454085b8f509992eee84a35e6ce0f4bfbc12308a77a59",
+    "tests/fe01a.test.cjs": "25b1f21779bf3f734e0a338e89af4b81a4183ff0aa1da34c5272bf1afe760c9f"
+  },
+  "images": [
+    {
+      "name": "before-desktop-open.png",
+      "sha256": "f2f0ea3f8c73445b734c0ab36099542c01be5dffda44167383c02def327712ef",
+      "captured_at": "2026-10-09T19:26:44.073923+00:00"
+    },
+    {
+      "name": "before-desktop-closed.png",
+      "sha256": "682139a086ee4b0f2551aadac25e21bf63fb4306cd5258021694f3500941db6c",
+      "captured_at": "2026-10-09T19:26:44.469918+00:00"
+    },
+    {
+      "name": "before-mobile-open.png",
+      "sha256": "0afab8331175c248a86e2fbac426a38e35d315b44e16bf385a49dfc661b35e1a",
+      "captured_at": "2026-10-09T19:26:45.258006+00:00"
+    },
+    {
+      "name": "before-mobile-closed.png",
+      "sha256": "2d1e3e896ee3cc0d3388ecaad2e8122963ee3b63f40901b5d676fcfff4f53e95",
+      "captured_at": "2026-10-09T19:26:45.635919+00:00"
+    },
+    {
+      "name": "after-desktop-initial-open.png",
+      "sha256": "f66392c9bdcb6044b072ad54a1708300d57b30fb841e75b392bd3e23d041ca4a",
+      "captured_at": "2026-10-10T01:21:55.133544+00:00"
+    },
+    {
+      "name": "after-desktop-initial-closed.png",
+      "sha256": "d52c3240e02288a75e5610ea5084ce8f12583e0b58347ac2aa7316cfe51d8a23",
+      "captured_at": "2026-10-10T01:21:55.518194+00:00"
+    },
+    {
+      "name": "after-mobile-initial-open.png",
+      "sha256": "ebaa889e0c3c41fb75fb9ddab740b053aa1d719e3ce209872a320728af97ff86",
+      "captured_at": "2026-10-10T01:21:56.354108+00:00"
+    },
+    {
+      "name": "after-mobile-initial-closed.png",
+      "sha256": "d98ca058bb4174b30575fdab90e4692919253e438f8cdff20881db4d3ab775eb",
+      "captured_at": "2026-10-10T01:21:56.749465+00:00"
+    },
+    {
+      "name": "after-desktop-layer-controls.png",
+      "sha256": "96265817ddf11cecee52ceb9a69bff19ead91147604a9a8922bc7522b95cad29",
+      "captured_at": "2026-10-10T01:29:49.653105+00:00"
+    },
+    {
+      "name": "after-mobile-layer-controls.png",
+      "sha256": "af80289296291783b9a7b6930b6328058e678ba2529765d206977354f5943063",
+      "captured_at": "2026-10-10T01:29:57.152841+00:00"
+    },
+    {
+      "name": "after-native-browser-zoom-200.png",
+      "sha256": "1dc7a0965c9d7823559c7f6deff9f75886e2501f68fb9122cdf0dd18dbec3c25",
+      "captured_at": "2026-10-10T01:30:00.744685+00:00"
+    },
+    {
+      "name": "after-relief-classification.png",
+      "sha256": "5232a0f7b7ae38badc8e33fe02cedf9ecfc88fcd3bb0b4bbd88f40870030d6c2",
+      "captured_at": "2026-10-10T01:29:50.488608+00:00"
+    },
+    {
+      "name": "after-planned-states.png",
+      "sha256": "27e0a8804328f80a684cd943dc31ece400e32d25d227a3f15d8ca20586ac579f",
+      "captured_at": "2026-10-10T01:29:50.576235+00:00"
+    }
+  ],
+  "browser_rerun": "Four FE-01A groups rerun successfully after selecting full Chromium for native zoom; frontend and original comparison captures unchanged"
+}

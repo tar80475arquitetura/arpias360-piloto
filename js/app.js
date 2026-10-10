@@ -263,12 +263,86 @@ async function readJSON(url){
   return response.json();
 }
 
+// Original inline operational SVGs; decorative because each control has a name.
+function uiIcon(name){
+  const paths={
+    search:'M10 3a7 7 0 1 0 0 14a7 7 0 1 0 0-14M15 15l6 6',
+    layers:'M3 7l9-5 9 5-9 5-9-5M3 12l9 5 9-5M3 17l9 5 9-5',
+    info:'M12 2a10 10 0 1 0 0 20a10 10 0 1 0 0-20M12 10v7M12 6v1',
+    work:'M5 3h14v18l-7-4-7 4V3M9 9l2 2 4-4',
+    loading:'M12 3a9 9 0 1 0 9 9M12 6v6l4 2',
+    error:'M12 3L2 21h20L12 3M12 9v5M12 17v1',
+    ready:'M4 12l5 5L20 6',
+    waiting:'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18M7 12h10',
+    collapse:'M5 12h14',expand:'M5 12h14M12 5v14',
+    close:'M5 5l14 14M19 5L5 19',
+    raster:'M3 3h18v18H3zM3 12h18M12 3v18'
+  };
+  if(!paths[name])throw Error('Unknown operational icon: '+name);
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('class','ui-icon');
+  svg.setAttribute('aria-hidden','true');svg.setAttribute('focusable','false');
+  const path=document.createElementNS(svg.namespaceURI,'path');path.setAttribute('d',paths[name]);svg.append(path);return svg;
+}
+function renderOperationalText(node,text){
+  const kind=/Falha de carregamento/.test(text)?'error':/· Carregando/.test(text)?'loading':/· Carregado/.test(text)?'ready':'waiting';
+  node.replaceChildren(uiIcon(kind),element('span',text));
+}
+function renderLayerPresentation(node,control){renderOperationalText(node,layerPresentation(control));}
+function refreshCategoryCounts(){
+  catalogSections.forEach(({section,rows})=>{
+    const inputs=new Map();
+    rows.forEach(row=>{
+      const id=row.dataset.layerId;
+      const input=row.dataset.controlId?document.getElementById(row.dataset.controlId):id?document.getElementById('layer_'+id):row.querySelector('input[name="base"]');
+      if(input)inputs.set(input.id,input);
+    });
+    const count=[...inputs.values()].filter(input=>input.checked).length;
+    const badge=section.querySelector('summary small');
+    if(badge){badge.classList.add('category-count');badge.textContent=`${rows.length} itens · ${count} ${section.id==='baseAccordion'?'base selecionada':count===1?'ligada':'ligadas'}`;}
+  });
+}
+function refreshLayerSymbols(){
+  if(typeof ARPIASUI==='undefined')return;
+  const definitions=[...overlayDefs,...civilDefs,...reliefDefs];
+  document.querySelectorAll('.layer-control[data-layer-id]').forEach(row=>{
+    const d=definitions.find(d=>d.id===row.dataset.layerId),icon=row.querySelector('.layer-icon');
+    if(!d||!icon)return;
+    icon.replaceChildren();
+    if(overlayDefs.includes(d)){
+      icon.append(ARPIASUI.styleSwatch(d.id,d.opacity??1));
+      icon.title=(d.id==='hidro'?'Linha':'Polígono')+' · estilo e opacidade da camada no mapa';
+    }else if(civilDefs.includes(d)){
+      icon.classList.add('legend-civil-marker');icon.append(symbol(d.id));
+      icon.style.opacity=String(d.opacity??1);icon.title='Ponto · mesmo marcador da camada no mapa';
+    }else if(d.data){
+      const classes=ARPIASGeomorphology.classes(d.data,d.field);
+      const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+      svg.setAttribute('viewBox','0 0 40 28');svg.setAttribute('class','legend-swatch');svg.setAttribute('aria-hidden','true');
+      classes.slice(0,3).forEach((c,i)=>{
+        const feature=d.data.features.find(f=>(d.field==='PADRAO'?f.properties.COD_REL:f.properties[d.field])===c.key);
+        const style=ARPIASGeomorphology.style(d.data,d.field,feature,d.opacity??1);
+        const path=document.createElementNS(svg.namespaceURI,'path');path.setAttribute('d',`M${2+i*12} 4h10v20h-10Z`);
+        path.setAttribute('stroke',style.color);path.setAttribute('fill',style.fillColor);path.setAttribute('stroke-width',style.weight);
+        path.setAttribute('stroke-opacity',style.opacity);path.setAttribute('fill-opacity',style.fillOpacity);
+        if(style.dashArray)path.setAttribute('stroke-dasharray',style.dashArray);svg.append(path);
+      });
+      icon.append(svg);icon.title=`Amostra de ${Math.min(3,classes.length)} de ${classes.length} classes · ${ARPIASGeomorphology.fields[d.field]}. Legenda completa no menu Mais.`;
+    }else{
+      icon.append(uiIcon('waiting'));icon.title='Simbologia temática disponível após carregar a classificação';
+    }
+    icon.setAttribute('role','img');icon.setAttribute('aria-label',icon.title);
+  });
+}
 const baseControl=document.getElementById('baseControl');
+document.addEventListener('DOMContentLoaded',refreshLayerSymbols);
+document.addEventListener('arpias:catalog-ready',refreshLayerSymbols);
+document.addEventListener('arpias:opacity',refreshLayerSymbols);
 const baseMeta=document.getElementById('baseMeta');
 let previousBaseDef=baseDefs[1];
 let baseGeneration=0;
 let baseTimer;
-function baseState(def,state){def.state=state;if(def.statusNode){def.statusNode.textContent=ARPIASCatalog.layerStatus(state,map.hasLayer(def.layer),def.opacity??1,{state:'integrated',control:'base_'+def.id});def.statusNode.setAttribute('data-state',state);}}
+function baseState(def,state){def.state=state;if(def.statusNode){renderOperationalText(def.statusNode,ARPIASCatalog.layerStatus(state,map.hasLayer(def.layer),def.opacity??1,{state:'integrated',control:'base_'+def.id}));def.statusNode.setAttribute('data-state',state);}}
 function selectBase(def){
   clearTimeout(baseTimer);baseGeneration++;
   if(activeBaseDef!==def)previousBaseDef=activeBaseDef;
@@ -316,8 +390,9 @@ baseDefs.forEach(d=>{
   d.statusNode=element('span','EM INTEGRAÇÃO · Aguardando carregamento','status');
   heading.append(element('span',shortNames[d.id],'name'),d.statusNode);text.append(heading);
   text.append(element('small',d.id==='ortho'?'Imagem histórica oficial':d.id==='osm'?'OpenStreetMap':`NASA VIIRS · ${recentDate}`));
-  label.append(radio,text);baseControl.append(label);
-  const info=element('button','ⓘ','info-button');info.type='button';info.setAttribute('aria-label',`Informações: ${d.name}`);
+  const swatch=element('span',undefined,'base-swatch');swatch.append(uiIcon('raster'));swatch.setAttribute('role','img');swatch.setAttribute('aria-label','Mapa-base raster');
+  label.append(radio,swatch,text);baseControl.append(label);
+  const info=element('button',undefined,'info-button');info.append(uiIcon('info'));info.type='button';info.setAttribute('aria-label',`Informações: ${d.name}`);
   info.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const box=content(d.name,[['Fonte',d.id==='ortho'?'Prefeitura Municipal de Niterói / SIGeo':d.id==='osm'?'OpenStreetMap':'NASA GIBS / VIIRS'],['Geometria','Raster'],['Status',d.statusNode.textContent],['Atualização',d.id==='ortho'?'2019':d.id==='recent'?recentDate:'Não informada']],d.desc);appendOpacity(box,d,true);box.firstChild.id='infoTitle';document.getElementById('infoBody').replaceChildren(box);document.getElementById('layerInfo').showModal();});label.append(info);
   radio.addEventListener('change',()=>{if(radio.checked)selectBase(d);});
   radio.addEventListener('click',()=>{if(radio.checked&&d.state==='Indisponível')selectBase(d);});
@@ -364,7 +439,7 @@ function layerControl(d,state,onChange,info){
   const label=element('div',undefined,'layer-label');
   const icon=element('span',undefined,`layer-icon ${d.symbolId||d.id}`);icon.append(symbol(d.symbolId||d.id));
   const text=element('span',undefined,'layer-name');
-  const choose=element('button',d.name,'name layer-target');choose.type='button';choose.setAttribute('aria-pressed','false');choose.title='Selecionar como camada de trabalho';
+  const choose=element('button',d.name,'name layer-target');choose.type='button';choose.setAttribute('aria-pressed','false');choose.title=d.name+' — selecionar como camada de trabalho';
   choose.addEventListener('click',()=>document.dispatchEvent(new CustomEvent('arpias:working-layer',{detail:d.symbolId||d.id})));text.append(choose);
   row.dataset.layerId=d.symbolId||d.id;
   d.status=element('small',state,'layer-status');text.append(d.status);
@@ -374,15 +449,20 @@ function layerControl(d,state,onChange,info){
   d.input.checked=!!d.layer&&map.hasLayer(d.layer);
   const track=element('span',undefined,'switch-track');track.setAttribute('aria-hidden','true');
   const word=element('span',undefined,'switch-word');word.setAttribute('aria-hidden','true');
-  control.append(d.input,track,word);label.append(icon,text,control);row.append(label);
-  if(info){const button=element('button','ⓘ','info-button');button.type='button';button.setAttribute('aria-label',`Informações: ${d.name}`);button.addEventListener('click',info);row.append(button);}
+  control.append(d.input,track,word);control.title='Ligar ou desligar a visibilidade no mapa';label.append(icon,text,control);row.append(label);
+  const work=element('button',undefined,'layer-work-button');work.type='button';work.append(uiIcon('work'));work.setAttribute('aria-label',`Selecionar para trabalho: ${d.name}`);work.title=`Selecionar para trabalho: ${d.name}`;work.setAttribute('aria-pressed','false');
+  work.addEventListener('click',()=>choose.click());row.append(work);
+  const workLabel=element('small','Camada de trabalho','work-indicator');workLabel.hidden=true;text.append(workLabel);
+  new MutationObserver(()=>{const chosen=row.dataset.working==='true';work.setAttribute('aria-pressed',String(chosen));workLabel.hidden=!chosen;}).observe(row,{attributes:true,attributeFilter:['data-working']});
+  if(info){const button=element('button',undefined,'info-button');button.append(uiIcon('info'));button.type='button';button.setAttribute('aria-label',`Informações: ${d.name}`);button.title='Informações, fonte e data da camada';button.addEventListener('click',info);row.append(button);}
   const syncOperationalState=()=>{
     row.dataset.visible=String(!!d.layer&&map.hasLayer(d.layer));
     const value=(d.status?.textContent||'').toLowerCase();
     row.dataset.state=value.includes('indispon')||value.includes('erro')||value.includes('falha')?'error':/^carregando/.test(value)?'loading':d.input.checked?'active':'ready';
+    queueMicrotask(refreshCategoryCounts);
   };
   d.input.addEventListener('change',()=>{onChange();syncOperationalState();});
-  new MutationObserver(syncOperationalState).observe(d.status,{childList:true,characterData:true,subtree:true});
+  new MutationObserver(()=>{syncOperationalState();refreshLayerSymbols();}).observe(d.status,{childList:true,characterData:true,subtree:true});
   d.syncOperationalState=syncOperationalState;syncOperationalState();
   return row;
 }
@@ -485,7 +565,7 @@ function showReliefInfo(){
 const classification=element('select');classification.id='reliefClassification';classification.setAttribute('aria-label','Classificação do relevo');
 Object.entries(ARPIASGeomorphology.fields).forEach(([value,label])=>{const option=element('option',label);option.value=value;classification.append(option);});
 classification.disabled=true;reliefRow.append(classification);document.getElementById('territoryControl').append(reliefRow);
-classification.addEventListener('change',()=>{relief.field=classification.value;relief.layer.setStyle(reliefStyle);});
+classification.addEventListener('change',()=>{relief.field=classification.value;relief.layer.setStyle(reliefStyle);refreshLayerSymbols();});
 const fetchRelief=ARPIASGeomorphology.createLoader(()=>readJSON('data/processed/cprm/padroes-relevo.geojson'));
 async function loadRelief(){
   if(relief.layer)return relief.layer;
@@ -521,9 +601,10 @@ function refreshCatalogStates(){
   document.querySelectorAll('.layer-control[data-layer-id]').forEach(row=>{
     const control='layer_'+row.dataset.layerId;
     const target=row.querySelector('.catalog-operational')|| (row.dataset.layerId.startsWith('alias_')?row.querySelector('.layer-status'):null);
-    if(target)target.textContent=layerPresentation(control);
+    if(target)renderLayerPresentation(target,control);
   });
   catalogEntries.filter(e=>e.item.control?.startsWith('base_')).forEach(({item,row})=>{const badge=row.querySelector('.catalog-badge');if(badge)badge.textContent=layerPresentation(item.control);});
+  refreshCategoryCounts();
 }
 document.addEventListener('arpias:opacity',refreshCatalogStates);
 map.on('layeradd layerremove',()=>queueMicrotask(refreshCatalogStates));
@@ -572,13 +653,13 @@ readJSON('data/catalogo.json').then(ARPIASCatalog.validate).then(catalog=>{
       if(item.state==='integrated'&&!input)throw Error(`Controle ausente: ${item.control}`);
       if(input&&!claimed.has(item.control)){
         claimed.add(item.control);row=input.closest('.layer-control,.control-item');
-        row.querySelector('.name').textContent=item.name;input.setAttribute('aria-label',item.name);
+        row.querySelector('.name').textContent=item.name;row.querySelector('.name').title=item.name+' — selecionar como camada de trabalho';input.setAttribute('aria-label',item.name);
         if(!isBase)body.append(row);
         const status=row.querySelector('.layer-status');
         // Presentation follows actual load/error events, without changing layer state.
         if(status){
           const badge=element('small',undefined,'catalog-operational');status.after(badge);status.hidden=true;
-          const sync=()=>{badge.textContent=layerPresentation(input.id);};
+          const sync=()=>{renderLayerPresentation(badge,input.id);};
           new MutationObserver(sync).observe(status,{childList:true,characterData:true,subtree:true});sync();
         }
       }else{
@@ -589,13 +670,15 @@ readJSON('data/catalogo.json').then(ARPIASCatalog.validate).then(catalog=>{
           const sync=()=>{proxy.layer=[...overlayDefs,...civilDefs,...reliefDefs].find(d=>'layer_'+d.id===item.control)?.layer;proxy.input.checked=input.checked;proxy.status.textContent=original.textContent+(item.count?` · ${item.count} pontos`:'');proxy.row.setAttribute('aria-busy',originalRow.getAttribute('aria-busy')||'false');};
           row=layerControl(proxy,'◐ Em integração',()=>{if(proxy.input.checked!==input.checked)input.click();sync();},()=>originalRow.querySelector('.info-button')?.click());
           proxy.status.hidden=true;const badge=element('small',undefined,'catalog-operational');proxy.status.after(badge);
-          const presentation=()=>{badge.textContent=layerPresentation(item.control);};new MutationObserver(presentation).observe(proxy.status,{childList:true});presentation();
+          const presentation=()=>{renderLayerPresentation(badge,item.control);};new MutationObserver(presentation).observe(proxy.status,{childList:true});presentation();
           new MutationObserver(sync).observe(original,{childList:true,characterData:true,subtree:true});
           new MutationObserver(sync).observe(originalRow,{attributes:true,attributeFilter:['aria-busy']});
           input.addEventListener('change',sync);['clearBtn','clearLayersBtn'].forEach(id=>document.getElementById(id).addEventListener('click',()=>requestAnimationFrame(sync)));sync();body.append(row);
-          rows.push(row);catalogEntries.push({item,group,row});return;
+          row.dataset.controlId=item.control;rows.push(row);catalogEntries.push({item,group,row});return;
         }
-        row=element('div',undefined,'planned-entry catalog-entry');row.append(element('strong',item.name));
+        row=element('div',undefined,'planned-entry catalog-entry');
+        const placeholder=element('span',undefined,'catalog-placeholder');placeholder.append(uiIcon(input?'raster':'waiting'));placeholder.title=input?'Mapa-base raster':'Simbologia ainda não definida; sem camada cartográfica integrada';placeholder.setAttribute('role','img');placeholder.setAttribute('aria-label',placeholder.title);
+        row.append(placeholder,element('strong',item.name));
         const badge=element('small',catalogBadge(item),'catalog-badge');row.append(badge);
         if(input){
           const original=input.closest('.layer-control,.control-item').querySelector('.layer-status,.status');
@@ -613,13 +696,14 @@ readJSON('data/catalogo.json').then(ARPIASCatalog.validate).then(catalog=>{
           button.addEventListener('click',()=>{if(input.type==='radio'){if(!input.checked)input.click();}else input.click();sync();toast(`${item.name}: ${input.checked?'selecionada':'ocultada'}.`);});row.append(button);
         }
         row.append(element('small',`Fonte: ${item.source}`),element('small',item.note));
-        const info=element('button','ⓘ Informações','catalog-select');info.type='button';if(item.analysis==='fragility')info.textContent='Como esta pontuação é calculada?';
+        const info=element('button',undefined,'catalog-select');info.append(uiIcon('info'),element('span','Informações'));info.type='button';if(item.analysis==='fragility')info.textContent='Como esta pontuação é calculada?';
         info.addEventListener('click',()=>{
           if(item.analysis==='fragility'){showFragilityMethodology();return;}
           const box=content(item.name,[['Status',badge.textContent],['Fonte',item.source],['Referência',item.url]],item.note);box.firstChild.id='infoTitle';
           document.getElementById('infoBody').replaceChildren(box);document.getElementById('layerInfo').showModal();
         });row.append(info);body.append(row);
       }
+      if(item.control)row.dataset.controlId=item.control;
       rows.push(row);catalogEntries.push({item,group,row});
     });
     catalogSections.push({section,rows});
@@ -632,12 +716,22 @@ readJSON('data/catalogo.json').then(ARPIASCatalog.validate).then(catalog=>{
       row.querySelector('.name').textContent=item.name;rows.push(row);catalogEntries.push({item,group,row});
       const status=row.querySelector('.layer-status'),badge=element('small',undefined,'catalog-operational');
       status.after(badge);status.hidden=true;
-      const sync=()=>{badge.textContent=layerPresentation('layer_'+id);};
+      const sync=()=>{renderLayerPresentation(badge,'layer_'+id);};
       new MutationObserver(sync).observe(status,{childList:true,characterData:true,subtree:true});sync();
       section.querySelector('summary small').textContent=`${rows.length} itens`;
     }
   });
-  oldSections.forEach(section=>section.remove());filterCatalog();
+  oldSections.forEach(section=>section.remove());
+  catalogEntries.forEach(({row})=>{
+    const name=row.querySelector('.layer-target'),work=row.querySelector('.layer-work-button');
+    if(name){name.title=name.textContent+' — selecionar como camada de trabalho';if(work){work.title='Selecionar para trabalho: '+name.textContent;work.setAttribute('aria-label',work.title);}}
+  });
+  document.querySelectorAll('.panel-scroll > .accordion, #catalogGroups > .accordion').forEach(section=>{
+    const toggle=element('span',undefined,'category-toggle');toggle.setAttribute('aria-hidden','true');
+    const render=()=>toggle.replaceChildren(uiIcon(section.open?'collapse':'expand'));
+    section.querySelector('summary').append(toggle);section.addEventListener('toggle',render);render();
+  });
+  filterCatalog();
   document.dispatchEvent(new Event('arpias:catalog-ready'));
   // Loading evidence comes exclusively from each loader, never from catalogue setup.
 }).catch(error=>{

@@ -46,7 +46,7 @@ const ARPIASUI=(()=>{
       if(next==='consult'&&byId('workingLayerPanel').dataset.layerId==='relevo'&&!await loadRelief())return false;
       stopHandler();generation++;closeTerritorial();map.closePopup();closeMore();closeLayers();placeResults.hidden=true;
       mode=next;queryLayer=byId('workingLayerPanel').dataset.layerId||null;byId('queryLayer').value=queryLayer||'';document.querySelectorAll('.layer-control[data-query-target="true"]').forEach(row=>row.removeAttribute('data-query-target'));byId('consultControls').hidden=next!=='consult';shell.classList.toggle('consult-active',next==='consult');if(next==='edit'){backup=serialize();backupTrash=JSON.parse(JSON.stringify(trash));}
-      byId('toolPanel').classList.remove('collapsed');byId('collapseTool').setAttribute('aria-expanded','true');byId('collapseTool').textContent='−';
+      byId('toolPanel').classList.remove('collapsed');byId('collapseTool').setAttribute('aria-expanded','true');byId('collapseTool').replaceChildren(uiIcon('collapse'));
       byId('toolPanel').hidden=next==='navigate';byId('measureControls').hidden=next!=='measure';byId('editControls').hidden=next!=='edit';
       ['measureDistance','measureArea','clearMeasure'].forEach(id=>byId(id).hidden=false);
       byId('toolTitle').textContent=next==='consult'?'Consultar no mapa':next==='measure'?'Medir':'Editar camada de trabalho';
@@ -58,7 +58,7 @@ const ARPIASUI=(()=>{
       return true;
     }finally{changing=false;}
   }
-  byId('collapseTool').addEventListener('click',()=>{const collapsed=byId('toolPanel').classList.toggle('collapsed');byId('collapseTool').setAttribute('aria-expanded',String(!collapsed));byId('collapseTool').setAttribute('aria-label',collapsed?'Expandir ferramenta':'Recolher ferramenta');byId('collapseTool').textContent=collapsed?'+':'−';});
+  byId('collapseTool').addEventListener('click',()=>{const collapsed=byId('toolPanel').classList.toggle('collapsed');byId('collapseTool').setAttribute('aria-expanded',String(!collapsed));byId('collapseTool').setAttribute('aria-label',collapsed?'Expandir ferramenta':'Recolher ferramenta');byId('collapseTool').replaceChildren(uiIcon(collapsed?'expand':'collapse'));});
   function measurementRows(m){
     const rows=[['Geometria',m.type==='Point'?'Ponto':/Polygon/.test(m.type)?'Polígono':'Linha'],['Latitude de referência',m.lat.toFixed(6)],['Longitude de referência',m.lon.toFixed(6)]];
     if(m.area!==undefined)rows.push(['Área geográfica estimada',areaLabel(m.area)],['Perímetro',distanceLabel(m.perimeter)]);
@@ -268,7 +268,7 @@ const ARPIASUI=(()=>{
     ['Geometria','Área e distância geográficas por Turf. Estimativas sem certificação cadastral.'],['Referência','Centro de massa dos polígonos; ponderação por área para multipartes.'],['Incidências','Apenas no ponto de referência e entre feições carregadas.'],['Equipamentos','Cadastros de localização; não comprovam operação atual.'],['Dados pessoais','A ficha exibe somente os atributos públicos permitidos.']
   ]));
   function styleSwatch(id,opacity=1,type,override){
-    const style=override||ARPIASCartography.style(id);const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 40 28');svg.setAttribute('class','legend-swatch');svg.setAttribute('aria-hidden','true');const path=document.createElementNS(svg.namespaceURI,'path');path.setAttribute('d',id==='hidro'||/LineString/.test(type||'')?'M3 22L14 7L23 18L37 4':type==='Point'?'M20 4a10 10 0 1 0 0 20a10 10 0 1 0 0-20':'M4 4H36V24H4Z');path.setAttribute('stroke',style.color);path.setAttribute('stroke-width',style.weight);path.setAttribute('fill',id==='hidro'||/LineString/.test(type||'')?'none':style.fillColor||'none');path.setAttribute('fill-opacity',(type==='Point'?(id==='consult'?0:1):(style.fillOpacity??0))*opacity);path.setAttribute('stroke-opacity',opacity);if(style.dashArray)path.setAttribute('stroke-dasharray',style.dashArray);svg.append(path);return svg;
+    const style=override||ARPIASCartography.style(id);const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 40 28');svg.setAttribute('class','legend-swatch');svg.setAttribute('aria-hidden','true');const path=document.createElementNS(svg.namespaceURI,'path');path.setAttribute('d',id==='hidro'||/LineString/.test(type||'')?'M3 22L14 7L23 18L37 4':type==='Point'?'M20 4a10 10 0 1 0 0 20a10 10 0 1 0 0-20':'M4 4H36V24H4Z');path.setAttribute('stroke',style.color);path.setAttribute('stroke-width',style.weight);path.setAttribute('fill',id==='hidro'||/LineString/.test(type||'')?'none':style.fillColor||'none');path.setAttribute('fill-opacity',(type==='Point'?(id==='consult'?0:1):(style.fillOpacity??0))*opacity);path.setAttribute('stroke-opacity',(style.opacity??1)*opacity);if(style.dashArray)path.setAttribute('stroke-dasharray',style.dashArray);svg.append(path);return svg;
   }
   function visibleLegend(){
     const box=element('div',undefined,'visible-legend');
@@ -297,5 +297,5 @@ const ARPIASUI=(()=>{
   window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
   try{restore(ARPIASWork.read(localStorage));const raw=localStorage.getItem('arpias360.workspace.trash.v1');if(raw)trash=ARPIASWork.validateCollection(JSON.parse(raw)).features;renderWork();}catch(error){toast('Não foi possível ler as camadas locais. Os dados existentes não foram sobrescritos.');}
   const linked=ARPIASLocation.parse(new URLSearchParams(location.search));if(linked&&!linked.error)select({type:'Feature',geometry:{type:'Point',coordinates:[linked.lon,linked.lat]},properties:{}},'Local compartilhado',{},L.latLng(linked.lat,linked.lon));
-  return {infoModal,selectionBounds:()=>selectionLayer?.getBounds(),refreshQueryable,setQueryLayer,mode:()=>mode,request,select,query,clearSelection,selection:()=>selection,fitSelection,measurementRows,areaLabel,distanceLabel,publicAttributes:geo.publicAttributes,confirm,workGroup,measureGroup,showTerritorial,closeTerritorial,visibleLegend};
+  return {styleSwatch,infoModal,selectionBounds:()=>selectionLayer?.getBounds(),refreshQueryable,setQueryLayer,mode:()=>mode,request,select,query,clearSelection,selection:()=>selection,fitSelection,measurementRows,areaLabel,distanceLabel,publicAttributes:geo.publicAttributes,confirm,workGroup,measureGroup,showTerritorial,closeTerritorial,visibleLegend};
 })();
