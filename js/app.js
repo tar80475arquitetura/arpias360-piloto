@@ -749,39 +749,19 @@ const queryBody=document.getElementById('queryBody');
 const compactMedia=matchMedia('(max-width:899px)');
 const mobileMedia=matchMedia('(max-width:599px)');
 let panelOpener=null,currentPopup=null,popupNode=null;
-function enableDesktopDrag(node,handle){
-  if(!node||!handle)return;
-  handle.classList.add('drag-handle');handle.title='Arraste para mover esta janela';
-  let drag=null;
-  const clamp=(x,y)=>{
-    const frame=mapwrap.getBoundingClientRect(),rect=node.getBoundingClientRect();
-    return {x:Math.max(8,Math.min(x,frame.width-rect.width-8)),y:Math.max(8,Math.min(y,frame.height-rect.height-8))};
-  };
-  handle.addEventListener('pointerdown',e=>{
-    if(compactMedia.matches||e.button!==0||e.target.closest('button,input,select,a'))return;
-    const frame=mapwrap.getBoundingClientRect(),rect=node.getBoundingClientRect();
-    drag={dx:e.clientX-rect.left,dy:e.clientY-rect.top};handle.setPointerCapture(e.pointerId);
-    node.style.left=`${rect.left-frame.left}px`;node.style.top=`${rect.top-frame.top}px`;node.style.right='auto';node.style.bottom='auto';node.style.transform='none';
-    node.classList.add('is-dragging');document.body.classList.add('dragging-panel');
-  });
-  handle.addEventListener('pointermove',e=>{
-    if(!drag)return;const frame=mapwrap.getBoundingClientRect(),p=clamp(e.clientX-frame.left-drag.dx,e.clientY-frame.top-drag.dy);
-    node.style.left=`${p.x}px`;node.style.top=`${p.y}px`;
-  });
-  const stop=e=>{if(!drag)return;drag=null;node.classList.remove('is-dragging');document.body.classList.remove('dragging-panel');try{handle.releasePointerCapture(e.pointerId);}catch(error){}document.dispatchEvent(new CustomEvent('arpias:panel-moved',{detail:node.id}));};
-  handle.addEventListener('pointerup',stop);handle.addEventListener('pointercancel',stop);
-  const keepInside=()=>{
-    if(compactMedia.matches){['left','top','right','bottom','transform'].forEach(key=>node.style.removeProperty(key));return;}
-    if(node.hidden||!node.style.left)return;
-    const rect=node.getBoundingClientRect(),frame=mapwrap.getBoundingClientRect(),p=clamp(rect.left-frame.left,rect.top-frame.top);
-    node.style.left=`${p.x}px`;node.style.top=`${p.y}px`;
-  };
-  window.addEventListener('resize',keepInside);
-  new ResizeObserver(keepInside).observe(mapwrap);
-  new ResizeObserver(keepInside).observe(node);
+ARPIASPanels.bind(document.getElementById('toolPanel'),'.tool-state strong',mapwrap);
+ARPIASPanels.bind(aboutPanel,'h2',mapwrap);
+ARPIASPanels.bind(document.querySelector('.floating-search'),'.search-icon',mapwrap);
+ARPIASPanels.bind(document.getElementById('placeResults'),'p',mapwrap);
+ARPIASPanels.bind(panel,'.panel-title-row',shell);
+ARPIASPanels.bind(document.getElementById('territorialPanel'),'.query-header',shell);
+ARPIASPanels.bind(querySheet,'.query-header',shell);
+for(const id of ['layerInfo','confirmAction','workFormDialog','shareDialog','technicalReport']){
+  ARPIASPanels.bind(document.getElementById(id),id==='layerInfo'?'#infoTitle':id==='technicalReport'?'.report-controls h2':'h2');
 }
-enableDesktopDrag(document.getElementById('toolPanel'),document.querySelector('#toolPanel .tool-state strong'));
-enableDesktopDrag(aboutPanel,aboutPanel.querySelector('h2'));
+map.on('popupopen',e=>ARPIASPanels.bind(e.popup.getElement(),'.popup-title',map.getContainer(),true));
+map.on('popupclose',e=>e.popup.getElement()?._arpiasDispose?.());
+map.on('moveend',()=>currentPopup?.getElement()?._arpiasKeepInside?.());
 function resizeMap(){map.invalidateSize({pan:false});}
 function scheduleResize(){requestAnimationFrame(resizeMap);clearTimeout(scheduleResize.timer);scheduleResize.timer=setTimeout(resizeMap,220);}
 mapwrap.addEventListener('transitionend',resizeMap);
@@ -824,9 +804,15 @@ dismissSheetOnSwipe(panel.querySelector('.sheet-handle'),()=>closeLayers(true));
 dismissSheetOnSwipe(querySheet.querySelector('.sheet-handle'),()=>map.closePopup());
 ['togglePanel','layersBtn','mobileLayersBtn'].forEach(id=>document.getElementById(id).addEventListener('click',()=>panel.classList.contains('hidden')?openLayers():closeLayers(true)));
 ['closePanel','panelBackdrop'].forEach(id=>document.getElementById(id).addEventListener('click',()=>closeLayers(true)));
+document.getElementById('collapsePanel').addEventListener('click',e=>{
+  const collapsed=panel.classList.toggle('is-collapsed');
+  e.currentTarget.setAttribute('aria-expanded',String(!collapsed));
+  e.currentTarget.setAttribute('aria-label',collapsed?'Expandir camadas':'Recolher camadas');
+  e.currentTarget.replaceChildren(uiIcon(collapsed?'expand':'collapse'));
+});
 panel.addEventListener('keydown',e=>{
   if(e.key!=='Tab'||!compactMedia.matches)return;
-  const nodes=[...panel.querySelectorAll('button,input,select,a[href],summary')].filter(node=>!node.disabled&&node.getClientRects().length);
+  const nodes=[...panel.querySelectorAll('.drag-handle[tabindex="0"],button,input,select,a[href],summary')].filter(node=>!node.disabled&&node.getClientRects().length);
   const first=nodes[0],last=nodes.at(-1);
   if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
   else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
@@ -856,6 +842,7 @@ document.getElementById('fullBtnTop').addEventListener('click',async()=>{
 document.addEventListener('fullscreenchange',scheduleResize);
 function presentPopup(popup){
   currentPopup=popup;popupNode=popup.getContent();
+  if(typeof popupNode==='function')popupNode=popupNode(popup._source||popup);
   if(typeof popupNode==='string')popupNode=content(popupNode,[]);
   if(mobileMedia.matches){
     popup.options.autoPan=false;closeLayers();closeMore();closeAbout();

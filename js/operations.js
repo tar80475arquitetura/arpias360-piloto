@@ -98,18 +98,18 @@ const ARPIASOperations=(()=>{
   }
   document.addEventListener('arpias:catalog-ready',restoreCategories);
   function restoreWindows(){
-    if(compactMedia.matches)return;
     for(const [id,pos] of Object.entries(windows)){
-      const node=byId(id);if(node.hidden)continue;
-      const x=Math.max(8,Math.min(pos.x,mapwrap.clientWidth-node.offsetWidth-8));
-      const y=Math.max(8,Math.min(pos.y,mapwrap.clientHeight-node.offsetHeight-8));
+      const node=byId(id);if(!node||node.hidden||node.classList.contains('hidden')||node.classList.contains('is-dragging'))continue;
+      const frame=node.offsetParent||mapwrap;
+      const x=Math.max(8,Math.min(pos.x,frame.clientWidth-node.offsetWidth-8));
+      const y=Math.max(8,Math.min(pos.y,frame.clientHeight-node.offsetHeight-8));
       Object.assign(node.style,{left:x+'px',top:y+'px',right:'auto',bottom:'auto',transform:'none'});
     }
   }
   document.addEventListener('arpias:panel-moved',e=>{
-    const node=byId(e.detail);windows[node.id]={x:parseFloat(node.style.left),y:parseFloat(node.style.top)};scheduleSave();
+    const node=byId(e.detail);if(!node||!ARPIASPreferences.windowIds.includes(node.id))return;windows[node.id]={x:parseFloat(node.style.left),y:parseFloat(node.style.top)};scheduleSave();
   });
-  ['toolPanel','aboutPanel'].forEach(id=>new MutationObserver(restoreWindows).observe(byId(id),{attributes:true,attributeFilter:['hidden']}));
+  ARPIASPreferences.windowIds.forEach(id=>new MutationObserver(restoreWindows).observe(byId(id),{attributes:true,attributeFilter:['hidden','class']}));
   byId('resetPreferences').addEventListener('click',async()=>{
     closeMore();if(!await ARPIASUI.confirm('Restaurar mapa-base, camadas, opacidade e painéis? Seus desenhos locais serão preservados.','Restaurar preferências'))return;
     restoring=true;clearTimeout(saveTimer);
@@ -118,7 +118,7 @@ const ARPIASOperations=(()=>{
     selectBase(baseDefs[0]);choose(null);closeLayers();
     catalogSearch.value='';catalogSearch.dispatchEvent(new Event('input'));
     document.querySelectorAll('.panel-scroll details.accordion').forEach(section=>{section.open=categoryKey(section)==='risk';});
-    for(const id of ['toolPanel','aboutPanel']){delete windows[id];['left','top','right','bottom','transform'].forEach(key=>byId(id).style.removeProperty(key));}
+    for(const id of ARPIASPreferences.windowIds){delete windows[id];['left','top','right','bottom','transform'].forEach(key=>byId(id).style.removeProperty(key));}
     restoring=false;sync();save();toast('Preferências restauradas. Desenhos locais preservados.');
   });
   if(saved){
@@ -128,7 +128,7 @@ const ARPIASOperations=(()=>{
     choose(saved.workingLayer);restoreCategories();
     if(saved.layersOpen&&!compactMedia.matches)openLayers();
   }
-  restoring=false;sync();
+  restoring=false;sync();restoreWindows();
   window.addEventListener('pagehide',save);
   return {choose,fitWorking,save};
 })();
