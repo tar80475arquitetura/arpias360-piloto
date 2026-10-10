@@ -1,0 +1,13 @@
+{
+  "evidence": {
+    "sha": "a02dabd2e89ae9b77e0c9e4d5275066cb204102a",
+    "dirty": true,
+    "recorded_at": "2026-10-10T03:15:01.735979+00:00",
+    "github_run_id": null
+  },
+  "groups": [
+    "desktop: pointer/touch, keyboard, layer independence, saved position, five native dialogs and popup/query sheet",
+    "mobile: pointer/touch, keyboard, layer independence, saved position, five native dialogs and popup/query sheet"
+  ],
+  "external_services": "Controlled fixtures; not live GIS or public-site homologation"
+}

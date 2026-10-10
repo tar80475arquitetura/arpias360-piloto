@@ -1,6 +1,7 @@
 /* Map preferences only; user drawings are stored independently by workspace.js. */
 (function(root){
   const key='arpias360.preferences.v1';
+  const windowIds=['toolPanel','aboutPanel','panel','territorialPanel','querySheet'];
   const record=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
   function validate(value,layerIds,baseIds){
     if(!record(value)||value.version!==1)return null;
@@ -15,7 +16,7 @@
     if(record(value.categories))for(const [id,open] of Object.entries(value.categories)){
       if(/^[a-z][a-z0-9-]{0,49}$/.test(id)&&typeof open==='boolean')result.categories[id]=open;
     }
-    if(record(value.windows))for(const id of ['toolPanel','aboutPanel']){
+    if(record(value.windows))for(const id of windowIds){
       const pos=value.windows[id];
       if(record(pos)&&[pos.x,pos.y].every(n=>typeof n==='number'&&Number.isFinite(n)&&n>=0&&n<=100000))result.windows[id]={x:pos.x,y:pos.y};
     }
@@ -27,6 +28,6 @@
   function write(storage,value,layerIds,baseIds){
     try{const clean=validate(value,layerIds,baseIds);if(!clean)return false;storage.setItem(key,JSON.stringify(clean));return true;}catch{return false;}
   }
-  const api={key,validate,read,write};
+  const api={key,windowIds,validate,read,write};
   if(typeof module==='object'&&module.exports)module.exports=api;else root.ARPIASPreferences=api;
 })(typeof window==='object'?window:globalThis);

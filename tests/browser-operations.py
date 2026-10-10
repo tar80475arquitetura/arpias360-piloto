@@ -205,3 +205,4 @@ if __name__=='__main__':
     asyncio.run(main())
     # Keep FE-01A presentation regressions in the existing CI browser job.
     subprocess.run([sys.executable,str(Path(__file__).with_name('browser-fe01a.py'))],check=True)
+    subprocess.run([sys.executable,str(Path(__file__).with_name('browser-panels.py'))],check=True)
