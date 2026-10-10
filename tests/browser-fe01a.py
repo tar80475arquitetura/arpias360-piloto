@@ -227,7 +227,10 @@ async def main():
             default = Path(profile) / 'Default'
             default.mkdir()
             (default/'Preferences').write_text(json.dumps({'partition':{'default_zoom_level':{'x':math.log(2)/math.log(1.2)}}}))
-            context = await p.chromium.launch_persistent_context(profile,executable_path=executable,headless=True,no_viewport=True,args=['--no-sandbox','--window-size=1366,768'])
+            # The default CI executable is headless-shell, which does not use
+            # Chrome's profile zoom preferences. Select the full Chromium
+            # channel for this native-browser scenario, as on the local run.
+            context = await p.chromium.launch_persistent_context(profile,executable_path=executable,channel='chromium',headless=True,no_viewport=True,args=['--no-sandbox','--window-size=1366,768'])
             await context.route('https://**/*',shared['external'])
             page = context.pages[0]
             await shared['ready'](page)
@@ -263,4 +266,11 @@ async def main():
 
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except Exception as error:
+        # Keep the failing assertion accessible in the CI check annotations,
+        # even when downloading the full workflow log is unavailable.
+        message = f'{type(error).__name__}: {error}'.replace('%','%25').replace('\r','%0D').replace('\n','%0A')
+        print(f'::error title=FE-01A browser regression::{message}',flush=True)
+        raise

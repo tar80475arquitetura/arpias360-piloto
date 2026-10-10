@@ -34,7 +34,7 @@ Navegador local: Chromium 151.0.7922.173, via Playwright. As execuções finais 
 
 Os fluxos verificam clique real para painel/categorias/zoom, teclado/foco, seleção para trabalho sem ligar a camada, múltiplas camadas simultâneas, aliases, opacidade zero, carregamento/falha e informações/simbologia das quatro classificações do relevo. As regressões anteriores cobrem seleção, consultas, geolocalização simulada, medição, preferências, arraste de painéis e relatórios com ponto, linha, polígono e geometria multipartida, inclusive com a origem oculta. O novo teste de apresentação é chamado pelo script operacional já utilizado no workflow existente.
 
-Os JSON locais registram SHA-base e `dirty: true`, porque os testes antecederam o commit. O `manifest.json` registra os hashes dos arquivos efetivamente testados. O SHA final e os checks de CI ficam registrados no PR.
+Os JSON locais registram o SHA vigente e `dirty: true`, porque os testes antecederam seus commits. O `manifest.json` registra os hashes dos arquivos efetivamente testados. O SHA final e os checks de CI ficam registrados no PR. Após a primeira execução do CI, o cenário de zoom nativo passou a selecionar explicitamente o Chromium completo (`channel="chromium"`), em vez do `headless-shell` padrão do Playwright. Os quatro grupos FE-01A foram executados novamente e aprovados; nenhuma expectativa foi relaxada e o frontend permaneceu intacto. Falhas desse teste também são registradas nas anotações do check, pois o download dos logs do GitHub retornou HTTP 403 neste ambiente.
 
 ## Comparação visual — mesmo estado inicial
 

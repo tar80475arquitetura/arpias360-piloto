@@ -1,7 +1,7 @@
 {
   "base_sha": "ed2854c6587c26b1765729b0714ca0458ed39632",
   "branch": "codex/frontend-fe01a",
-  "recorded_at": "2026-10-09T22:32:14.067815-03:00",
+  "recorded_at": "2026-10-09T22:41:22.345311-03:00",
   "scope": "FE-01A local controlled browser validation, no production deployment",
   "files": {
     "index.html": "c4f890373866250e74ee4b27f3a37724677dfbe21a02d7f7b224960e23e52bdd",
@@ -10,7 +10,7 @@
     "js/app.js": "6ecc684ebba9dc5fde43082ca16ecdb0224eb7823a5733df9f3d3ccc3773e0ea",
     "js/tools.js": "d7f2589c505cb37ff1ff24e51d35560082b171921f8b6e8a8db05996eed49747",
     "tests/browser-operations.py": "e65e9df83aa4dd7c59b4dfa9ccafd4957fa474f7f705a484eb9a95503b1c033f",
-    "tests/browser-fe01a.py": "04b4b44fe11ce3f20ac9a465547cbb4a9d311799ebc105c681c0a943ea7aa1f0",
+    "tests/browser-fe01a.py": "1abd138634746a7bdcc454085b8f509992eee84a35e6ce0f4bfbc12308a77a59",
     "tests/fe01a.test.cjs": "25b1f21779bf3f734e0a338e89af4b81a4183ff0aa1da34c5272bf1afe760c9f"
   },
   "images": [
@@ -79,5 +79,6 @@
       "sha256": "27e0a8804328f80a684cd943dc31ece400e32d25d227a3f15d8ca20586ac579f",
       "captured_at": "2026-10-10T01:29:50.576235+00:00"
     }
-  ]
+  ],
+  "browser_rerun": "Four FE-01A groups rerun successfully after selecting full Chromium for native zoom; frontend and original comparison captures unchanged"
 }
