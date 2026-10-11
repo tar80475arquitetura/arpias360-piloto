@@ -1,0 +1,30 @@
+{
+  "base_sha": "6133c1f0409de9056319cf1ea573959a94c27b23",
+  "branch": "codex/fe02-portal-ferramentas",
+  "capture_state": "worktree modificada antes do commit FE-02; consulte evidence nos JSON",
+  "files": {
+    "fe01a-results.full.json.gz": "b8313b66489d5f943c91372937da57202dfd317aba2b1851ab26d9303d96d5e5",
+    "fe01a-results.json": "86a9723e2e2108b73968ab68a9d663db336d9e52a7ce75850f3c96bb9a4dc2f2",
+    "fe02-desktop-portal-profile.png": "1b0db82102942bd87143f06b997f441545f6641bef8c379af96df14d3289884c",
+    "fe02-desktop-portal.png": "ee536be758df41cce6e842262b4bd304f3c9a38fcc92abc01e85f6f7766e51d2",
+    "fe02-desktop-resilience.png": "baaa0650f2a4fa8e6acf0e07c5d856de0f8ae709f68866f2e60a2438ec338eeb",
+    "fe02-mobile-portal-options.png": "fbc632bc9772fea96b725c2280b126db2c39639262e4f13ffc765137d3f858d5",
+    "fe02-mobile-portal.png": "de114402ee3049882c45c03402a739d820c82b4f5337c0b79b79f30b4e519a7f",
+    "fe02-mobile-resilience.png": "11ff0e3d303bacf5e4983e98d10e5c14edee8e150a1cd8e03daa96882e8cd117",
+    "panels-results.json": "aa9cf7b92bc1bfcfeebf5f56c6a4aef2bd5fc04d4b61ccb0993ac03a8d7b8d22",
+    "portal-results.json": "7521966ccf88bec998c003e6fce03329d68130d3a9569ef23ebb3cf25c079a13",
+    "results.json": "2a30e898c4c0dfc9d7f10beb09252facfe48abb7307e8ff0a5ce3bf05277c78e",
+    "round2-results.json": "3d2e307a7bc18c38efe681ad378a443fbe1f100b2a6be18ed2e16359aa7c4202",
+    "unit-results.txt": "92b30158af23d26f56e3b11607affef652ac1f80210d39395ed99baf726dd785"
+  },
+  "source_sha256": {
+    "index.html": "a7ae6530ef4fe446f1ec324ba8ac0edb9d9b7cb3329bd7f612a73975f3963887",
+    "js/portal.js": "1e9fe2a257d0fcc65126405ea244fec0f2bf021f9c01c3ffbb8c4ef329abf42b",
+    "js/portal-ui.js": "8264bd83e10825c474821331a50e89aadfdc01819f1766f0485209567eed7590",
+    "css/portal.css": "42e6c3b7ad3183ec837f98bba81d3c6bb6c840710a16557b456cfd8f98c9faf6",
+    "tests/portal.test.cjs": "95f9d698131570615c1f5bd31a7ad6a3d536755277d121f35d5c78b778d0f8ee",
+    "tests/browser-portal.py": "014b447e40a3c8ede96e3b3b9d15afaaab30c4ead51d91ca85fd04415617e637",
+    "tests/browser-operations.py": "b7cb45b3d604e22ae39f3ef1dff0350b154d04baf6e42f5345f182fb562dc80e",
+    "tests/browser-panels.py": "7410e42d951785c30a64943088171b0a695490ffc2607f44cd76c423649366d6"
+  }
+}

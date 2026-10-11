@@ -1,0 +1,17 @@
+{
+  "evidence": {
+    "sha": "6133c1f0409de9056319cf1ea573959a94c27b23",
+    "dirty": true,
+    "recorded_at": "2026-10-11T18:16:20.655447+00:00",
+    "github_run_id": null
+  },
+  "passed": [
+    "first visit, all four choices, keyboard entry, same map, full catalog and category ordering",
+    "selection, working layer, zero opacity, work features, measurement, consult mode and map preferences preserved by portal/context switch",
+    "validated optional profile, remembered choice, root QR still shows presentation, resume, free-map shortcut and return from fullscreen",
+    "shared coordinate link bypass, invalid-coordinate error preserved and unknown QR params show portal",
+    "six responsive sizes, touch targets, keyboard loop, mobile modal return, viewport change and permanent portal button",
+    "malformed and denied storage remain usable"
+  ],
+  "external_services": "simulated 503; not live GIS validation"
+}

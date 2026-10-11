@@ -36,9 +36,15 @@ async def external(route):
     else:
         await route.fulfill(status=503,headers={'access-control-allow-origin':'*'},body='External outage simulated by test')
 
+async def enter_map(page):
+    # Explicitly enter the full WebGIS; portal behavior has its own regression suite.
+    if await page.locator('#toolPortal').is_visible():
+        await page.locator('#portalSkip').click()
+
 async def ready(page):
     await page.goto('http://127.0.0.1:8080',wait_until='load')
     await page.wait_for_function("typeof ARPIASOperations!=='undefined' && catalogSections.length===14")
+    await enter_map(page)
 
 async def open_layers(page):
     if await page.locator('#panel').evaluate("e=>e.classList.contains('hidden')"):
@@ -104,6 +110,7 @@ async def main():
         await page.evaluate("document.querySelector('[data-group=environment]').open=true;selectBase(baseDefs[1])")
         await page.wait_for_timeout(350)
         await page.reload(wait_until='load');await page.wait_for_function("catalogSections.length===14 && civilDefs[0].layer")
+        await enter_map(page)
         assert await page.locator('#base_osm').is_checked()
         assert await page.locator('#layer_sirenes').is_checked()
         assert await page.evaluate('civilDefs[0].layer.getLayers()[0].options.opacity')==.4
@@ -153,6 +160,7 @@ async def main():
         await page.wait_for_timeout(350)
         assert await page.evaluate("JSON.parse(localStorage.getItem(ARPIASPreferences.key)).windows.toolPanel.x>0")
         await page.reload(wait_until='load');await page.wait_for_function("catalogSections.length===14")
+        await enter_map(page)
         await page.locator('#moreBtn').click();await page.locator('#measureBtn').click()
         assert await page.locator('#toolPanel').evaluate('e=>parseFloat(e.style.left)>0')
         await page.set_viewport_size({'width':1024,'height':768});await page.wait_for_timeout(300)
@@ -195,6 +203,7 @@ async def main():
         pg=await c.new_page();await ready(pg)
         await pg.evaluate("localStorage.setItem(ARPIASPreferences.key,'{invalid')")
         await pg.reload(wait_until='load');await pg.wait_for_function("catalogSections.length===14")
+        await enter_map(pg)
         await choose_sirens(pg);assert await pg.locator('#workingLayerControls').is_visible()
         results.append('malformed preferences do not stop catalog or working-layer controls')
         await c.close();await browser.close()
@@ -206,3 +215,4 @@ if __name__=='__main__':
     # Keep FE-01A presentation regressions in the existing CI browser job.
     subprocess.run([sys.executable,str(Path(__file__).with_name('browser-fe01a.py'))],check=True)
     subprocess.run([sys.executable,str(Path(__file__).with_name('browser-panels.py'))],check=True)
+    subprocess.run([sys.executable,str(Path(__file__).with_name('browser-portal.py'))],check=True)
