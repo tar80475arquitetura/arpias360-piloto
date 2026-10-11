@@ -1,0 +1,21 @@
+{
+  "base_sha": "a02dabd2e89ae9b77e0c9e4d5275066cb204102a",
+  "recorded_at": "2026-10-10T03:15:54.084071+00:00",
+  "files": {
+    "index.html": "2ccdc510e3c47ed457a201b2146f59d5732195ab78a311302ae57f60f1a8fecf",
+    "css/ux.css": "e8b25f609ad89a778a3c07961918d0d6535c777ff2375d33bbd82ad8a32848a6",
+    "js/app.js": "a0a1401ccccdb6c2bfb8cd250af03828d23094911c63d75c7e54724010607386",
+    "js/panels.js": "bc4c561db5531b8d32318c6e41465759385dd8547a9ab89c6b5137ce40540c99",
+    "js/operations.js": "9d1e1fe2787a9297ffb098077c7e842448d243b906e4cef96865c3df5aa19e98",
+    "js/preferences.js": "3c9bc95e7f61c1315749bb5ad9034a52b47b333a83951cdcd57beb7da3afe450",
+    "tests/browser-operations.py": "4234574d7877e9600a84a433ab1ebac06a9aa0835d04d3d4a75f613a70e4ab51",
+    "tests/browser-panels.py": "d4a2c9572f49d329c3e6065d310c6356eb924bf5318a3ee2ab15be94a4119499",
+    "tests/panels.test.cjs": "3afd5986ad63581cefa9cb24fba209fa3d2f889277e4cbebec97302a1efba91d"
+  },
+  "images": {
+    "movable-mobile-query.png": "07ef6762f61104da23fc4f3b88225f7148359b9cca30f3019d8d17fe02eab975",
+    "movable-mobile-layers.png": "d9072c6d52216cf259853055a858f49dfb5013a319aaa2ca0813f2b61d043bc2",
+    "movable-desktop-layers.png": "f4c2033fce9bdcf2cea16b0afb39ee8934e5ecd1183c4d3afa46826f3b6f66dc",
+    "movable-desktop-popup.png": "5cc85e7552ab244251ec8c06fedb10f63f5469213cab0ce16b0a13089976d07e"
+  }
+}

@@ -8,9 +8,9 @@
   <meta name="description" content="WebGIS experimental para leitura integrada de dados territoriais e áreas sensíveis em Niterói/RJ." />
   <link rel="preconnect" href="https://geo.niteroi.rj.gov.br" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <link rel="stylesheet" href="css/style.css?v=20261009-fe01a" />
+  <link rel="stylesheet" href="css/style.css?v=20261010-mobilidade" />
   <link rel="stylesheet" href="js/vendor/leaflet-draw/leaflet.draw.css" />
-  <link rel="stylesheet" href="css/ux.css?v=20261009-fe01a" />
+  <link rel="stylesheet" href="css/ux.css?v=20261010-mobilidade" />
 </head>
 <body>
   <a class="skip-link" href="#searchMirror">Ir para a busca no mapa</a>
@@ -56,7 +56,7 @@
     <button id="panelBackdrop" class="panel-backdrop" aria-label="Fechar painel de camadas" hidden tabindex="-1"></button>
     <aside id="panel" class="layer-panel" aria-labelledby="panelTitle">
       <div class="sheet-handle" aria-hidden="true"></div>
-      <div class="panel-title-row"><div><span class="eyebrow">Leitura do território</span><h2 id="panelTitle">Camadas</h2></div><button id="closePanel" class="close-btn" aria-label="Fechar camadas"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>
+      <div class="panel-title-row"><div><span class="eyebrow">Leitura do território</span><h2 id="panelTitle">Camadas</h2></div><div class="panel-window-actions"><button id="collapsePanel" class="close-btn" aria-label="Recolher camadas" aria-expanded="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14"/></svg></button><button id="closePanel" class="close-btn" aria-label="Fechar camadas"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div></div>
       <div class="panel-scroll">
         <div class="sidebar-search" role="search"><input id="searchInput" type="search" placeholder="Buscar bairro, local ou coordenada" aria-label="Buscar bairro, local ou coordenada no painel" aria-describedby="searchHint" enterkeyhint="search" /><button id="searchBtn" aria-label="Buscar no painel"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 3a7 7 0 1 0 0 14a7 7 0 1 0 0-14M15 15l6 6"/></svg></button></div>
         <p id="searchHint" class="search-hint">Busca por bairros e coordenadas. Ruas em integração futura.</p>
@@ -91,7 +91,7 @@
     </aside>
     <section class="mapwrap" aria-label="Área cartográfica">
       <div id="map" aria-label="Mapa interativo de Niterói"></div>
-      <div class="floating-search" role="search"><span class="search-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24" focusable="false"><path d="M10 3a7 7 0 1 0 0 14a7 7 0 1 0 0-14M15 15l6 6"/></svg></span><input id="searchMirror" type="search" placeholder="Buscar bairro, local ou coordenada" aria-label="Buscar bairro, local ou coordenada" aria-describedby="searchHint" enterkeyhint="search" /><button id="searchMirrorBtn"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 3a7 7 0 1 0 0 14a7 7 0 1 0 0-14M15 15l6 6"/></svg> Buscar</button></div>
+      <div class="floating-search" role="search"><span class="search-icon" aria-label="Mover busca"><svg class="ui-icon" viewBox="0 0 24 24" focusable="false"><path d="M10 3a7 7 0 1 0 0 14a7 7 0 1 0 0-14M15 15l6 6"/></svg></span><input id="searchMirror" type="search" placeholder="Buscar bairro, local ou coordenada" aria-label="Buscar bairro, local ou coordenada" aria-describedby="searchHint" enterkeyhint="search" /><button id="searchMirrorBtn"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 3a7 7 0 1 0 0 14a7 7 0 1 0 0-14M15 15l6 6"/></svg> Buscar</button></div>
       <section id="placeResults" class="place-results" aria-label="Resultados da busca territorial" aria-live="polite" hidden></section>
       <div class="edge-tools"><button id="togglePanel" aria-label="Abrir camadas" aria-controls="panel" aria-expanded="true" title="Camadas"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 7l9-5 9 5-9 5-9-5M3 12l9 5 9-5M3 17l9 5 9-5"/></svg></button></div>
       <div id="mapStatus" class="map-status"><span class="status-dot" aria-hidden="true"></span><div><strong id="activeBaseLabel">Foto Aérea 2019</strong><small id="statusMessage">Carregando base cartográfica…</small></div></div>
@@ -121,11 +121,12 @@
   <script src="js/search.js"></script>
   <script src="js/cartography.js"></script>
   <script src="js/geomorphology.js"></script>
-  <script src="js/app.js?v=20261009-fe01a"></script>
+  <script src="js/panels.js?v=20261010-mobilidade"></script>
+  <script src="js/app.js?v=20261010-mobilidade"></script>
   <script src="js/reference-labels.js"></script>
-  <script src="js/tools.js?v=20261009-fe01a"></script>
-  <script src="js/preferences.js"></script>
-  <script src="js/operations.js"></script>
+  <script src="js/tools.js?v=20261010-mobilidade"></script>
+  <script src="js/preferences.js?v=20261010-mobilidade"></script>
+  <script src="js/operations.js?v=20261010-mobilidade"></script>
   <script src="js/report.js"></script>
 </body>
 </html>

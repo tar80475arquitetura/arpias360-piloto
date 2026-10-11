@@ -298,3 +298,29 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
   .has-territorial .map-status,.has-territorial .mobile-actions{display:none}
   .about-panel{max-height:68dvh}
 }
+
+/* Movable windows: compact initial sizes and handles without blocking inputs. */
+.layers-open .mapwrap,.has-territorial .mapwrap {left:0;right:0}
+.layer-panel {left:12px;top:72px;bottom:auto;right:auto;width:min(350px,calc(100% - 24px));height:min(580px,calc(100% - 88px));max-height:calc(100% - 16px);border:1px solid #0d251e;border-radius:12px;box-shadow:var(--shadow)}
+.layer-panel.hidden {visibility:hidden;pointer-events:none}
+.territorial-panel {top:72px;right:12px;bottom:auto;left:auto;width:min(350px,calc(100% - 24px));max-height:calc(100% - 88px);border-radius:12px}
+.drag-handle {cursor:grab!important;touch-action:none;user-select:none}
+.drag-handle:active,.is-dragging .drag-handle {cursor:grabbing!important}
+.drag-handle::after {content:' ⠿';font-size:18px;opacity:.7}
+.panel-title-row.drag-handle::after,.query-header.drag-handle::after,.report-controls.drag-handle::after {order:-1}
+[data-movable].is-dragging {transition:none!important;box-shadow:0 18px 50px #172f2948}
+.popup-moved .leaflet-popup-tip-container {display:none}
+.tool-panel,.about-panel {touch-action:auto}
+@media(max-width:599px){
+  .layer-panel {left:8px;right:auto;top:auto;bottom:12px;width:calc(100% - 16px);height:min(440px,62dvh);max-height:calc(100% - 16px);border-radius:12px}
+  .query-sheet:not([hidden]) {left:8px;right:auto;bottom:12px;width:calc(100% - 16px);max-height:min(52dvh,calc(100% - 16px));border-radius:12px}
+  .territorial-panel {left:8px;right:auto;top:auto;bottom:12px;width:calc(100% - 16px);max-height:min(62dvh,calc(100% - 16px))}
+}
+@media print {#technicalReport {left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;transform:none!important;margin:0!important}.drag-handle::after {content:none}}
+.layer-panel {resize:both;overflow:hidden;min-width:min(280px,calc(100% - 16px));max-width:calc(100% - 16px)}
+.panel-window-actions {display:flex;gap:4px;flex:none}
+.layer-panel.is-collapsed {height:auto!important;resize:none;min-height:0}
+.layer-panel.is-collapsed .panel-scroll,.layer-panel.is-collapsed .panel-footer,.layer-panel.is-collapsed .sheet-handle {display:none}
+.floating-search .search-icon.drag-handle {min-width:44px}
+.floating-search .search-icon.drag-handle::after {content:none}
+@media(max-width:359px){.floating-search .search-icon.drag-handle {display:grid}}
