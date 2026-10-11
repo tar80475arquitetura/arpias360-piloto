@@ -1,0 +1,1023 @@
+{
+  "evidence": {
+    "sha": "0de370489a874116714bc9f6a894248af9a20006",
+    "dirty": true,
+    "recorded_at": "2026-10-11T19:34:55.593136+00:00",
+    "github_run_id": null
+  },
+  "passed": [
+    "first visit, all four choices, keyboard entry, same map, full catalog and category ordering",
+    "selection, working layer, zero opacity, work features, measurement, consult mode and map preferences preserved by portal/context switch",
+    "validated optional profile, remembered choice, root QR still shows presentation, resume, free-map shortcut and return from fullscreen",
+    "shared coordinate link bypass, invalid-coordinate error preserved and unknown QR params show portal",
+    "six responsive sizes, touch targets, keyboard loop, mobile modal return, viewport change and permanent portal button",
+    "malformed and denied storage remain usable",
+    "1366×768: mouse/Enter for all tools, initial/entry/return focus, visible non-inert targets, open/scrolled/collapsed layers, fullscreen and preserved cartographic fixtures",
+    "390×844: mouse/Enter for all tools, initial/entry/return focus, visible non-inert targets, open/scrolled/collapsed layers, fullscreen and preserved cartographic fixtures",
+    "320×568: mouse/Enter for all tools, initial/entry/return focus, visible non-inert targets, open/scrolled/collapsed layers, fullscreen and preserved cartographic fixtures"
+  ],
+  "focus_evidence": [
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "toolModeSelect",
+      "tag": "SELECT",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "toolModeSelect",
+      "tag": "SELECT",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "",
+      "tag": "DIV",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "",
+      "tag": "DIV",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "fullscreenPortalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "toolModeSelect",
+      "tag": "SELECT",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "toolModeSelect",
+      "tag": "SELECT",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "",
+      "tag": "DIV",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "fullscreenPortalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "toolModeSelect",
+      "tag": "SELECT",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "toolModeSelect",
+      "tag": "SELECT",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "",
+      "tag": "DIV",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "fullscreenPortalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "portalQuestion",
+      "tag": "H2",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    {
+      "id": "portalBtn",
+      "tag": "BUTTON",
+      "hidden": false,
+      "inert": false,
+      "visible": true,
+      "viewport": [
+        320,
+        568
+      ]
+    }
+  ],
+  "external_services": "simulated 503; not live GIS validation"
+}

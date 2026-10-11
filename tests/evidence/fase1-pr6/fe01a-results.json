@@ -1,0 +1,15 @@
+{
+  "evidence": {
+    "sha": "0de370489a874116714bc9f6a894248af9a20006",
+    "dirty": true,
+    "recorded_at": "2026-10-11T19:34:09.458596+00:00",
+    "github_run_id": null
+  },
+  "passed": [
+    "desktop: keyboard/focus/name, true marker, independent visibility/work, aliases, operational states, counts, contrast and no overflow",
+    "real line styles, complete long names, unstyled planned/unloaded data and actual relief classes in all four classifications",
+    "mobile: keyboard/focus/name, true marker, independent visibility/work, aliases, operational states, counts, contrast and no overflow",
+    "native Chromium zoom 200%: verified CSS viewport/DPR, usable work-layer button and no horizontal overflow"
+  ],
+  "external_services": "Controlled 503 fixtures; no public-site or live GIS validation"
+}

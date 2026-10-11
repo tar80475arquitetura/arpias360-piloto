@@ -54,6 +54,7 @@ async def main():
    assert await page.locator('#panel .panel-scroll').is_visible()
    await snap(page,f'movable-{label}-layers.png')
    await page.locator('#closePanel').click();await page.reload(wait_until='load');await page.wait_for_function('catalogSections.length===14')
+   await shared['enter_map'](page)
    await shared['open_layers'](page);await page.wait_for_timeout(250)
    assert await page.locator('#panel').evaluate('e=>!!e.style.left')
    await page.locator('#closePanel').click()

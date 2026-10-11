@@ -11,8 +11,21 @@
   <link rel="stylesheet" href="css/style.css?v=20261010-mobilidade" />
   <link rel="stylesheet" href="js/vendor/leaflet-draw/leaflet.draw.css" />
   <link rel="stylesheet" href="css/ux.css?v=20261010-mobilidade" />
+  <link rel="stylesheet" href="css/portal.css?v=20261011-fe02" />
 </head>
 <body>
+  <section id="toolPortal" class="tool-portal" aria-labelledby="portalQuestion" role="dialog" aria-modal="true">
+    <div class="portal-inner">
+      <header class="portal-brand"><div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M6 27 13 9l9 5 11-7-3 25-11-4-13 5zM13 9l6 19m3-14 8 18M6 27l16-13"/></svg></div><div><h1>ARPIAS360</h1><p>Avaliação de Riscos e Planejamento Integrado de Áreas Sensíveis.</p></div></header>
+      <div class="portal-intro"><div><span class="portal-label">Piloto Niterói/RJ · Um território, várias leituras</span><h2 id="portalQuestion" tabindex="-1">Qual ferramenta você deseja utilizar?</h2><p>Escolha um ponto de partida. Você pode trocar de ferramenta a qualquer momento, mantendo seu trabalho no mesmo mapa.</p></div></div>
+      <div id="portalChoices" class="portal-choices" aria-label="Ferramentas disponíveis"></div>
+      <div class="portal-shortcut"><button id="portalSkip" type="button">Pular apresentação · Mapa Livre</button></div>
+      <div class="portal-options"><label for="portalProfile">Perfil opcional<select id="portalProfile"><option value="">Sem perfil</option><option value="citizen">Cidadão</option><option value="manager">Gestor público</option><option value="business">Empresa</option><option value="researcher">Pesquisador</option></select></label><button id="portalResume" type="button" hidden></button></div>
+      <p class="portal-note">Sem cadastro obrigatório. O perfil não restringe acesso a dados ou ferramentas. As preferências são guardadas apenas neste dispositivo. Fontes em integração ou planejadas continuam sinalizadas; este protótipo experimental não substitui análises técnicas ou sistemas oficiais.</p>
+      <p id="portalStorageStatus" role="status" class="portal-note"></p>
+      <noscript>Ative JavaScript para abrir as ferramentas cartográficas.</noscript>
+    </div>
+  </section>
   <a class="skip-link" href="#searchMirror">Ir para a busca no mapa</a>
   <header class="topbar">
     <div class="brand-block">
@@ -27,6 +40,7 @@
       <button id="locateBtn" class="tool-button" title="Minha localização"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2v4M12 18v4M2 12h4M18 12h4M12 6a6 6 0 1 0 0 12a6 6 0 1 0 0-12M12 10a2 2 0 1 0 0 4a2 2 0 1 0 0-4"/></svg> Minha localização</button>
     </nav>
     <div class="header-end"><span class="pilot-chip"><span aria-hidden="true">●</span> Piloto Niterói/RJ</span>
+      <button id="portalBtn" class="tool-button" aria-label="Voltar ao portal de ferramentas" title="Portal de ferramentas"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/></svg><span class="portal-btn-label">Ferramentas</span></button>
       <div class="more-wrap">
         <button id="moreBtn" class="tool-button" aria-expanded="false" aria-controls="moreMenu"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 11v2M12 11v2M19 11v2"/></svg> Mais</button>
         <div id="moreMenu" class="more-menu" hidden>
@@ -53,15 +67,17 @@
     </div>
   </header>
   <main class="app-shell layers-open">
+    <button id="fullscreenPortalBtn" class="fullscreen-portal" type="button">Portal de ferramentas</button>
     <button id="panelBackdrop" class="panel-backdrop" aria-label="Fechar painel de camadas" hidden tabindex="-1"></button>
     <aside id="panel" class="layer-panel" aria-labelledby="panelTitle">
       <div class="sheet-handle" aria-hidden="true"></div>
       <div class="panel-title-row"><div><span class="eyebrow">Leitura do território</span><h2 id="panelTitle">Camadas</h2></div><div class="panel-window-actions"><button id="collapsePanel" class="close-btn" aria-label="Recolher camadas" aria-expanded="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14"/></svg></button><button id="closePanel" class="close-btn" aria-label="Fechar camadas"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div></div>
       <div class="panel-scroll">
+        <section class="tool-context" aria-labelledby="toolContextTitle"><h3 id="toolContextTitle">Mapa Livre</h3><label for="toolModeSelect">Trocar ferramenta</label><div class="context-navigation"><select id="toolModeSelect"></select><button id="panelPortalBtn" type="button" aria-label="Voltar ao portal de ferramentas" title="Voltar ao portal de ferramentas"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/></svg></button></div><details class="context-help"><summary>Sobre este contexto</summary><p id="toolContextDescription"></p><p id="toolContextHint"></p></details></section>
         <div class="sidebar-search" role="search"><input id="searchInput" type="search" placeholder="Buscar bairro, local ou coordenada" aria-label="Buscar bairro, local ou coordenada no painel" aria-describedby="searchHint" enterkeyhint="search" /><button id="searchBtn" aria-label="Buscar no painel"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 3a7 7 0 1 0 0 14a7 7 0 1 0 0-14M15 15l6 6"/></svg></button></div>
         <p id="searchHint" class="search-hint">Busca por bairros e coordenadas. Ruas em integração futura.</p>
         <div class="catalog-search"><label for="layerSearch">Pesquisar camadas</label><input id="layerSearch" type="search" placeholder="Sirene, chuva, ITBI, lote…" autocomplete="off" /><p id="catalogSearchStatus" role="status" aria-live="polite">Carregando catálogo…</p></div>
-        <p class="catalog-key">Maturidade: DISPONÍVEL · EM INTEGRAÇÃO · PLANEJADO<br>Carregamento, visibilidade e camada de trabalho são independentes.</p>
+        <section class="catalog-key" aria-labelledby="maturityLegendTitle"><h3 id="maturityLegendTitle">Legenda de maturidade das camadas</h3><p>DISPONÍVEL · EM INTEGRAÇÃO · PLANEJADO</p><p>Maturidade e estado operacional são distintos. A disponibilidade efetiva depende das fontes externas e da verificação no ambiente público. Testes locais ou simulados não comprovam homologação dos serviços GIS.</p><p>Carregamento, visibilidade e camada de trabalho são independentes.</p></section>
         <details id="baseAccordion" class="accordion" data-category="territory" open><summary>Mapas de Referência <small>Uma base por vez</small></summary><div class="accordion-body"><div id="baseControl" class="control-list"></div><div id="baseMeta" class="meta-card"></div><button id="baseFallback" class="quiet-button" hidden>Usar mapa de ruas</button></div></details>
         <section id="workingLayerPanel" class="working-layer-panel" aria-labelledby="workingLayerHeading">
           <h3 id="workingLayerHeading">Camada de trabalho</h3>
@@ -128,5 +144,7 @@
   <script src="js/preferences.js?v=20261010-mobilidade"></script>
   <script src="js/operations.js?v=20261010-mobilidade"></script>
   <script src="js/report.js"></script>
+  <script src="js/portal.js?v=20261011-fe02"></script>
+  <script src="js/portal-ui.js?v=20261011-fe02"></script>
 </body>
 </html>

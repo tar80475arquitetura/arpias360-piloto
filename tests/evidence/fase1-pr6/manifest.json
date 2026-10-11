@@ -1,0 +1,35 @@
+{
+  "base_sha": "0de370489a874116714bc9f6a894248af9a20006",
+  "pr5_ancestor": "30b5f617767c1a89477999e3c6d557f0db8345c6",
+  "scope": "pre-commit local captures; final head is validated by CI and final delivery record",
+  "files": {
+    "README.md": "4be4d9aa7b47b2f4b6bacbb26f1b36b3448dbcc5556af9630980b7392c88be8e",
+    "fase1-fe02-desktop-maturity.png": "a306ce08b560b786446606d8da7ce9883644ae57ccaf45f9bce3573e5a547d8b",
+    "fase1-fe02-desktop-portal-profile.png": "990cc4781d57853439fe6e3b519cfe6a5ee9319346958a60e4bdbf2b00f69a81",
+    "fase1-fe02-desktop-portal.png": "b6fa7333fbeb4ce1161f380ecd40da04276f34ad6de3eb431d943ae406afdff3",
+    "fase1-fe02-desktop-resilience.png": "b216c85039318606ea798462788ec0eb81cf3b1f264e2677085e1f5eea920fcb",
+    "fase1-fe02-mobile-maturity.png": "fd7a5f1cf9cc7ade1cbe72d9be7117dcb8c6c4fd3c7a091bff110a81dc42f30f",
+    "fase1-fe02-mobile-portal-options.png": "c272cd4a10c1ec107f26068c29a21364f870e08c5579aae6a4e5a9b4cf9df3fc",
+    "fase1-fe02-mobile-portal.png": "a00b6981bc33374fcbbffba02ee5d0e7a157a28254d5b654bcd8f279eeb49095",
+    "fase1-fe02-mobile-resilience.png": "11ff0e3d303bacf5e4983e98d10e5c14edee8e150a1cd8e03daa96882e8cd117",
+    "fase1-fe02-tablet-portal.png": "5313bf9e257c680816f2b1323b6610f43239921a5a3d3da1d767d1355a8a745b",
+    "fase1-fe02-tablet-shortcut.png": "5313bf9e257c680816f2b1323b6610f43239921a5a3d3da1d767d1355a8a745b",
+    "fe01a-results.json": "e688bdd7eeb6e1632ab8f19e566f08cf81e2013e949a9fa81de0d206f7da6641",
+    "focus-baseline.json": "06468929afe1cc3694416672cd658efe168b4da2eaf0397c687fdb20bd750b92",
+    "panels-results.json": "651956fc1a1326d524bd6c50739df1fbfcd53d976aaa746e1555682e10fd0ac2",
+    "popup-lifecycle-results.json": "1e5d290f1573dbf3fbd626554016ec3c1de13e8a5985b18a7d2467a27be7befc",
+    "portal-results.json": "2bacce2284d11e538abb9177c5a5a9727deeeab75b29e1af3aa87b6532df5662",
+    "results.json": "5f022eb2dc0a58e26bc7087abf628db78ee90b4d4766b4c498dfc808bf34780a",
+    "round2-results.json": "b5fe4f3e933f30a568a0784d1935df796961ee44288b6549c3b0b8ed7745ffeb",
+    "unit-results.txt": "82bb1409e921454fc03dd4147f402205d55f0b110742d5d3f26e1d800e44e008"
+  },
+  "source_sha256": {
+    "index.html": "23b7ce68ae143822548c8023875f31cd5835e7d3b5fe20a076b281596fe96ab7",
+    "css/portal.css": "a51924d22c419949d82f78330e635f9296f47bd6bfc6c6ffe2be1946d2282a8f",
+    "js/portal-ui.js": "70de2011f11d9a45aa2b5e9120126c5e45a7a479d464584d56b58edfac2916fd",
+    "js/panels.js": "bf460c2c1f2dd51200c3163cc0cba6d22c1da1e4e06c7d0a27d7df7748624401",
+    "tests/browser-portal.py": "836714289ee3184e6dc54d24bd62c41c54756fe57cbb4e08e8883e415012132e",
+    "tests/browser-popup-lifecycle.py": "f34deafe0d4f98c62eeeeb7863b0739522c9e1be169f1f9bd3d7a061d5768342",
+    "tests/browser-operations.py": "da44973b3c2120827cdc945cfe7b97bcc8db0da3de607456380c4adab89434e0"
+  }
+}
