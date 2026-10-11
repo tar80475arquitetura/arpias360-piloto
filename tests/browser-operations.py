@@ -216,3 +216,4 @@ if __name__=='__main__':
     subprocess.run([sys.executable,str(Path(__file__).with_name('browser-fe01a.py'))],check=True)
     subprocess.run([sys.executable,str(Path(__file__).with_name('browser-panels.py'))],check=True)
     subprocess.run([sys.executable,str(Path(__file__).with_name('browser-portal.py'))],check=True)
+    subprocess.run([sys.executable,str(Path(__file__).with_name('browser-popup-lifecycle.py'))],check=True)

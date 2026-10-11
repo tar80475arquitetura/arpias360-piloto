@@ -1,0 +1,19 @@
+{
+  "base_sha": "6133c1f0409de9056319cf1ea573959a94c27b23",
+  "scope": "pre-commit local results; final head is validated by CI and final delivery record",
+  "files": {
+    "README.md": "71865cd41892793e4fd9722e46204d44cda186d04e5db5437f58569c75fb9320",
+    "fe01a-results.json": "b552c18d31065eef2c08241eb3bb71f071b8b6e875659e170c6d0564c500333c",
+    "panels-results.json": "d310f8e2bd1d99b3197978a1b5ba2afab28ebe017b83723b061d4f3cf70b59e6",
+    "popup-baseline.json": "00c99d5b80816e3530be2f984a7609fdc089dec98608e1a2b4d0aa1567836eee",
+    "popup-lifecycle-results.json": "7cabc2a4215a2bd190796fddfd3809ffa18323cffbb9e174d678f86bfaaf3d95",
+    "results.json": "a80434b73b0f259e7749584bab898e7d83fa5709cd77c1cc6ecb17f043c22347",
+    "round2-results.json": "459638fb68ef3a50bbcdf92768c8bb5ef5782dc28ced0f8e7895055579a04447",
+    "unit-results.txt": "825ed3c54d7053fca3d4017bab7bef55d3209501a2a8be44afc75c120f46a63f"
+  },
+  "source_sha256": {
+    "js/panels.js": "bf460c2c1f2dd51200c3163cc0cba6d22c1da1e4e06c7d0a27d7df7748624401",
+    "tests/browser-popup-lifecycle.py": "f34deafe0d4f98c62eeeeb7863b0739522c9e1be169f1f9bd3d7a061d5768342",
+    "tests/browser-operations.py": "229e0e0447979e7f6522baf7f339fdde70b7a3ab02ef08d6cf704856cad1100f"
+  }
+}
