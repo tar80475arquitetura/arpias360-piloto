@@ -28,6 +28,8 @@ jobs:
       ARPIAS_TEST_OUTPUT: /tmp/arpias-browser
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # Base of the virtual PR merge for FE-03 comparison artifacts.
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
