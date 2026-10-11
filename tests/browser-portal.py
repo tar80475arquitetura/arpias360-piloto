@@ -3,7 +3,7 @@ import asyncio,json,os,runpy
 from pathlib import Path
 from playwright.async_api import async_playwright
 shared=runpy.run_path(str(Path(__file__).with_name('browser-operations.py')))
-OUT=shared['OUT'];groups=[]
+OUT=shared['OUT'];groups=[];focus_evidence=[]
 CONTRAST=runpy.run_path(str(Path(__file__).with_name('browser-fe01a.py')))['CONTRAST']
 async def root(page,suffix=''):
  await page.goto('http://127.0.0.1:8080/'+suffix,wait_until='load')
@@ -21,6 +21,60 @@ async def snapshot(page):
   selection:ARPIASUI.selection(),work:ARPIASUI.workGroup.toGeoJSON(false),measure:ARPIASUI.measureGroup.toGeoJSON(false),mode:ARPIASUI.mode(),
   categoryStates:catalogSections.map(s=>[s.section.dataset.group,s.section.open]),
   prefs:localStorage.getItem(ARPIASPreferences.key),drawings:localStorage.getItem('arpias360.workspace.v1')})''')
+async def focus_valid(page,expected=None):
+ result=await page.evaluate(r"""()=>{
+  const e=document.activeElement,r=e.getBoundingClientRect();let clipped=false;
+  for(let p=e.parentElement;p;p=p.parentElement){const c=p.getBoundingClientRect(),s=getComputedStyle(p);
+   if(/auto|scroll|hidden|clip/.test(s.overflowY)&&(r.top<c.top||r.bottom>c.bottom))clipped=true;
+   if(/auto|scroll|hidden|clip/.test(s.overflowX)&&(r.left<c.left||r.right>c.right))clipped=true;}
+  return {id:e.id,tag:e.tagName,hidden:!!e.closest('[hidden],[aria-hidden="true"]'),inert:!!e.closest('[inert]'),
+   visible:!!e.getClientRects().length&&getComputedStyle(e).visibility!=='hidden'&&r.top>=0&&r.left>=0&&r.bottom<=innerHeight&&r.right<=innerWidth&&!clipped,
+   viewport:[innerWidth,innerHeight]};
+ }""")
+ assert result['visible'] and not result['hidden'] and not result['inert'],result
+ if expected:assert await page.locator(expected).evaluate('e=>e===document.activeElement'),(expected,result)
+ focus_evidence.append(result)
+async def focus_scenarios(browser,w,h):
+ c=await browser.new_context(viewport={'width':w,'height':h},has_touch=True);await c.route('https://**/*',shared['external'])
+ page=await c.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));await root(page)
+ await focus_valid(page,'#portalQuestion')
+ # The shortcut must occur after the complete set of cards, in layout and DOM order.
+ layout=await page.evaluate("(()=>{const cards=[...document.querySelectorAll('#portalChoices button')],skip=document.getElementById('portalSkip');return {below:skip.getBoundingClientRect().top>=Math.max(...cards.map(c=>c.getBoundingClientRect().bottom)),after:!!(cards.at(-1).compareDocumentPosition(skip)&Node.DOCUMENT_POSITION_FOLLOWING),secondary:getComputedStyle(skip).backgroundColor==='rgba(0, 0, 0, 0)'}})()")
+ assert layout['below'] and layout['after'] and layout['secondary'],layout
+ await page.locator('[data-tool=free]').click();await focus_valid(page)
+ await page.evaluate("window.portalMap=map;ARPIASUI.select({type:'Feature',properties:{},geometry:{type:'Point',coordinates:[-43.1,-22.9]}},'Fixture de foco',{origin:'search'});map.closePopup();ARPIASUI.workGroup.addLayer(L.marker([-22.91,-43.11]));ARPIASUI.measureGroup.addLayer(L.polyline([[-22.9,-43.1],[-22.91,-43.11]]))")
+ await shared['choose_sirens'](page);await page.locator('#closePanel').click();await page.wait_for_timeout(400)
+ for activation in ['mouse','keyboard']:
+  for n,mode in enumerate(['resilience','territorial','integrated','free']):
+   before=await snapshot(page);await return_portal(page);await focus_valid(page,'#portalQuestion')
+   if activation=='mouse':await page.locator('[data-tool='+mode+']').click()
+   else:
+    for _ in range(n+1):await page.keyboard.press('Tab')
+    await focus_valid(page,'[data-tool='+mode+']')
+    assert await page.locator('[data-tool='+mode+']').evaluate("e=>getComputedStyle(e).outlineStyle==='solid'&&parseFloat(getComputedStyle(e).outlineWidth)>=3")
+    await page.keyboard.press('Enter')
+   await focus_valid(page,'#portalBtn');assert await snapshot(page)==before,(activation,mode,before,await snapshot(page))
+ # Open modal/mobile or desktop layers and change context without leaving the control.
+ await shared['open_layers'](page);select=page.locator('#toolModeSelect');await select.scroll_into_view_if_needed();await select.focus()
+ before=await snapshot(page);await select.select_option('integrated');await focus_valid(page,'#toolModeSelect');assert await snapshot(page)==before
+ legend=await page.locator('.catalog-key').inner_text()
+ for text in ['Legenda de maturidade das camadas','DISPONÍVEL · EM INTEGRAÇÃO · PLANEJADO','Maturidade e estado operacional são distintos','verificação no ambiente público','não comprovam homologação dos serviços GIS']:assert text in legend,text
+ # Native button reaches portal when the mobile background is inert.
+ await return_portal(page);await focus_valid(page,'#portalQuestion');await page.locator('[data-tool=resilience]').click();await focus_valid(page,'#toolModeSelect')
+ if w>899:
+  await page.locator('#panel .panel-scroll').evaluate('e=>e.scrollTop=e.scrollHeight')
+  await return_portal(page);await page.locator('[data-tool=territorial]').click();await focus_valid(page,'#panel .panel-title-row')
+ # Exercise component entry from a collapsed panel; its select is genuinely hidden.
+ await page.locator('#collapsePanel').click();assert await select.is_hidden()
+ await page.evaluate('ARPIASPortalUI.show()');await focus_valid(page,'#portalQuestion')
+ await page.locator('[data-tool=free]').click();await focus_valid(page,'#panel .panel-title-row')
+ await page.locator('#collapsePanel').click();await page.locator('#closePanel').click()
+ await page.locator('#moreBtn').click();await page.locator('#fullBtnTop').click();await page.wait_for_function('document.fullscreenElement!==null')
+ await page.locator('#fullscreenPortalBtn').focus();await focus_valid(page,'#fullscreenPortalBtn');await page.keyboard.press('Enter')
+ await page.wait_for_function('document.fullscreenElement===null');await focus_valid(page,'#portalQuestion')
+ await page.keyboard.press('Tab');await page.keyboard.press('Enter');await focus_valid(page,'#portalBtn')
+ assert not errors,errors;groups.append(f'{w}×{h}: mouse/Enter for all tools, initial/entry/return focus, visible non-inert targets, open/scrolled/collapsed layers, fullscreen and preserved cartographic fixtures')
+ await c.close()
 async def main():
  async with async_playwright() as p:
   browser=await p.chromium.launch(executable_path=os.environ.get('ARPIAS_CHROMIUM','/usr/bin/chromium') or None,headless=True,args=['--no-sandbox'])
@@ -34,14 +88,14 @@ async def main():
   assert await page.locator('#portalQuestion').evaluate('e=>e===document.activeElement')
   contrast=await page.locator('#toolPortal h1,#toolPortal h2,#toolPortal p,#toolPortal strong,#toolPortal .portal-card span,#toolPortal small,#toolPortal label,#portalSkip,#portalProfile').evaluate_all(CONTRAST)
   assert all(row['ratio']>=4.5 for row in contrast),contrast
-  await capture(page,'fe02-desktop-portal.png');await page.locator('#portalProfile').scroll_into_view_if_needed();await capture(page,'fe02-desktop-portal-profile.png')
+  await capture(page,'fase1-fe02-desktop-portal.png');await page.locator('#portalProfile').scroll_into_view_if_needed();await capture(page,'fase1-fe02-desktop-portal-profile.png')
   await page.locator('#portalQuestion').focus();await page.keyboard.press('Tab')
-  assert await page.locator('#portalSkip').evaluate('e=>e===document.activeElement')
-  await page.keyboard.press('Tab');await page.keyboard.press('Enter')
+  assert await page.locator('[data-tool=resilience]').evaluate('e=>e===document.activeElement')
+  await page.keyboard.press('Enter')
   assert await page.locator('#toolPortal').is_hidden()
   assert await page.evaluate('ARPIASPortalUI.mode')=='resilience'
   await shared['open_layers'](page)
-  await capture(page,'fe02-desktop-resilience.png')
+  await capture(page,'fase1-fe02-desktop-resilience.png')
   await page.evaluate('window.portalMap=map')
   for mode in ['territorial','integrated','free','resilience']:
    before=await snapshot(page);await return_portal(page)
@@ -107,11 +161,11 @@ async def main():
     await card.scroll_into_view_if_needed();b=await card.bounding_box();assert b['x']>=0 and b['x']+b['width']<=w+1 and b['height']>=44
    await page.locator('#portalProfile').select_option('citizen')
    await page.locator('#portalResume').focus();await page.keyboard.press('Tab')
-   assert await page.locator('#portalSkip').evaluate('e=>e===document.activeElement'),'keyboard must wrap within portal'
+   assert await page.locator('[data-tool=resilience]').evaluate('e=>e===document.activeElement'),'keyboard must wrap within portal'
    if w==390:
-    await page.locator('#toolPortal').evaluate('e=>e.scrollTop=0');await capture(page,'fe02-mobile-portal.png');await page.locator('[data-tool=free]').scroll_into_view_if_needed();await capture(page,'fe02-mobile-portal-options.png')
+    await page.locator('#toolPortal').evaluate('e=>e.scrollTop=0');await capture(page,'fase1-fe02-mobile-portal.png');await page.locator('[data-tool=free]').scroll_into_view_if_needed();await capture(page,'fase1-fe02-mobile-portal-options.png')
    await page.locator('[data-tool=resilience]').click();await shared['open_layers'](page)
-   if w==390:await capture(page,'fe02-mobile-resilience.png')
+   if w==390:await capture(page,'fase1-fe02-mobile-resilience.png')
    assert await page.locator('#panel .panel-scroll').evaluate('e=>e.scrollWidth<=e.clientWidth+1')
    await page.locator('#toolModeSelect').select_option('integrated')
    await return_portal(page);await page.set_viewport_size({'width':w,'height':h-40});await page.wait_for_timeout(250)
@@ -132,8 +186,9 @@ async def main():
    if 'denied' in script:assert 'Não foi possível salvar' in await page.locator('#portalStorageStatus').inner_text()
    await c.close()
   groups.append('malformed and denied storage remain usable')
+  for w,h in [(1366,768),(390,844),(320,568)]:await focus_scenarios(browser,w,h)
   await browser.close()
- (OUT/'portal-results.json').write_text(json.dumps({'evidence':shared['evidence'](),'passed':groups,'external_services':'simulated 503; not live GIS validation'},ensure_ascii=False,indent=2))
+ (OUT/'portal-results.json').write_text(json.dumps({'evidence':shared['evidence'](),'passed':groups,'focus_evidence':focus_evidence,'external_services':'simulated 503; not live GIS validation'},ensure_ascii=False,indent=2))
  print(json.dumps({'passed':len(groups),'groups':groups},ensure_ascii=False,indent=2))
 if __name__=='__main__':
  try:asyncio.run(main())

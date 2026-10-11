@@ -51,10 +51,24 @@
     // The existing responsive panel may have changed modal state while covered.
     webgis[0].inert=matchMedia('(max-width:899px)').matches&&!document.getElementById('panel').classList.contains('hidden');
   }
+  function focusMap(){
+    function visible(element){
+      if(!element||element.closest('[hidden],[inert],[aria-hidden="true"]')||!element.getClientRects().length)return false;
+      const r=element.getBoundingClientRect();
+      if(r.top<0||r.left<0||r.bottom>innerHeight||r.right>innerWidth||getComputedStyle(element).visibility==='hidden')return false;
+      // A control can have a rect even when clipped outside a scrolled panel.
+      for(let parent=element.parentElement;parent;parent=parent.parentElement){
+        const style=getComputedStyle(parent),clip=parent.getBoundingClientRect();
+        if(/auto|scroll|hidden|clip/.test(style.overflowY)&&(r.top<clip.top||r.bottom>clip.bottom))return false;
+        if(/auto|scroll|hidden|clip/.test(style.overflowX)&&(r.left<clip.left||r.right>clip.right))return false;
+      }
+      return true;
+    }
+    [select,document.querySelector('#panel .panel-title-row'),document.getElementById('portalBtn'),document.getElementById('fullscreenPortalBtn')].find(visible)?.focus({preventScroll:true});
+  }
   function enter(id){state={...state,mode:api.mode(id).id,profile:profile.value};save();context();hide();
     // No opening/closing panels here: mobile modal state, selections and tools survive.
-    let target=!document.getElementById('panel').inert?select:document.getElementById('portalBtn');
-    if(!target.getClientRects().length)target=document.querySelector('#panel .panel-title-row');target.focus({preventScroll:true});
+    focusMap();
   }
   async function show(){
     if(!portal.hidden)return;

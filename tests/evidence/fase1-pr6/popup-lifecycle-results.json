@@ -1,0 +1,507 @@
+{
+  "evidence": {
+    "sha": "0de370489a874116714bc9f6a894248af9a20006",
+    "dirty": true,
+    "recorded_at": "2026-10-11T19:34:59.293426+00:00",
+    "github_run_id": null
+  },
+  "diagnostic_only": false,
+  "baseline": {
+    "mutation": 0,
+    "resize": 0,
+    "callbacks": 0,
+    "nodeListeners": 0,
+    "windowResize": 14
+  },
+  "cycles": [
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 1,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 1,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 2,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 2,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 3,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 3,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 4,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 4,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 5,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 5,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 6,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 6,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 7,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 7,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 8,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 8,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 9,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 9,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 10,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 10,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 11,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 11,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 12,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 12,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 13,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 13,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 14,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 14,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 15,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 15,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 16,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 16,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 17,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 17,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 18,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 18,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 19,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 19,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 20,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 20,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 21,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 21,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 22,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 22,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 23,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 23,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 24,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 24,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 25,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 25,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 26,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 26,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 27,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 27,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 28,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 28,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 29,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 29,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    },
+    {
+      "opened": {
+        "mutation": 1,
+        "resize": 1,
+        "callbacks": 30,
+        "nodeListeners": 6,
+        "windowResize": 15
+      },
+      "closed": {
+        "mutation": 0,
+        "resize": 0,
+        "callbacks": 30,
+        "nodeListeners": 0,
+        "windowResize": 14
+      }
+    }
+  ],
+  "closedMutationCallbacks": 0,
+  "closedHeaderPrepared": false,
+  "groups": [
+    "30 distinct real popup open/close cycles: observers and listeners return to baseline; closed content causes no callbacks",
+    "reused element resumes changed header; repeated bind is idempotent; mouse, touch and keyboard move without coordinate changes",
+    "close during capture releases drag state; repeated dispose and resume remain safe"
+  ],
+  "external_services": "simulated 503, not live GIS validation",
+  "scope": "Registration cleanup and detached-node callbacks; no heap/GC memory-leak claim"
+}

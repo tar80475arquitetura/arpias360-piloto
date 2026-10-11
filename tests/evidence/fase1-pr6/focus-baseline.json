@@ -1,0 +1,31 @@
+{
+  "focused": "toolModeSelect",
+  "rect": {
+    "x": 28,
+    "y": -3231,
+    "width": 266,
+    "height": 46,
+    "top": -3231,
+    "right": 294,
+    "bottom": -3185,
+    "left": 28
+  },
+  "scrollViewport": {
+    "x": 13,
+    "y": 226.5,
+    "width": 348,
+    "height": 414,
+    "top": 226.5,
+    "right": 361,
+    "bottom": 640.5,
+    "left": 13
+  },
+  "insideScrollViewport": false,
+  "inert": false,
+  "evidence": {
+    "sha": "0de370489a874116714bc9f6a894248af9a20006",
+    "dirty": false,
+    "recorded_at": "2026-10-11T19:28:16.204192+00:00",
+    "github_run_id": null
+  }
+}
