@@ -217,3 +217,13 @@ if __name__=='__main__':
     subprocess.run([sys.executable,str(Path(__file__).with_name('browser-panels.py'))],check=True)
     subprocess.run([sys.executable,str(Path(__file__).with_name('browser-portal.py'))],check=True)
     subprocess.run([sys.executable,str(Path(__file__).with_name('browser-popup-lifecycle.py'))],check=True)
+    # FE-03 PR artifacts include authentic base/head comparisons without editing
+    # the checkout or copying screenshots into version control.
+    if os.environ.get('GITHUB_EVENT_NAME')=='pull_request':
+        event=json.loads(Path(os.environ['GITHUB_EVENT_PATH']).read_text())
+        if event['pull_request']['head']['ref']=='codex/fe03-revisao-frontend':
+            base_ref=event['pull_request']['base']['sha']
+            subprocess.run(['git','cat-file','-e',base_ref+'^{commit}'],check=True)
+            baseline_env={**os.environ,'ARPIAS_FE03_PHASE':'before','ARPIAS_FE03_BASE_REF':base_ref}
+            subprocess.run([sys.executable,str(Path(__file__).with_name('browser-fe03.py'))],env=baseline_env,check=True)
+    subprocess.run([sys.executable,str(Path(__file__).with_name('browser-fe03.py'))],check=True)

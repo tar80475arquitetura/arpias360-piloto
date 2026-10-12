@@ -27,13 +27,39 @@ async def focus_valid(page,expected=None):
   for(let p=e.parentElement;p;p=p.parentElement){const c=p.getBoundingClientRect(),s=getComputedStyle(p);
    if(/auto|scroll|hidden|clip/.test(s.overflowY)&&(r.top<c.top||r.bottom>c.bottom))clipped=true;
    if(/auto|scroll|hidden|clip/.test(s.overflowX)&&(r.left<c.left||r.right>c.right))clipped=true;}
-  return {id:e.id,tag:e.tagName,hidden:!!e.closest('[hidden],[aria-hidden="true"]'),inert:!!e.closest('[inert]'),
+  return {id:e.id,tool:e.dataset.tool,tag:e.tagName,rect:{top:r.top,bottom:r.bottom,left:r.left,right:r.right},clipped,hidden:!!e.closest('[hidden],[aria-hidden="true"]'),inert:!!e.closest('[inert]'),
    visible:!!e.getClientRects().length&&getComputedStyle(e).visibility!=='hidden'&&r.top>=0&&r.left>=0&&r.bottom<=innerHeight&&r.right<=innerWidth&&!clipped,
    viewport:[innerWidth,innerHeight]};
  }""")
  assert result['visible'] and not result['hidden'] and not result['inert'],result
  if expected:assert await page.locator(expected).evaluate('e=>e===document.activeElement'),(expected,result)
  focus_evidence.append(result)
+async def first_card_by_keyboard(page):
+ # The public notice precedes the cards in DOM and keyboard order.
+ # Exercise its disclosure and scroll region instead of skipping accessibility.
+ await page.locator('#portalQuestion').scroll_into_view_if_needed()
+ await focus_valid(page,'#portalQuestion')
+ await page.keyboard.press('Tab')
+ await focus_valid(page,'#portalExperimentalNotice summary')
+ await page.keyboard.press('Enter')
+ assert await page.locator('#portalExperimentalNotice').evaluate('e=>e.open')
+ await page.keyboard.press('Tab')
+ await focus_valid(page,'#portalExperimentalNotice .experimental-notice-content')
+ await page.keyboard.press('Shift+Tab')
+ await focus_valid(page,'#portalExperimentalNotice summary')
+ await page.keyboard.press('Enter')
+ assert not await page.locator('#portalExperimentalNotice').evaluate('e=>e.open')
+ await page.keyboard.press('Tab')
+ await focus_valid(page,'[data-tool=resilience]')
+ await page.keyboard.press('Shift+Tab')
+ await focus_valid(page,'#portalExperimentalNotice summary')
+ await page.keyboard.press('Shift+Tab')
+ last=await page.locator('#toolPortal button,#toolPortal select,#toolPortal a[href]').evaluate_all('es=>es.filter(e=>!e.hidden&&e.getClientRects().length).at(-1).id')
+ await focus_valid(page,'#'+last)
+ await page.keyboard.press('Tab')
+ await focus_valid(page,'#portalExperimentalNotice summary')
+ await page.keyboard.press('Tab')
+ await focus_valid(page,'[data-tool=resilience]')
 async def focus_scenarios(browser,w,h):
  c=await browser.new_context(viewport={'width':w,'height':h},has_touch=True);await c.route('https://**/*',shared['external'])
  page=await c.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));await root(page)
@@ -49,7 +75,8 @@ async def focus_scenarios(browser,w,h):
    before=await snapshot(page);await return_portal(page);await focus_valid(page,'#portalQuestion')
    if activation=='mouse':await page.locator('[data-tool='+mode+']').click()
    else:
-    for _ in range(n+1):await page.keyboard.press('Tab')
+    await first_card_by_keyboard(page)
+    for _ in range(n):await page.keyboard.press('Tab')
     await focus_valid(page,'[data-tool='+mode+']')
     assert await page.locator('[data-tool='+mode+']').evaluate("e=>getComputedStyle(e).outlineStyle==='solid'&&parseFloat(getComputedStyle(e).outlineWidth)>=3")
     await page.keyboard.press('Enter')
@@ -72,7 +99,7 @@ async def focus_scenarios(browser,w,h):
  await page.locator('#moreBtn').click();await page.locator('#fullBtnTop').click();await page.wait_for_function('document.fullscreenElement!==null')
  await page.locator('#fullscreenPortalBtn').focus();await focus_valid(page,'#fullscreenPortalBtn');await page.keyboard.press('Enter')
  await page.wait_for_function('document.fullscreenElement===null');await focus_valid(page,'#portalQuestion')
- await page.keyboard.press('Tab');await page.keyboard.press('Enter');await focus_valid(page,'#portalBtn')
+ await first_card_by_keyboard(page);await page.keyboard.press('Enter');await focus_valid(page,'#portalBtn')
  assert not errors,errors;groups.append(f'{w}×{h}: mouse/Enter for all tools, initial/entry/return focus, visible non-inert targets, open/scrolled/collapsed layers, fullscreen and preserved cartographic fixtures')
  await c.close()
 async def main():
@@ -89,7 +116,7 @@ async def main():
   contrast=await page.locator('#toolPortal h1,#toolPortal h2,#toolPortal p,#toolPortal strong,#toolPortal .portal-card span,#toolPortal small,#toolPortal label,#portalSkip,#portalProfile').evaluate_all(CONTRAST)
   assert all(row['ratio']>=4.5 for row in contrast),contrast
   await capture(page,'fase1-fe02-desktop-portal.png');await page.locator('#portalProfile').scroll_into_view_if_needed();await capture(page,'fase1-fe02-desktop-portal-profile.png')
-  await page.locator('#portalQuestion').focus();await page.keyboard.press('Tab')
+  await page.locator('#portalQuestion').focus();await first_card_by_keyboard(page)
   assert await page.locator('[data-tool=resilience]').evaluate('e=>e===document.activeElement')
   await page.keyboard.press('Enter')
   assert await page.locator('#toolPortal').is_hidden()
@@ -121,7 +148,7 @@ async def main():
   await shared['open_layers'](page)
   await page.wait_for_timeout(350)
   before=await snapshot(page)
-  await return_portal(page);await page.keyboard.press('Escape');assert await snapshot(page)==before
+  await return_portal(page);await page.keyboard.press('Escape');assert await snapshot(page)==before,('portal Escape',before,await snapshot(page))
   await page.locator('[data-tool=integrated]').click();assert await snapshot(page)==before
   await page.locator('#toolModeSelect').select_option('territorial');assert await snapshot(page)==before
   groups.append('selection, working layer, zero opacity, work features, measurement, consult mode and map preferences preserved by portal/context switch')
@@ -161,6 +188,8 @@ async def main():
     await card.scroll_into_view_if_needed();b=await card.bounding_box();assert b['x']>=0 and b['x']+b['width']<=w+1 and b['height']>=44
    await page.locator('#portalProfile').select_option('citizen')
    await page.locator('#portalResume').focus();await page.keyboard.press('Tab')
+   await focus_valid(page,'#portalExperimentalNotice summary')
+   await page.keyboard.press('Tab')
    assert await page.locator('[data-tool=resilience]').evaluate('e=>e===document.activeElement'),'keyboard must wrap within portal'
    if w==390:
     await page.locator('#toolPortal').evaluate('e=>e.scrollTop=0');await capture(page,'fase1-fe02-mobile-portal.png');await page.locator('[data-tool=free]').scroll_into_view_if_needed();await capture(page,'fase1-fe02-mobile-portal-options.png')

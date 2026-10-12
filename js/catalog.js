@@ -33,11 +33,18 @@
   }
   function operationalStatus(text){
     if(/falha|indisponível|erro/i.test(text))return 'Falha de carregamento · serviço inacessível ou não verificado';
+    if(/^carregado parcialmente/i.test(text))return 'Carregado parcialmente · há áreas sem imagem';
+    if(/^sem feições nesta área/i.test(text))return 'Carregamento concluído · nenhuma feição encontrada nesta área';
+    if(/^aproxime o mapa/i.test(text))return 'Aguardando aproximação do mapa';
     if(/^carregando/i.test(text))return 'Carregando';
     if(/^(disponível|carregado)$/i.test(text))return 'Carregado';
     return 'Aguardando carregamento';
   }
-  function layerStatus(text,visible,opacity=1,item={state:'integrated'}){return publicStatus(item)+' · '+operationalStatus(text)+' · '+(visible?(opacity===0?'Camada no mapa · opacidade zero (não perceptível)':'Camada visível'):'Camada oculta');}
+  function layerStatus(text,visible,opacity=1,item={state:'integrated'}){
+    const failedBase=item.control?.startsWith('base_')&&/falha|indisponível|erro/i.test(text);
+    const visibility=visible?(failedBase?'Mapa-base selecionado · imagem não carregada':opacity===0?'Camada no mapa · opacidade zero (não perceptível)':'Camada visível'):'Camada oculta';
+    return publicStatus(item)+' · '+operationalStatus(text)+' · '+visibility;
+  }
   const api={normalize,validate,matches,publicStatus,operationalStatus,layerStatus};
   if(typeof module==='object'&&module.exports)module.exports=api;
   else root.ARPIASCatalog=api;
