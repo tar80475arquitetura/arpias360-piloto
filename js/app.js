@@ -96,9 +96,6 @@ const apa=feature(URLS.apa,()=>ARPIASCartography.style('apa'),'Área de Proteç�
 const comunidades=feature(URLS.comunidades,()=>ARPIASCartography.style('comunidades'),'Comunidades · base pública municipal','Prefeitura Municipal de Niterói · Dados Abertos');
 const lotes=feature(URLS.lotes,()=>ARPIASCartography.style('lotes'),'Lote · base pública municipal','Prefeitura Municipal de Niterói · Dados Abertos',{minZoom:16,simplifyFactor:.2});
 
-limite.addTo(map);
-bairros.addTo(map);
-
 function bindTerritorialName(event,className){
   const name=event.feature?.properties?.tx_nome||event.layer?.feature?.properties?.tx_nome;
   if(typeof name!=='string'||!name.trim())return;
@@ -343,6 +340,19 @@ let previousBaseDef=baseDefs[1];
 let baseGeneration=0;
 let baseTimer;
 function baseState(def,state){def.state=state;if(def.statusNode){renderOperationalText(def.statusNode,ARPIASCatalog.layerStatus(state,map.hasLayer(def.layer),def.opacity??1,{state:'integrated',control:'base_'+def.id}));def.statusNode.setAttribute('data-state',state);}}
+function validBaseTile(def,tile){
+  // Esri loads errorTileUrl as an image after a failed tile request. It is not data.
+  const src=tile?.currentSrc||tile?.src;
+  return !!src&&src!==def.layer.options?.errorTileUrl&&tile.naturalWidth>0&&tile.naturalHeight>0;
+}
+function baseCoverageMessage(def){
+  return def.failedTiles?'Imagem carregada parcialmente. Algumas áreas estão sem imagem por ausência de cobertura ou falha de carregamento. '+def.desc:def.desc;
+}
+function publishBaseCoverage(def){
+  document.getElementById('baseFallback').hidden=true;
+  baseState(def,def.failedTiles?'Carregado parcialmente':'Disponível');
+  updateStatus(def,baseCoverageMessage(def));
+}
 function selectBase(def){
   clearTimeout(baseTimer);baseGeneration++;
   if(activeBaseDef!==def)previousBaseDef=activeBaseDef;
@@ -351,13 +361,16 @@ function selectBase(def){
   map.setMaxZoom(def.id==='ortho'?23:19);
   // Keep the previous base underneath while NASA tiles are being checked.
   baseDefs.forEach(d=>{if(d!==def&&!(def.id==='recent'&&d===previousBaseDef)&&map.hasLayer(d.layer))map.removeLayer(d.layer);});
+  // Retrying an attached failed base must request tiles again and invalidate old callbacks.
+  if(def.state==='Indisponível'&&map.hasLayer(def.layer))map.removeLayer(def.layer);
+  baseState(def,'Carregando');
   if(!map.hasLayer(def.layer))def.layer.addTo(map);
   document.getElementById(`base_${def.id}`).checked=true;
   baseMeta.textContent=def.desc;baseMeta.classList.add('visible');
-  updateStatus(def,'Carregando base cartográfica…');baseState(def,'Carregando');
+  updateStatus(def,'Carregando base cartográfica…');
   if(def.loaded&&!def.layer.isLoading()){
     if(def.id==='recent')baseDefs.forEach(other=>{if(other!==def&&map.hasLayer(other.layer))map.removeLayer(other.layer);});
-    baseState(def,'Disponível');updateStatus(def,def.desc);return;
+    publishBaseCoverage(def);return;
   }
   const generation=baseGeneration;
   baseTimer=setTimeout(()=>{if(generation===baseGeneration&&!def.loaded)baseFailure(def);},15000);
@@ -368,7 +381,7 @@ function baseFailure(def){
   if(activeBaseDef!==def)return;
   if(def.id==='ortho'){
     clearTimeout(baseTimer);
-    updateStatus(def,'Foto Aérea 2019 indisponível no momento. Use o mapa de ruas ou selecione a foto aérea novamente.');
+    updateStatus(def,'Não foi possível carregar a Foto Aérea 2019 nesta área. O serviço pode estar indisponível ou a área pode não ter cobertura. Use o mapa de ruas ou tente novamente.');
     document.getElementById('activeBaseLabel').textContent='Foto Aérea 2019 · indisponível';
     document.getElementById('baseFallback').hidden=false;
     toast('Foto Aérea 2019 indisponível no momento.');return;
@@ -379,7 +392,11 @@ function baseFailure(def){
   updateStatus(fallback,`${def.name} indisponível. Exibindo ${fallback.name}.`);
   toast(`${def.name} temporariamente indisponível.`);
 }
-function settleBase(def){if(activeBaseDef===def&&!def.loaded)baseFailure(def);}
+function settleBase(def){
+  if(activeBaseDef!==def||def.state==='Indisponível')return;
+  if(!def.loaded)baseFailure(def);
+  else publishBaseCoverage(def);
+}
 baseDefs.forEach(d=>{
   const label=element('label',undefined,'control-item');
   const radio=element('input');radio.type='radio';radio.name='base';radio.id=`base_${d.id}`;radio.checked=d===activeBaseDef;
@@ -396,13 +413,19 @@ baseDefs.forEach(d=>{
   info.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const box=content(d.name,[['Fonte',d.id==='ortho'?'Prefeitura Municipal de Niterói / SIGeo':d.id==='osm'?'OpenStreetMap':'NASA GIBS / VIIRS'],['Geometria','Raster'],['Status',d.statusNode.textContent],['Atualização',d.id==='ortho'?'2019':d.id==='recent'?recentDate:'Não informada']],d.desc);appendOpacity(box,d,true);box.firstChild.id='infoTitle';document.getElementById('infoBody').replaceChildren(box);document.getElementById('layerInfo').showModal();});label.append(info);
   radio.addEventListener('change',()=>{if(radio.checked)selectBase(d);});
   radio.addEventListener('click',()=>{if(radio.checked&&d.state==='Indisponível')selectBase(d);});
-  d.layer.on('loading',()=>{d.loaded=false;d.failedTiles=0;if(activeBaseDef===d)baseState(d,'Carregando');});
-  d.layer.on('tileload',()=>{
-    if(activeBaseDef!==d)return;
+  d.layer.on('loading',()=>{
+    if(activeBaseDef!==d||!map.hasLayer(d.layer)||d.state==='Indisponível')return;
+    // Cached, still-visible aerial tiles survive a partially failing next batch.
+    const current=Object.values(d.layer._tiles||{}).filter(t=>t.current!==false);
+    d.loaded=current.some(t=>t.loaded&&validBaseTile(d,t.el));
+    d.failedTiles=current.filter(t=>t.el.src===d.layer.options.errorTileUrl).length;
+    if(activeBaseDef===d)baseState(d,'Carregando');
+  });
+  d.layer.on('tileload',e=>{
+    if(activeBaseDef!==d||!map.hasLayer(d.layer)||d.state==='Indisponível'||!validBaseTile(d,e.tile))return;
     d.loaded=true;
-    document.getElementById('baseFallback').hidden=true;
     if(d.id==='recent')baseDefs.forEach(other=>{if(other!==d&&map.hasLayer(other.layer))map.removeLayer(other.layer);});
-    clearTimeout(baseTimer);baseState(d,'Disponível');updateStatus(d,d.desc);
+    clearTimeout(baseTimer);publishBaseCoverage(d);
   });
   // The official mosaic returns 404 for uncached/no-data tiles outside its footprint.
   // A single missing tile must not discard other successfully rendered aerial tiles.
@@ -466,6 +489,61 @@ function layerControl(d,state,onChange,info){
   d.syncOperationalState=syncOperationalState;syncOperationalState();
   return row;
 }
+function configureOverlayLoading(d,row){
+  // Service callbacks can emit load BEFORE requestsuccess for an empty query.
+  // Match request params by identity (Esri 3.0.12 retains them) and attachment cycle.
+  const requests=new WeakMap(),cache=new Map();let cycle=null;
+  const scope=()=>`${map.getZoom()}|${map.getBounds().toBBoxString()}|${d.layer.options.where||''}`;
+  function begin(){
+    cycle={scope:scope(),pending:new Set(),settled:false,unknown:false,responses:0,features:0};
+    d.queryResponses=0;d.queryFeatures=0;d.loadFailed=false;
+    d.status.textContent='Carregando';row.setAttribute('aria-busy','true');
+  }
+  function publish(){
+    if(!cycle||d.loadFailed||!map.hasLayer(d.layer)||!cycle.settled)return;
+    if(cycle.pending.size)return;
+    let result=null;
+    if(!cycle.unknown&&scope()===cycle.scope){
+      if(cycle.responses){
+        result={features:cycle.features};cache.set(cycle.scope,result);
+        if(cache.size>16)cache.delete(cache.keys().next().value);
+      }else result=cache.get(cycle.scope);
+    }
+    d.status.textContent=map.getZoom()<(d.layer.options.minZoom??0)?'Aproxime o mapa para carregar esta camada':
+      result?(result.features===0?'Sem feições nesta área':'Disponível'):'Aguardando carregamento';
+    row.setAttribute('aria-busy','false');
+  }
+  d.layer.on('loading',begin);
+  d.layer.on('remove',()=>{cycle=null;});
+  d.layer.on('requeststart',e=>{
+    if(!map.hasLayer(d.layer)||!e.params||typeof e.params!=='object')return;
+    if(!cycle)begin();
+    const query=/\/query(?:$|\?)/i.test(e.url||'');
+    requests.set(e.params,{cycle,query});if(query)cycle.pending.add(e.params);
+  });
+  d.layer.on('requestsuccess',e=>{
+    const request=e.params&&requests.get(e.params);
+    if(!request||request.cycle!==cycle||d.loadFailed||!map.hasLayer(d.layer))return;
+    requests.delete(e.params);
+    if(request.query){
+      cycle.pending.delete(e.params);
+      if(Array.isArray(e.response?.features)){
+        cycle.responses++;cycle.features+=e.response.features.length;
+        d.queryResponses=cycle.responses;d.queryFeatures=cycle.features;
+      }else cycle.unknown=true;
+    }
+    publish();
+  });
+  d.layer.on('load',()=>{if(cycle){cycle.settled=true;publish();}});
+  d.layer.on('requesterror',e=>{
+    const request=e.params&&requests.get(e.params);
+    if(!request||request.cycle!==cycle||!map.hasLayer(d.layer))return;
+    cache.delete(cycle.scope);requests.delete(e.params);
+    d.loadFailed=true;d.status.textContent='Indisponível';d.input.checked=false;
+    row.setAttribute('aria-busy','false');map.removeLayer(d.layer);
+    toast(`Não foi possível carregar ${d.name}. Tente novamente mais tarde; você pode continuar usando outras camadas.`);
+  });
+}
 overlayDefs.forEach(d=>{
   const target=d.group==='Ambiente'?'environmentControl':d.group==='Áreas sensíveis'?'sensitiveControl':'territoryControl';
   const row=layerControl(d,'Aguardando carregamento',()=>{
@@ -473,11 +551,11 @@ overlayDefs.forEach(d=>{
     else{map.removeLayer(d.layer);toast(`${d.name} ocultada.`);}
   },()=>showOverlayInfo(d));
   document.getElementById(target).append(row);
-  d.layer.on('loading',()=>{d.loadFailed=false;d.status.textContent='Carregando';row.setAttribute('aria-busy','true');});
-  d.layer.on('load',()=>{if(d.loadFailed)return;d.status.textContent='Disponível';row.setAttribute('aria-busy','false');});
-  d.layer.on('requesterror',()=>{
-    d.loadFailed=true;d.status.textContent='Indisponível';d.input.checked=false;row.setAttribute('aria-busy','false');map.removeLayer(d.layer);toast('Não foi possível carregar esta camada.');
-  });
+  configureOverlayLoading(d,row);
+  // Register requeststart BEFORE the two default layers issue their first queries.
+  if(d.id==='limite'||d.id==='bairros'){
+    d.input.checked=true;d.layer.addTo(map);d.syncOperationalState();
+  }
 });
 const civilDefs=[
   {id:'sirenes',name:'Sirenes de alerta',title:'Sirene de alerta',file:'sirenes.geojson',count:37},
@@ -770,14 +848,15 @@ new ResizeObserver(resizeMap).observe(mapwrap);
 function closeMore(focus=false){moreMenu.hidden=true;document.getElementById('moreBtn').setAttribute('aria-expanded','false');if(focus)document.getElementById('moreBtn').focus();}
 function configurePanel(){
   const open=!panel.classList.contains('hidden');
-  const modal=compactMedia.matches&&open;
+  // Camadas é não modal; o Portal mantém seu bloqueio próprio do WebGIS.
+  const portal=document.getElementById('toolPortal');
   shell.classList.toggle('layers-open',open);panel.inert=!open;
-  document.getElementById('panelBackdrop').hidden=!modal;
-  document.querySelector('.topbar').inert=modal;mapwrap.inert=modal;
-  document.querySelector('.mobile-actions').inert=modal;
+  document.getElementById('panelBackdrop').hidden=true;
+  document.querySelector('.topbar').inert=!!portal&&!portal.hidden;mapwrap.inert=false;
+  document.querySelector('.mobile-actions').inert=false;
   panel.setAttribute('aria-hidden',String(!open));
-  if(modal){panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');}
-  else{panel.removeAttribute('role');panel.removeAttribute('aria-modal');}
+  if(panel.getAttribute('role')==='dialog')panel.removeAttribute('role');
+  panel.removeAttribute('aria-modal');
   ['layersBtn','togglePanel','mobileLayersBtn'].forEach(id=>{
     const button=document.getElementById(id);button.setAttribute('aria-expanded',String(open));button.classList.toggle('active',open);
   });
@@ -811,7 +890,7 @@ document.getElementById('collapsePanel').addEventListener('click',e=>{
   e.currentTarget.replaceChildren(uiIcon(collapsed?'expand':'collapse'));
 });
 panel.addEventListener('keydown',e=>{
-  if(e.key!=='Tab'||!compactMedia.matches)return;
+  if(e.key!=='Tab'||panel.getAttribute('aria-modal')!=='true')return;
   const nodes=[...panel.querySelectorAll('.drag-handle[tabindex="0"],button,input,select,a[href],summary')].filter(node=>!node.disabled&&node.getClientRects().length);
   const first=nodes[0],last=nodes.at(-1);
   if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
@@ -863,6 +942,21 @@ function presentPopup(popup){
 map.on('popupopen',e=>presentPopup(e.popup));
 map.on('popupclose',()=>{currentPopup=null;popupNode=null;querySheet.hidden=true;shell.classList.remove('has-query');queryBody.replaceChildren();});
 document.getElementById('closeQuery').addEventListener('click',()=>{map.closePopup();document.getElementById('layersBtn').focus({preventScroll:true});});
+// Include the public disclosure in the portal's existing keyboard cycle.
+// Its older card-only boundaries must not skip the notice on Shift+Tab.
+document.addEventListener('keydown',event=>{
+  if(event.key!=='Tab')return;
+  const portal=document.getElementById('toolPortal'),notice=document.getElementById('portalExperimentalNotice');
+  if(!portal||portal.hidden||!notice)return;
+  const summary=notice.querySelector('summary'),first=portal.querySelector('#portalChoices button');
+  const controls=[...portal.querySelectorAll('button,select,a[href]')].filter(e=>!e.hidden&&e.getClientRects().length);
+  const last=controls.at(-1),active=document.activeElement;
+  let target;
+  if(event.shiftKey&&active===first)target=notice.open?notice.querySelector('.experimental-notice-content'):summary;
+  else if(event.shiftKey&&active===summary)target=last;
+  else if(!event.shiftKey&&active===last)target=summary;
+  if(target){event.preventDefault();event.stopImmediatePropagation();target.focus();}
+},true);
 document.addEventListener('keydown',e=>{
   if(e.key!=='Escape'||document.getElementById('layerInfo').open)return;
   if(!moreMenu.hidden){closeMore(true);return;}

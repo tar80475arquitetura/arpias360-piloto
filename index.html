@@ -8,16 +8,46 @@
   <meta name="description" content="WebGIS experimental para leitura integrada de dados territoriais e áreas sensíveis em Niterói/RJ." />
   <link rel="preconnect" href="https://geo.niteroi.rj.gov.br" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <link rel="stylesheet" href="css/style.css?v=20261010-mobilidade" />
+  <link rel="stylesheet" href="css/style.css?v=20261011-fe03" />
   <link rel="stylesheet" href="js/vendor/leaflet-draw/leaflet.draw.css" />
-  <link rel="stylesheet" href="css/ux.css?v=20261010-mobilidade" />
-  <link rel="stylesheet" href="css/portal.css?v=20261011-fe02" />
+  <link rel="stylesheet" href="css/ux.css?v=20261011-fe03" />
+  <link rel="stylesheet" href="css/portal.css?v=20261011-fe03" />
+  <style>
+    /* Notice occupies document flow; it never overlays the cartographic viewport. */
+    body {display:flex;flex-direction:column}
+    body > .topbar {flex:none}
+    body > .app-shell {flex:1;height:auto;min-height:0}
+    .experimental-notice {flex:none;background:#f4f5f1;color:#203e36;border-bottom:1px solid #6c7d70}
+    .experimental-notice > summary {min-height:44px;padding:8px 16px;cursor:pointer;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+    .experimental-notice > summary:focus-visible {outline:3px solid #203e36;outline-offset:-3px}
+    .experimental-notice-content {max-height:min(40dvh,max(72px,calc(100dvh - var(--header-height) - 60px - 320px)));overflow:auto;padding:0 16px 12px;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+    .experimental-notice-content:focus-visible {outline:3px solid #203e36;outline-offset:-3px}
+    .experimental-notice-content p {margin:8px 0}
+    .experimental-notice-content ul {margin:8px 0;padding-left:22px}
+    .portal-inner > .experimental-notice {margin:0 0 24px;border:1px solid #6c7d70;border-radius:8px}
+    /* Keep the covered map's dimensions stable while its portal is open. */
+    body:has(#toolPortal:not([hidden])) > #experimentalNotice {visibility:hidden}
+  </style>
 </head>
 <body>
   <section id="toolPortal" class="tool-portal" aria-labelledby="portalQuestion" role="dialog" aria-modal="true">
     <div class="portal-inner">
       <header class="portal-brand"><div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M6 27 13 9l9 5 11-7-3 25-11-4-13 5zM13 9l6 19m3-14 8 18M6 27l16-13"/></svg></div><div><h1>ARPIAS360</h1><p>Avaliação de Riscos e Planejamento Integrado de Áreas Sensíveis.</p></div></header>
       <div class="portal-intro"><div><span class="portal-label">Piloto Niterói/RJ · Um território, várias leituras</span><h2 id="portalQuestion" tabindex="-1">Qual ferramenta você deseja utilizar?</h2><p>Escolha um ponto de partida. Você pode trocar de ferramenta a qualquer momento, mantendo seu trabalho no mesmo mapa.</p></div></div>
+  <details id="portalExperimentalNotice" class="experimental-notice">
+    <summary><strong>ARPIAS360 | Piloto experimental</strong> · Limitações conhecidas</summary>
+    <div class="experimental-notice-content" tabindex="0" role="region" aria-label="Limitações do piloto experimental">
+      <p>O ARPIAS360 está em desenvolvimento e validação. Algumas funcionalidades apresentam limitações conhecidas:</p>
+      <ul>
+        <li>Imagens e dados territoriais: serviços oficiais de ortofoto e camadas territoriais apresentaram erros HTTP 503 durante os testes realizados. A disponibilidade desses dados depende dos respectivos provedores.</li>
+        <li>Navegação no mapa: em determinadas resoluções de tela, o painel Camadas pode encobrir os controles de zoom.</li>
+        <li>Edição por toque: vértices de linhas muito próximos podem ser difíceis de selecionar em dispositivos com tela sensível ao toque.</li>
+        <li>Dependências externas: a plataforma utiliza bibliotecas carregadas pelo CDN unpkg.com, incluindo Leaflet e Esri Leaflet, e não funciona integralmente offline.</li>
+      </ul>
+      <p>As informações disponibilizadas destinam-se à pesquisa e ao apoio à análise territorial. Não constituem classificação oficial de risco e não substituem vistorias, avaliações técnicas ou informações oficiais dos órgãos competentes.</p>
+      <p>Antes de utilizar os resultados em decisões, consulte a fonte, a data e a disponibilidade dos dados.</p>
+    </div>
+  </details>
       <div id="portalChoices" class="portal-choices" aria-label="Ferramentas disponíveis"></div>
       <div class="portal-shortcut"><button id="portalSkip" type="button">Pular apresentação · Mapa Livre</button></div>
       <div class="portal-options"><label for="portalProfile">Perfil opcional<select id="portalProfile"><option value="">Sem perfil</option><option value="citizen">Cidadão</option><option value="manager">Gestor público</option><option value="business">Empresa</option><option value="researcher">Pesquisador</option></select></label><button id="portalResume" type="button" hidden></button></div>
@@ -46,26 +76,40 @@
         <div id="moreMenu" class="more-menu" hidden>
           <button id="menuHome"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 11l9-8 9 8M5 10v11h14V10M10 21v-7h4v7"/></svg> Ver Niterói</button>
           <button id="menuLocate" class="menu-location"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2v4M12 18v4M2 12h4M18 12h4M12 6a6 6 0 1 0 0 12a6 6 0 1 0 0-12M12 10a2 2 0 1 0 0 4a2 2 0 1 0 0-4"/></svg> Minha localização</button>
-          <button id="menuBase"><span aria-hidden="true">▱</span> Mapa Base</button>
+          <button id="menuBase"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3V6M9 3v15M15 6v15"/></svg> Mapa Base</button>
           <button id="measureBtn"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 15L15 3l6 6L9 21zM7 11l3 3M11 7l3 3M15 11l3 3"/></svg> Medir</button>
           <button id="editBtn"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 16L16 4l4 4L8 20H4zM13 7l4 4"/></svg> Editar mapa</button>
-          <button id="legendBtn">Legenda</button>
-          <button id="showSelectionBtn" disabled>Reabrir resultado</button>
-          <button id="shareSelectionBtn" disabled>Compartilhar seleção</button>
-          <button id="menuReport" disabled>Gerar relatório</button>
-          <button id="helpBtn">Ajuda</button>
-          <button id="methodBtn">Metodologia</button>
-          <button id="sourcesBtn">Fontes</button>
-          <button id="clearSelectionBtn">Limpar seleção</button>
-          <button id="aboutBtn"><span aria-hidden="true">i</span> Sobre o projeto</button>
-          <button id="fragilityBtn"><span aria-hidden="true">◇</span> Índice ARPIAS de Fragilidade Urbana <small>Em desenvolvimento metodológico</small></button>
-          <button id="fullBtnTop"><span aria-hidden="true">⛶</span> Tela cheia</button>
-          <button id="resetPreferences">Restaurar preferências</button>
-          <button id="clearBtn"><span aria-hidden="true">↺</span> Limpar camadas</button>
+          <button id="legendBtn"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 5h4v4H3zM11 7h10M3 15h4v4H3zM11 17h10"/></svg> Legenda</button>
+          <button id="showSelectionBtn" disabled><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4M12 8a4 4 0 1 0 0 8a4 4 0 1 0 0-8"/></svg> Reabrir resultado</button>
+          <button id="shareSelectionBtn" disabled><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 12l8-6M8 12l8 6M4 9a3 3 0 1 0 0 6a3 3 0 1 0 0-6M17 3a3 3 0 1 0 0 6a3 3 0 1 0 0-6M17 15a3 3 0 1 0 0 6a3 3 0 1 0 0-6"/></svg> Compartilhar seleção</button>
+          <button id="menuReport" disabled><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 3h12l4 4v14H4zM15 3v5h5M8 12h8M8 16h5"/></svg> Gerar relatório</button>
+          <button id="helpBtn"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2a10 10 0 1 0 0 20a10 10 0 1 0 0-20M9 8a3 3 0 1 1 5 2l-2 2v2M12 17v1"/></svg> Ajuda</button>
+          <button id="methodBtn"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 3h12l4 4v14H4zM15 3v5h5M8 12h8M8 16h8"/></svg> Metodologia</button>
+          <button id="sourcesBtn"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 6c0-4 16-4 16 0s-16 4-16 0M4 6v12c0 4 16 4 16 0V6M4 12c0 4 16 4 16 0"/></svg> Fontes</button>
+          <button id="clearSelectionBtn"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4M9 9l6 6M15 9l-6 6"/></svg> Limpar seleção</button>
+          <button id="aboutBtn"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2a10 10 0 1 0 0 20a10 10 0 1 0 0-20M12 10v7M12 6v1"/></svg> Sobre o projeto</button>
+          <button id="fragilityBtn"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3l9 9-9 9-9-9zM12 8v5M12 16v1"/></svg> Índice ARPIAS de Fragilidade Urbana <small>Em desenvolvimento metodológico</small></button>
+          <button id="fullBtnTop"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5"/></svg> Tela cheia</button>
+          <button id="resetPreferences"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12a8 8 0 1 1 2 6M3 5v7h7"/></svg> Restaurar preferências</button>
+          <button id="clearBtn"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 11a9 9 0 1 1 2 7M3 5v6h6"/></svg> Limpar camadas</button>
         </div>
       </div>
     </div>
   </header>
+  <details id="experimentalNotice" class="experimental-notice">
+    <summary><strong>ARPIAS360 | Piloto experimental</strong> · Limitações conhecidas</summary>
+    <div class="experimental-notice-content" tabindex="0" role="region" aria-label="Limitações do piloto experimental">
+      <p>O ARPIAS360 está em desenvolvimento e validação. Algumas funcionalidades apresentam limitações conhecidas:</p>
+      <ul>
+        <li>Imagens e dados territoriais: serviços oficiais de ortofoto e camadas territoriais apresentaram erros HTTP 503 durante os testes realizados. A disponibilidade desses dados depende dos respectivos provedores.</li>
+        <li>Navegação no mapa: em determinadas resoluções de tela, o painel Camadas pode encobrir os controles de zoom.</li>
+        <li>Edição por toque: vértices de linhas muito próximos podem ser difíceis de selecionar em dispositivos com tela sensível ao toque.</li>
+        <li>Dependências externas: a plataforma utiliza bibliotecas carregadas pelo CDN unpkg.com, incluindo Leaflet e Esri Leaflet, e não funciona integralmente offline.</li>
+      </ul>
+      <p>As informações disponibilizadas destinam-se à pesquisa e ao apoio à análise territorial. Não constituem classificação oficial de risco e não substituem vistorias, avaliações técnicas ou informações oficiais dos órgãos competentes.</p>
+      <p>Antes de utilizar os resultados em decisões, consulte a fonte, a data e a disponibilidade dos dados.</p>
+    </div>
+  </details>
   <main class="app-shell layers-open">
     <button id="fullscreenPortalBtn" class="fullscreen-portal" type="button">Portal de ferramentas</button>
     <button id="panelBackdrop" class="panel-backdrop" aria-label="Fechar painel de camadas" hidden tabindex="-1"></button>
@@ -77,7 +121,6 @@
         <div class="sidebar-search" role="search"><input id="searchInput" type="search" placeholder="Buscar bairro, local ou coordenada" aria-label="Buscar bairro, local ou coordenada no painel" aria-describedby="searchHint" enterkeyhint="search" /><button id="searchBtn" aria-label="Buscar no painel"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 3a7 7 0 1 0 0 14a7 7 0 1 0 0-14M15 15l6 6"/></svg></button></div>
         <p id="searchHint" class="search-hint">Busca por bairros e coordenadas. Ruas em integração futura.</p>
         <div class="catalog-search"><label for="layerSearch">Pesquisar camadas</label><input id="layerSearch" type="search" placeholder="Sirene, chuva, ITBI, lote…" autocomplete="off" /><p id="catalogSearchStatus" role="status" aria-live="polite">Carregando catálogo…</p></div>
-        <section class="catalog-key" aria-labelledby="maturityLegendTitle"><h3 id="maturityLegendTitle">Legenda de maturidade das camadas</h3><p>DISPONÍVEL · EM INTEGRAÇÃO · PLANEJADO</p><p>Maturidade e estado operacional são distintos. A disponibilidade efetiva depende das fontes externas e da verificação no ambiente público. Testes locais ou simulados não comprovam homologação dos serviços GIS.</p><p>Carregamento, visibilidade e camada de trabalho são independentes.</p></section>
         <details id="baseAccordion" class="accordion" data-category="territory" open><summary>Mapas de Referência <small>Uma base por vez</small></summary><div class="accordion-body"><div id="baseControl" class="control-list"></div><div id="baseMeta" class="meta-card"></div><button id="baseFallback" class="quiet-button" hidden>Usar mapa de ruas</button></div></details>
         <section id="workingLayerPanel" class="working-layer-panel" aria-labelledby="workingLayerHeading">
           <h3 id="workingLayerHeading">Camada de trabalho</h3>
@@ -91,6 +134,7 @@
           </div>
         </section>
         <div id="catalogGroups"></div>
+        <section class="catalog-key" aria-labelledby="maturityLegendTitle"><h3 id="maturityLegendTitle">Legenda de maturidade das camadas</h3><p>DISPONÍVEL · EM INTEGRAÇÃO · PLANEJADO</p><p>Maturidade e estado operacional são distintos. A disponibilidade efetiva depende das fontes externas e da verificação no ambiente público. Testes locais ou simulados não comprovam homologação dos serviços GIS.</p><p>Carregamento, visibilidade e camada de trabalho são independentes.</p></section>
         <details id="workAccordion" class="accordion" data-category="planning"><summary>Minhas camadas <small id="workCount">0 feições</small></summary><div class="accordion-body"><p class="source-note">Dados salvos neste dispositivo. Camadas oficiais permanecem somente para leitura.</p><div id="workList" class="control-list"></div><button id="workExportGeo" class="quiet-button"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3v12M7 10l5 5 5-5M4 16v5h16v-5"/></svg> Exportar GeoJSON</button><button id="workExportCSV" class="quiet-button"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3v12M7 10l5 5 5-5M4 16v5h16v-5"/></svg> Exportar CSV</button><button id="restoreWork" class="quiet-button" disabled>Restaurar última exclusão</button></div></details>
         <details class="accordion" data-category="civil" open><summary>Defesa Civil <small>4 camadas</small></summary><div class="accordion-body"><div id="civilControl" class="control-list"></div><div id="civilMessage" class="sidebar-note" role="status" aria-live="polite"></div><p class="source-note">Prefeitura de Niterói / GeoNit / Defesa Civil</p></div></details>
         <details class="accordion" data-category="territory"><summary>Território</summary><div class="accordion-body"><div id="territoryControl" class="control-list"></div></div></details>
@@ -107,23 +151,23 @@
     </aside>
     <section class="mapwrap" aria-label="Área cartográfica">
       <div id="map" aria-label="Mapa interativo de Niterói"></div>
-      <div class="floating-search" role="search"><span class="search-icon" aria-label="Mover busca"><svg class="ui-icon" viewBox="0 0 24 24" focusable="false"><path d="M10 3a7 7 0 1 0 0 14a7 7 0 1 0 0-14M15 15l6 6"/></svg></span><input id="searchMirror" type="search" placeholder="Buscar bairro, local ou coordenada" aria-label="Buscar bairro, local ou coordenada" aria-describedby="searchHint" enterkeyhint="search" /><button id="searchMirrorBtn"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 3a7 7 0 1 0 0 14a7 7 0 1 0 0-14M15 15l6 6"/></svg> Buscar</button></div>
+      <div class="floating-search" role="search"><span class="search-icon" aria-label="Mover busca"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 3a7 7 0 1 0 0 14a7 7 0 1 0 0-14M15 15l6 6"/></svg></span><input id="searchMirror" type="search" placeholder="Buscar bairro, local ou coordenada" aria-label="Buscar bairro, local ou coordenada" aria-describedby="searchHint" enterkeyhint="search" /><button id="searchMirrorBtn"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 3a7 7 0 1 0 0 14a7 7 0 1 0 0-14M15 15l6 6"/></svg> Buscar</button></div>
       <section id="placeResults" class="place-results" aria-label="Resultados da busca territorial" aria-live="polite" hidden></section>
       <div class="edge-tools"><button id="togglePanel" aria-label="Abrir camadas" aria-controls="panel" aria-expanded="true" title="Camadas"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 7l9-5 9 5-9 5-9-5M3 12l9 5 9-5M3 17l9 5 9-5"/></svg></button></div>
       <div id="mapStatus" class="map-status"><span class="status-dot" aria-hidden="true"></span><div><strong id="activeBaseLabel">Foto Aérea 2019</strong><small id="statusMessage">Carregando base cartográfica…</small></div></div>
       <div id="coords" class="coords">Ative Consultar para investigar um local</div>
       <section id="toolPanel" class="tool-panel" aria-label="Ferramenta ativa" hidden><div class="tool-state"><strong id="toolTitle"></strong><button id="collapseTool" class="close-btn" aria-label="Recolher ferramenta" aria-expanded="true"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14"/></svg></button><button id="exitTool" class="close-btn" aria-label="Encerrar ferramenta"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div><div id="consultControls" hidden><label for="queryLayer">Camada para consulta:</label><select id="queryLayer"><option value="">Escolha uma camada</option></select></div><p id="toolHint" role="status" aria-live="polite"></p><div id="measureControls" class="tool-actions" hidden><button id="measureDistance">Medir distância</button><button id="measureArea">Medir área</button><button id="finishDrawing" hidden>Finalizar desenho</button><button id="keepMeasure" hidden>Manter no mapa</button><button id="clearMeasure">Limpar medição</button></div><div id="editControls" class="tool-actions" hidden><button id="drawPoint"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18M12 10v4M10 12h4"/></svg> Ponto</button><button id="drawLine"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 19L9 5l7 10 5-12"/></svg> Linha</button><button id="drawPolygon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 8l9-5 9 9-7 9-11-4z"/></svg> Polígono</button><button id="editGeometry"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 16L16 4l4 4L8 20H4zM13 7l4 4"/></svg> Editar geometria / vértices</button><button id="finishGeometry" hidden>Concluir ajuste</button><button id="saveWork">Salvar neste dispositivo</button><button id="cancelWork">Cancelar edição</button></div><p id="toolResult" class="tool-result"></p></section>
-      <aside id="aboutPanel" class="about-panel" aria-labelledby="aboutTitle" hidden><button id="closeAbout" class="close-btn" aria-label="Fechar sobre o projeto">×</button><span class="eyebrow">Protótipo científico e tecnológico</span><h2 id="aboutTitle">Um território, várias leituras</h2><p>O ARPIAS360 integra dados públicos territoriais, ambientais, climáticos, imobiliários, de segurança e de riscos em uma única interface cartográfica.</p><div class="question-card"><span>Pergunta-guia</span><strong>O que os dados de mercado imobiliário, segurança pública, clima e território revelam quando passam a ser vistos juntos em um único mapa?</strong></div><p class="method-note">Protótipo experimental. Não substitui sistemas oficiais, vistorias, laudos técnicos ou decisões das autoridades competentes.</p></aside>
+      <aside id="aboutPanel" class="about-panel" aria-labelledby="aboutTitle" hidden><button id="closeAbout" class="close-btn" aria-label="Fechar sobre o projeto"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg></button><span class="eyebrow">Protótipo científico e tecnológico</span><h2 id="aboutTitle">Um território, várias leituras</h2><p>O ARPIAS360 integra dados públicos territoriais, ambientais, climáticos, imobiliários, de segurança e de riscos em uma única interface cartográfica.</p><div class="question-card"><span>Pergunta-guia</span><strong>O que os dados de mercado imobiliário, segurança pública, clima e território revelam quando passam a ser vistos juntos em um único mapa?</strong></div><p class="method-note">Protótipo experimental. Não substitui sistemas oficiais, vistorias, laudos técnicos ou decisões das autoridades competentes.</p></aside>
     </section>
-    <aside id="territorialPanel" class="territorial-panel" aria-labelledby="territorialTitle" hidden><header class="query-header"><h2 id="territorialTitle">Ficha territorial</h2><button id="closeTerritorial" class="close-btn" aria-label="Fechar ficha territorial">×</button></header><div id="territorialBody" class="territorial-body"></div></aside>
+    <aside id="territorialPanel" class="territorial-panel" aria-labelledby="territorialTitle" hidden><header class="query-header"><h2 id="territorialTitle">Ficha territorial</h2><button id="closeTerritorial" class="close-btn" aria-label="Fechar ficha territorial"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg></button></header><div id="territorialBody" class="territorial-body"></div></aside>
     <nav class="mobile-actions" aria-label="Ações do mapa"><button id="mobileLayersBtn" aria-controls="panel" aria-expanded="false"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 7l9-5 9 5-9 5-9-5M3 12l9 5 9-5M3 17l9 5 9-5"/></svg> Camadas</button><button id="mobileConsultBtn" aria-pressed="false"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2a10 10 0 1 0 0 20a10 10 0 1 0 0-20M12 10v7M12 6v1"/></svg> Consultar</button><button id="mobileLocateBtn"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2v4M12 18v4M2 12h4M18 12h4M12 6a6 6 0 1 0 0 12a6 6 0 1 0 0-12M12 10a2 2 0 1 0 0 4a2 2 0 1 0 0-4"/></svg> Minha localização</button></nav>
-    <section id="querySheet" class="query-sheet" aria-labelledby="queryHeading" hidden><div class="sheet-handle" aria-hidden="true"></div><header class="query-header"><h2 id="queryHeading" tabindex="-1">Consulta do ponto</h2><button id="closeQuery" class="close-btn" aria-label="Fechar consulta">×</button></header><div id="queryBody" class="query-body"></div></section>
+    <section id="querySheet" class="query-sheet" aria-labelledby="queryHeading" hidden><div class="sheet-handle" aria-hidden="true"></div><header class="query-header"><h2 id="queryHeading" tabindex="-1">Consulta do ponto</h2><button id="closeQuery" class="close-btn" aria-label="Fechar consulta"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg></button></header><div id="queryBody" class="query-body"></div></section>
   </main>
   <dialog id="layerInfo" aria-labelledby="infoTitle"><button id="closeInfo" class="close-btn" aria-label="Fechar informações"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg></button><div id="infoBody"></div></dialog>
   <dialog id="confirmAction" aria-labelledby="confirmTitle"><h2 id="confirmTitle">Confirmar ação</h2><p id="confirmText"></p><div class="dialog-actions"><button id="confirmCancel">Cancelar</button><button id="confirmAccept">Confirmar</button></div></dialog>
   <dialog id="workFormDialog" aria-labelledby="workFormTitle"><h2 id="workFormTitle">Feição de trabalho</h2><form id="workForm"><label>Título<input name="titulo" required maxlength="160" /></label><label>Categoria<input name="categoria" maxlength="160" /></label><label>Descrição<textarea name="descricao" maxlength="2000"></textarea></label><label>Data<input name="data" type="date" /></label><label>Status<select name="status"><option>Rascunho</option><option>Em análise</option><option>Concluído</option></select></label><label>Prioridade<select name="prioridade"><option>Não definida</option><option>Baixa</option><option>Média</option><option>Alta</option></select></label><label>Fonte<input name="source" maxlength="160" placeholder="Informe a origem da anotação" /></label><label>Observações<textarea name="observacoes" maxlength="2000"></textarea></label><div class="dialog-actions"><button id="cancelWorkForm" type="button">Cancelar</button><button type="submit">Aplicar à camada de trabalho</button></div></form></dialog>
   <dialog id="shareDialog" aria-labelledby="shareTitle"><h2 id="shareTitle">Compartilhar seleção</h2><p id="shareHint">Link com as coordenadas e o zoom da seleção.</p><input id="selectionLink" readonly aria-label="Link da seleção" /><img id="selectionQR" alt="QR Code para abrir a seleção no ARPIAS360" /><div class="dialog-actions"><button id="copySelectionLink">Copiar link</button><button id="closeShare">Fechar</button></div></dialog>
-  <dialog id="technicalReport" aria-labelledby="reportTitle"><header class="report-controls"><h2 id="reportTitle">Relatório técnico</h2><button id="printReport">Imprimir / Salvar como PDF</button><button id="closeReport" aria-label="Fechar relatório">×</button></header><article id="reportBody"></article></dialog>
+  <dialog id="technicalReport" aria-labelledby="reportTitle"><header class="report-controls"><h2 id="reportTitle">Relatório técnico</h2><button id="printReport">Imprimir / Salvar como PDF</button><button id="closeReport" aria-label="Fechar relatório"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg></button></header><article id="reportBody"></article></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://unpkg.com/esri-leaflet@3.0.12/dist/esri-leaflet.js"></script>

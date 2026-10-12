@@ -13,6 +13,7 @@ const ARPIASUI=(()=>{
   let mode='navigate',changing=false,dirty=false,backup=null,backupTrash=[],handler=null,editing=null;
   let selection=null,selectionLayer=null,selectionPopup=null,generation=0,pending=null,trash=[],queryLayer=null;
   let vertexCount=0,currentDrawType=null;
+  let toolOpener=null;
   const format=new Intl.NumberFormat('pt-BR',{maximumFractionDigits:2});
   const distanceLabel=value=>value>=1000?`${format.format(value/1000)} km`:`${format.format(value)} m`;
   const areaLabel=value=>value>=10000?`${format.format(value)} m² (${format.format(value/10000)} ha)`:`${format.format(value)} m²`;
@@ -40,6 +41,8 @@ const ARPIASUI=(()=>{
   function clearSelection(){generation++;selection=null;selectionPopup=null;document.querySelectorAll('.layer-control[data-result-source="true"]').forEach(row=>row.removeAttribute('data-result-source'));if(selectionLayer)map.removeLayer(selectionLayer);selectionLayer=null;if(queryMarker)map.removeLayer(queryMarker);queryMarker=null;map.closePopup();closeTerritorial();byId('showSelectionBtn').disabled=true;byId('shareSelectionBtn').disabled=true;byId('menuReport').disabled=true;byId('coords').textContent='Ative Consultar para investigar um local';}
   async function request(next){
     if(changing)return false;if(mode===next)return true;changing=true;
+    const opener=document.activeElement,previousMode=mode;
+    const restoreFocus=next==='navigate'&&byId('toolPanel').contains(opener);
     try{
       if(mode==='edit'&&dirty){if(!await confirm('Há alterações não salvas. Deseja descartá-las e encerrar a edição?','Descartar e sair'))return false;stopHandler();trash=JSON.parse(JSON.stringify(backupTrash));restore(backup);dirty=false;}
       if(next==='edit'&&!await confirm('Deseja iniciar uma camada de trabalho? As bases oficiais permanecem somente para leitura.','Iniciar edição'))return false;
@@ -55,6 +58,15 @@ const ARPIASUI=(()=>{
       shell.classList.toggle('has-tool',next!=='navigate');
       ['consultBtn','mobileConsultBtn'].forEach(id=>{byId(id).classList.toggle('active',next==='consult');byId(id).setAttribute('aria-pressed',String(next==='consult'));});
       [['measureBtn','measure'],['editBtn','edit']].forEach(([id,state])=>{byId(id).classList.toggle('active',next===state);byId(id).setAttribute('aria-pressed',String(next===state));});byId('toolPanel').dataset.mode=next;syncQueryTarget();
+      if(next!=='navigate')toolOpener=opener;
+      else if(restoreFocus){
+        const visible=node=>{
+          if(!node?.isConnected||node.disabled||node.tabIndex<0||node.closest('[hidden],[inert],[aria-hidden="true"]')||!node.getClientRects().length)return false;
+          const r=node.getBoundingClientRect();return getComputedStyle(node).visibility!=='hidden'&&r.bottom>0&&r.right>0&&r.top<innerHeight&&r.left<innerWidth;
+        };
+        const target=[toolOpener,byId(previousMode==='consult'?'consultBtn':'moreBtn'),byId('mobileConsultBtn')].find(visible);
+        target?.focus({preventScroll:true});
+      }
       return true;
     }finally{changing=false;}
   }
@@ -240,11 +252,53 @@ const ARPIASUI=(()=>{
       localStorage.setItem('arpias360.workspace.trash.v1',JSON.stringify({type:'FeatureCollection',features:trash}));ARPIASWork.save(localStorage,serialize());dirty=false;backup=serialize();backupTrash=JSON.parse(JSON.stringify(trash));byId('toolResult').textContent='Dados salvos neste dispositivo.';toast('Dados salvos neste dispositivo.');
     }catch(error){toast('Não foi possível salvar neste dispositivo. Exporte suas camadas para preservar o trabalho.');}
   });
+  function keepWorkEditVisible(){
+    if(mode!=='edit'||!editing||!workGroup.getLayers().length)return;
+    const frame=map.getContainer().getBoundingClientRect(),bounds=workGroup.getBounds();
+    if(!bounds.isValid())return;
+    // Re-measure after a limitation notice changes the tool panel's height.
+    for(let attempt=0;attempt<2;attempt++){
+      const obstacles=[...document.querySelectorAll('#toolPanel,.floating-search,.edge-tools,.leaflet-control-zoom,#mapStatus,#coords,#toast.show')]
+        .filter(e=>e.getClientRects().length&&!e.closest('[hidden]')&&getComputedStyle(e).visibility!=='hidden')
+        .map(e=>e.getBoundingClientRect()).map(r=>({left:Math.max(frame.left,r.left-8),right:Math.min(frame.right,r.right+8),top:Math.max(frame.top,r.top-8),bottom:Math.min(frame.bottom,r.bottom+8)}))
+        .filter(r=>r.right>r.left&&r.bottom>r.top);
+      const nw=map.latLngToContainerPoint(bounds.getNorthWest()),se=map.latLngToContainerPoint(bounds.getSouthEast());
+      const current={left:frame.left+nw.x-24,right:frame.left+se.x+24,top:frame.top+nw.y-24,bottom:frame.top+se.y+24};
+      const overlaps=(a,b)=>a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;
+      if(current.left>=frame.left&&current.right<=frame.right&&current.top>=frame.top&&current.bottom<=frame.bottom&&!obstacles.some(r=>overlaps(current,r)))return;
+      const xs=[...new Set([frame.left,frame.right,...obstacles.flatMap(r=>[r.left,r.right])])].sort((a,b)=>a-b);
+      const ys=[...new Set([frame.top,frame.bottom,...obstacles.flatMap(r=>[r.top,r.bottom])])].sort((a,b)=>a-b);
+      let free=null,area=0,fitFree=null,fitArea=0;
+      for(let i=0;i<xs.length-1;i++)for(let j=i+1;j<xs.length;j++)for(let k=0;k<ys.length-1;k++)for(let l=k+1;l<ys.length;l++){
+        const r={left:xs[i],right:xs[j],top:ys[k],bottom:ys[l]},size=(r.right-r.left)*(r.bottom-r.top);
+        if(r.right-r.left<72||r.bottom-r.top<72||obstacles.some(b=>overlaps(r,b)))continue;
+        if(size>area){free=r;area=size;}
+        if(current.right-current.left<=r.right-r.left&&current.bottom-current.top<=r.bottom-r.top&&size>fitArea){fitFree=r;fitArea=size;}
+      }
+      free=fitFree||free;
+      const fits=free&&current.right-current.left<=free.right-free.left&&current.bottom-current.top<=free.bottom-free.top;
+      if(!fits&&attempt===0){
+        byId('toolHint').textContent='Escala preservada. As feições não cabem juntas na área livre. Desloque o mapa para alcançar os outros vértices ou reduza o zoom manualmente. Bases oficiais protegidas.';
+        continue;
+      }
+      if(!free)return;
+      let anchor=nw.add(se).divideBy(2);
+      if(!fits){
+        const first=workGroup.getLayers()[0];let vertex=first.getLatLng?.()||first.getLatLngs?.();
+        while(Array.isArray(vertex))vertex=vertex[0];
+        if(!vertex)return;anchor=map.latLngToContainerPoint(vertex);
+      }
+      // Pan only: maxZoom in fitBounds is a ceiling, not a guarantee of scale.
+      const target=L.point((free.left+free.right)/2-frame.left,(free.top+free.bottom)/2-frame.top);
+      map.panBy(anchor.subtract(target),{animate:false});return;
+    }
+  }
   byId('editGeometry').addEventListener('click',()=>{
     if(mode!=='edit'||!workGroup.getLayers().length){toast('Crie uma feição de trabalho antes de editar vértices.');return;}
     try{ARPIASWork.assertWorkLayers(workGroup);}catch(error){toast(error.message);return;}stopHandler();
     workGroup.eachLayer(layer=>{if(!map.hasLayer(layer))layer.addTo(map);});
     editing=new L.EditToolbar.Edit(map,{featureGroup:workGroup,selectedPathOptions:ARPIASCartography.style('editing')});editing.enable();byId('finishGeometry').hidden=false;byId('toolHint').textContent='Arraste os vértices ou pontos das suas camadas de trabalho. Bases oficiais protegidas.';
+    requestAnimationFrame(keepWorkEditVisible);
   });
   byId('finishGeometry').addEventListener('click',()=>{if(editing){editing.save();editing.disable();editing=null;workGroup.eachLayer(layer=>{layer.feature=ARPIASWork.record(layer.toGeoJSON(false),'edit');});dirty=true;renderWork();byId('finishGeometry').hidden=true;}});
   byId('cancelWork').addEventListener('click',()=>request('navigate'));

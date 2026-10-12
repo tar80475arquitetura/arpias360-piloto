@@ -48,8 +48,8 @@
     portal.hidden=true;document.body.classList.remove('portal-active');
     for(const [element,inert,aria] of background){element.inert=inert;if(aria===null)element.removeAttribute('aria-hidden');else element.setAttribute('aria-hidden',aria);}
     background=[];
-    // The existing responsive panel may have changed modal state while covered.
-    webgis[0].inert=matchMedia('(max-width:899px)').matches&&!document.getElementById('panel').classList.contains('hidden');
+    // Reconciliar a interação sem fechar painéis ou perder seleção/preferências.
+    configurePanel();
   }
   function focusMap(){
     function visible(element){

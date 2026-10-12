@@ -1,7 +1,7 @@
 name: Testes ARPIAS360
 on:
   push:
-    branches: [codex/arpias360-next, main]
+    branches: [codex/arpias360-next, main, audit/fe03-aviso-publico]
   pull_request:
     branches: [main]
 permissions:
@@ -28,6 +28,8 @@ jobs:
       ARPIAS_TEST_OUTPUT: /tmp/arpias-browser
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # Pai-base do merge virtual para os artefatos comparativos FE-03.
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -48,6 +50,12 @@ jobs:
           done
           python tests/browser-operations.py
           python tests/browser-round2.py
+          # Referência fixa da autorização: comparação negativa sem mudar checkout.
+          git fetch --no-tags origin ab885c61040a0db08505efc4f56ae1fb991c1d00 --depth=1
+          ARPIAS_FE03_PHASE=before ARPIAS_FE03_BASE_REF=ab885c61040a0db08505efc4f56ae1fb991c1d00 python tests/browser-fe03-corrective.py
+          python tests/browser-fe03-corrective.py
+          # P4/P2/P3; a matriz de zoom mantém P1 histórico explícito, sem ocultar regressões.
+          python tests/browser-fe03-deep.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -55,4 +63,5 @@ jobs:
           path: |
             /tmp/arpias-browser
             /tmp/arpias-server.log
+            docs/FE03_RODADA_CORRETIVA_02.md
           if-no-files-found: warn
