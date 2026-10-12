@@ -29,8 +29,13 @@ async def main():
             assert expected in text,expected
         await page.locator('#closeInfo').click()
         await page.route('**/data/processed/cprm/padroes-relevo.geojson',lambda route:route.fulfill(status=503,body='Intentional local fixture failure'))
-        await page.locator('#layer_relevo').check()
+        # A falha 503 desmarca o controle antes que check() termine; testar
+        # a ação e o estado final evita exigir um estado transitório carregando.
+        assert not await page.locator('#layer_relevo').is_checked()
+        await page.locator('#layer_relevo').click()
         await page.wait_for_function("relief.status.textContent==='Falha de carregamento'")
+        assert not await page.locator('#layer_relevo').is_checked()
+        assert not await page.evaluate('relief.ready')
         await info.click();assert await page.locator('#layerInfo').evaluate('e=>e.open')
         await page.keyboard.press('Escape');assert not await page.locator('#layerInfo').evaluate('e=>e.open')
         await page.unroute('**/data/processed/cprm/padroes-relevo.geojson')

@@ -40,3 +40,21 @@
 @media(max-width:650px){.tool-portal{padding:24px 18px}.portal-brand{gap:12px;margin-bottom:24px}.portal-brand .brand-mark{width:48px;height:48px}.portal-brand p{font-size:13px}.portal-intro{display:block}.portal-intro h2{margin-top:10px}.portal-intro p{font-size:14px}.portal-choices{grid-template-columns:1fr}.portal-card{padding:20px 16px;min-height:0;gap:8px 12px}.portal-card strong{font-size:20px}.portal-card span{font-size:14px}.portal-options{display:block}.portal-options label{margin-bottom:12px}.portal-options select{width:100%}#portalResume{width:100%}}
 @media(prefers-reduced-motion:no-preference){.portal-card{transition:background .15s,border-color .15s}}
 @media print{.tool-portal,#portalBtn,.tool-context{display:none!important}}
+
+/* FE-03: use the same control/focus tokens as the map; keep all four contexts. */
+.portal-card {border-color:var(--control-line);border-radius:var(--radius-panel);padding:24px;box-shadow:0 2px 6px #172f290a}
+.portal-card svg {width:32px;height:32px;stroke-width:1.75}
+.portal-card:hover,.portal-card.last-choice {border-color:var(--territory)}
+.tool-portal select,.tool-context select,.tool-portal button:not(.portal-card),.tool-context button {border-color:var(--control-line);border-radius:var(--radius-control)}
+.tool-portal :focus-visible,.tool-context :focus-visible,#portalBtn:focus-visible,.fullscreen-portal:focus-visible {outline:3px solid var(--focus);outline-offset:3px;box-shadow:0 0 0 3px var(--focus-gap)}
+#portalSkip {border-color:transparent}
+.tool-context {display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 8px;margin:10px;padding:10px 12px;border-radius:var(--radius-control);border-color:var(--control-line)}
+.tool-context h3 {margin:0;font-size:16px;line-height:1.5}
+.tool-context label {margin:0;align-self:center;font-size:var(--font-meta);line-height:1.5}
+.context-navigation,.context-help {grid-column:1/-1;min-width:0}
+.context-help {margin-top:0}
+.context-help summary {font-size:var(--font-meta)}
+.catalog-key p {margin-top:6px}
+.tool-context .context-navigation button {min-height:44px}
+@media(max-width:650px) {.portal-card {padding:20px 16px}}
+@media(prefers-reduced-motion:reduce) {.portal-card {transition:none}}

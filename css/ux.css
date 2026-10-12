@@ -324,3 +324,88 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .floating-search .search-icon.drag-handle {min-width:44px}
 .floating-search .search-icon.drag-handle::after {content:none}
 @media(max-width:359px){.floating-search .search-icon.drag-handle {display:grid}}
+
+/* FE-03: presentation only. Map symbols and operational state contracts stay intact. */
+.tool-button, .close-btn, .quiet-button, .working-layer-actions button,
+.tool-actions button, .dialog-actions button, .report-controls button,
+.catalog-select, .popup-actions a, .popup-actions button,
+#workForm input, #workForm textarea, #workForm select, #selectionLink {
+  border-color:var(--control-line);
+  border-radius:var(--radius-control);
+}
+.tool-button {background:var(--paper)}
+.tool-button:hover {background:var(--territory-soft);border-color:var(--territory)}
+.tool-button.active {border-color:var(--territory);font-weight:var(--weight-bold)}
+button:disabled {opacity:1;cursor:default;color:var(--muted);background:var(--surface);border-style:dashed}
+.more-menu button {background:transparent;border:1px solid transparent}
+.more-menu button:hover {border-color:var(--control-line)}
+.more-menu .ui-icon {flex-shrink:0}
+.more-menu small {margin-left:30px}
+
+/* The white spacer is the adjacent focus surface on light/active controls. */
+:is(button,a,summary,input,select,textarea,.drag-handle):focus-visible {
+  outline:3px solid var(--focus);outline-offset:3px;
+  box-shadow:0 0 0 3px var(--focus-gap);
+}
+.switch input:focus-visible {outline:0;box-shadow:none}
+.switch input:focus-visible+.switch-track {outline:3px solid var(--focus);outline-offset:3px;box-shadow:0 0 0 3px var(--focus-gap)}
+.layer-panel .accordion>summary:focus-visible {outline-color:var(--focus-on-dark);outline-offset:-3px;box-shadow:none}
+.catalog-search input:focus-visible {outline-color:var(--focus);box-shadow:0 0 0 3px var(--focus-gap)}
+.drag-handle:focus-visible {outline-offset:-3px}
+.layer-panel .panel-title-row:focus-visible {outline-color:var(--focus)}
+.info-button, .layer-work-button {border-color:var(--control-line);background:var(--paper)}
+.layer-target {border-radius:var(--radius-control)}
+.layer-target:focus-visible {outline-offset:-3px;box-shadow:inset 0 0 0 3px var(--focus-gap)}
+.layer-control[data-visible="true"] {border-color:var(--territory)}
+.switch-track {background:#566b5d}
+.switch input:checked+.switch-track {border-color:var(--territory-hover)}
+#queryLayer {border-color:var(--control-line)}
+.leaflet-control-zoom {border-color:var(--control-line)!important}
+.leaflet-control-zoom a {width:44px!important;height:44px!important;line-height:44px!important}
+.floating-search {border-color:var(--control-line);border-radius:var(--radius-control)}
+.floating-search .search-icon.drag-handle {height:44px;align-self:center}
+.edge-tools button {border-color:var(--control-line)}
+input::placeholder,textarea::placeholder {color:var(--muted);opacity:1}
+
+.layer-panel {height:min(var(--panel-height),calc(100% - 88px));border-radius:var(--radius-panel)}
+.panel-title-row {gap:var(--space-2);padding:10px 12px}
+.panel-title-row h2 {font-size:19px}
+.panel-footer {padding:var(--space-2) var(--space-3)}
+.panel-footer small {margin-top:var(--space-1);font-size:var(--font-meta)}
+.working-layer-panel {margin:var(--space-2) 10px;padding:var(--space-3)}
+.working-layer-panel p {margin:4px 0 6px}
+.catalog-search {padding-top:var(--space-2)}
+.catalog-key {padding:var(--space-3);margin:12px 10px;border:1px solid #829a8c;border-radius:var(--radius-control);background:var(--forest-950)}
+.panel-method {padding-bottom:var(--space-4)}
+.work-entry {color:var(--panel-text);border-color:#829a8c;padding:var(--space-3)}
+.work-entry>label, .work-entry button {min-height:var(--touch)}
+.work-entry>small {font-size:var(--font-meta);line-height:1.5}
+.work-entry button {font-size:var(--font-meta);border-color:var(--control-line)}
+.territorial-panel, .tool-panel, .about-panel {border-radius:var(--radius-panel)}
+.popup-fields {font-size:var(--font-meta)}
+.popup-note, .future-module summary {font-size:var(--font-meta)}
+.popup-actions a, .popup-actions button {font-size:var(--font-meta)}
+.report-controls .ui-icon {width:20px;height:20px}
+
+@media(min-width:900px) {
+  /* Keep zoom accessible beside Layers; the active tool occupies the other side. */
+  .layer-panel {left:72px}
+  .tool-panel {left:auto;right:16px}
+}
+
+@media(max-width:599px) {
+  .layer-panel {height:min(420px,62dvh)}
+  .panel-title-row {padding:6px 10px}
+  .header-end .tool-button {min-width:44px;padding-inline:8px}
+  .topbar {column-gap:6px}
+  .map-status {max-width:calc(100% - 184px)}
+  .map-status[data-state="Indisponível"] {max-width:calc(100% - 24px)}
+}
+@media(max-width:359px) {
+  .brand-copy h1 {font-size:20px;letter-spacing:0}
+  .brand-block {gap:6px}
+  .toolbar .tool-button {gap:4px;font-size:13px}
+  .toolbar .ui-icon {width:20px;height:20px}
+  .header-end #moreBtn {font-size:13px;gap:4px}
+  .header-end .tool-button {padding-inline:6px}
+}
