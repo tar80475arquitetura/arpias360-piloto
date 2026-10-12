@@ -423,3 +423,4 @@ input::placeholder,textarea::placeholder {color:var(--muted);opacity:1}
   .header-end #moreBtn {font-size:13px;gap:4px}
   .header-end .tool-button {padding-inline:6px}
 }
+.tool-portal {scroll-padding-block:8px}

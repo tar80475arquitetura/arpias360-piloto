@@ -942,6 +942,21 @@ function presentPopup(popup){
 map.on('popupopen',e=>presentPopup(e.popup));
 map.on('popupclose',()=>{currentPopup=null;popupNode=null;querySheet.hidden=true;shell.classList.remove('has-query');queryBody.replaceChildren();});
 document.getElementById('closeQuery').addEventListener('click',()=>{map.closePopup();document.getElementById('layersBtn').focus({preventScroll:true});});
+// Include the public disclosure in the portal's existing keyboard cycle.
+// Its older card-only boundaries must not skip the notice on Shift+Tab.
+document.addEventListener('keydown',event=>{
+  if(event.key!=='Tab')return;
+  const portal=document.getElementById('toolPortal'),notice=document.getElementById('portalExperimentalNotice');
+  if(!portal||portal.hidden||!notice)return;
+  const summary=notice.querySelector('summary'),first=portal.querySelector('#portalChoices button');
+  const controls=[...portal.querySelectorAll('button,select,a[href]')].filter(e=>!e.hidden&&e.getClientRects().length);
+  const last=controls.at(-1),active=document.activeElement;
+  let target;
+  if(event.shiftKey&&active===first)target=notice.open?notice.querySelector('.experimental-notice-content'):summary;
+  else if(event.shiftKey&&active===summary)target=last;
+  else if(!event.shiftKey&&active===last)target=summary;
+  if(target){event.preventDefault();event.stopImmediatePropagation();target.focus();}
+},true);
 document.addEventListener('keydown',e=>{
   if(e.key!=='Escape'||document.getElementById('layerInfo').open)return;
   if(!moreMenu.hidden){closeMore(true);return;}
