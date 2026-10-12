@@ -770,14 +770,15 @@ new ResizeObserver(resizeMap).observe(mapwrap);
 function closeMore(focus=false){moreMenu.hidden=true;document.getElementById('moreBtn').setAttribute('aria-expanded','false');if(focus)document.getElementById('moreBtn').focus();}
 function configurePanel(){
   const open=!panel.classList.contains('hidden');
-  const modal=compactMedia.matches&&open;
+  // Camadas é não modal; o Portal mantém seu bloqueio próprio do WebGIS.
+  const portal=document.getElementById('toolPortal');
   shell.classList.toggle('layers-open',open);panel.inert=!open;
-  document.getElementById('panelBackdrop').hidden=!modal;
-  document.querySelector('.topbar').inert=modal;mapwrap.inert=modal;
-  document.querySelector('.mobile-actions').inert=modal;
+  document.getElementById('panelBackdrop').hidden=true;
+  document.querySelector('.topbar').inert=!!portal&&!portal.hidden;mapwrap.inert=false;
+  document.querySelector('.mobile-actions').inert=false;
   panel.setAttribute('aria-hidden',String(!open));
-  if(modal){panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');}
-  else{panel.removeAttribute('role');panel.removeAttribute('aria-modal');}
+  if(panel.getAttribute('role')==='dialog')panel.removeAttribute('role');
+  panel.removeAttribute('aria-modal');
   ['layersBtn','togglePanel','mobileLayersBtn'].forEach(id=>{
     const button=document.getElementById(id);button.setAttribute('aria-expanded',String(open));button.classList.toggle('active',open);
   });
@@ -811,7 +812,7 @@ document.getElementById('collapsePanel').addEventListener('click',e=>{
   e.currentTarget.replaceChildren(uiIcon(collapsed?'expand':'collapse'));
 });
 panel.addEventListener('keydown',e=>{
-  if(e.key!=='Tab'||!compactMedia.matches)return;
+  if(e.key!=='Tab'||panel.getAttribute('aria-modal')!=='true')return;
   const nodes=[...panel.querySelectorAll('.drag-handle[tabindex="0"],button,input,select,a[href],summary')].filter(node=>!node.disabled&&node.getClientRects().length);
   const first=nodes[0],last=nodes.at(-1);
   if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}

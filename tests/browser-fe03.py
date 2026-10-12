@@ -1,8 +1,8 @@
-"""FE-03 rendered contrast, exact rectangle-union map area and comparable captures.
+"""FE-03: contraste renderizado, união de retângulos e capturas comparáveis.
 
-Run after the existing server is ready. Output goes to ARPIAS_TEST_OUTPUT, never
-tests/evidence. GIS is deliberately simulated by the existing regression fixture.
-ARPIAS_FE03_PHASE=before records the baseline without asserting proposed styles.
+Executar depois que o servidor existente estiver pronto. Saída em ARPIAS_TEST_OUTPUT,
+nunca em tests/evidence. GIS simulado pela configuração das regressões existentes.
+ARPIAS_FE03_PHASE=before registra a base sem exigir os estilos propostos.
 """
 import asyncio, base64, hashlib, json, math, os, runpy, subprocess, tempfile
 from urllib.parse import urlsplit
@@ -13,19 +13,50 @@ shared = runpy.run_path(str(Path(__file__).with_name('browser-operations.py')))
 OUT = shared['OUT']; PHASE = os.environ.get('ARPIAS_FE03_PHASE', 'after')
 ROWS = []; CONTRASTS = []; TARGETS = []; MODALITIES = []
 FOCUS_RETURNS = []; BASE_REF = os.environ.get('ARPIAS_FE03_BASE_REF')
-PRESENTATION = ['css/style.css','css/ux.css','css/portal.css','index.html']
+# A base deve reproduzir também os três módulos funcionais agora autorizados.
+PRESENTATION = ['css/style.css','css/ux.css','css/portal.css','index.html','js/app.js','js/portal-ui.js','js/tools.js']
 
 def rendered_source(path):
     return subprocess.check_output(['git','show',BASE_REF+':'+path]) if BASE_REF else Path(path).read_bytes()
 
+def comparison():
+    before=OUT/'fe03-before.json';after=OUT/'fe03-after.json'
+    if not before.exists() or not after.exists():return
+    a=json.loads(before.read_text());b=json.loads(after.read_text())
+    rows=[]
+    for old,new in zip(a['area'],b['area'],strict=True):
+        assert (old['label'],old['state'],old['viewport'])==(new['label'],new['state'],new['viewport'])
+        rows.append({'ambiente':new['label'],'estado':new['state'],'viewport':new['viewport'],
+                     'zoom_percentual':new['browser_zoom_percent'],'antes':old,'depois':new,
+                     'diferenca_px2':new['useful_px2']-old['useful_px2'],
+                     'diferenca_pontos_percentuais':new['useful_percent']-old['useful_percent']})
+    shots=sorted(OUT.glob('before-*.png'));pairs=[]
+    for shot in shots:
+        candidate=OUT/shot.name.replace('before-','after-',1)
+        assert candidate.exists(),candidate.name
+        pairs.append({'antes':shot.name,'depois':candidate.name})
+    report={'referencia_anterior':a['rendered_ref'],'evidencia_anterior':a['evidence'],
+            'evidencia_posterior':b['evidence'],'areas':rows,'pares_de_capturas':pairs,
+            'limite':'A união de retângulos é uma medida geométrica. A operação efetiva exige as sondagens independentes RC02.'}
+    (OUT/'fe03-comparacoes.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+    lines=['# Comparações FE-03','',report['limite'],'',
+           '| Ambiente | Estado | Viewport | Zoom | Antes px² úteis | Depois px² úteis | Diferença px² | Diferença p.p. |',
+           '|---|---|---|---|---:|---:|---:|---:|']
+    for r in rows:
+        lines.append(f"| {r['ambiente']} | {r['estado']} | {r['viewport']} | {r['zoom_percentual']}% | {r['antes']['useful_px2']:.2f} | {r['depois']['useful_px2']:.2f} | {r['diferenca_px2']:.2f} | {r['diferenca_pontos_percentuais']:.4f} |")
+    lines+=['','## Capturas pareadas','']
+    for pair in pairs:lines.append(f"- [Antes]({pair['antes']}) / [Depois]({pair['depois']})")
+    (OUT/'COMPARACOES.md').write_text('\n'.join(lines)+'\n')
+
 async def routes(context):
     await context.route('https://**/*',shared['external'])
     if BASE_REF:
-        assert PHASE=='before', 'Git baseline routing is only for baseline measurements'
+        assert PHASE=='before', 'A renderização dos blobs Git só se aplica à medição anterior'
         async def baseline(route):
             path=urlsplit(route.request.url).path.lstrip('/') or 'index.html'
             if path in PRESENTATION:
-                await route.fulfill(status=200,body=rendered_source(path),content_type='text/css' if path.endswith('.css') else 'text/html')
+                kind='text/css' if path.endswith('.css') else 'application/javascript' if path.endswith('.js') else 'text/html'
+                await route.fulfill(status=200,body=rendered_source(path),content_type=kind)
             else:await route.continue_()
         await context.route('http://127.0.0.1:8080/**',baseline)
 
@@ -54,8 +85,8 @@ AREA = r"""() => {
  const total=m.width*m.height;
  return {viewport:[innerWidth,innerHeight],map:{x:m.x,y:m.y,width:m.width,height:m.height},
   total_px2:total,obstructed_px2:blocked,useful_px2:total-blocked,useful_percent:100*(total-blocked)/total,
-  occluders:rectangles,method:'Clipped DOM bounding boxes; exact union by vertical sweep',
-  limitations:'Bounding boxes include rounded transparent corners; shadows excluded. Modal backdrop counts as obstruction because map input is blocked. GIS fixtures; not public homologation.'};
+  occluders:rectangles,method:'Retângulos do DOM intersectados com mapa; união exata por varredura vertical',
+  limitations:'Retângulos incluem cantos arredondados transparentes; sombras excluídas. Fundo modal conta como obstrução porque a interação é bloqueada. GIS simulado; não é homologação pública.'};
 }"""
 
 PAIRS = r"""elements => {
@@ -76,7 +107,7 @@ PAIRS = r"""elements => {
    outline:s.outlineColor,outline_style:s.outlineStyle,outline_offset:s.outlineOffset,outline_width:s.outlineWidth,
    outline_vs_surface:ratio(color(s.outlineColor),bg),outline_vs_white:ratio(color(s.outlineColor),[255,255,255,1]),
    shadow:s.boxShadow,disabled:!!e.disabled,opacity:s.opacity,
-   text_criterion:'WCAG 1.4.3: 4.5:1 for normal text (disabled exempt)',component_criterion:'WCAG 1.4.11: 3:1 for identifying boundaries/icons',focus_criterion:'Visible focus: 3:1 against adjacent surface; white spacer measured separately, not general WCAG claim'};
+   text_criterion:'WCAG 1.4.3: 4,5:1 para texto normal (desabilitados isentos)',component_criterion:'WCAG 1.4.11: 3:1 para limites/ícones identificáveis',focus_criterion:'Foco visível: 3:1 contra superfície adjacente; separador branco medido à parte; sem declaração geral de conformidade WCAG'};
  });
 }"""
 
@@ -112,7 +143,7 @@ async def inspect(page, label):
         # Existing status observer/event contract, with explicitly labelled fixtures.
         await page.evaluate('text=>civilDefs[0].status.textContent=text',source_event)
         await page.wait_for_function('state=>document.querySelector(".layer-control[data-layer-id=sirenes]").dataset.state===state',arg=state)
-        CONTRASTS.append({'label':label,'state':state,'source':'operational event fixture, not live service','measurements':await row.locator('.catalog-operational,.layer-status').evaluate_all(PAIRS)})
+        CONTRASTS.append({'label':label,'state':state,'source':'evento operacional simulado, não serviço real','measurements':await row.locator('.catalog-operational,.layer-status').evaluate_all(PAIRS)})
         if PHASE=='after':
             assert all(p['text_ratio']>=4.5 for p in CONTRASTS[-1]['measurements'])
         await record(page,label,'layer-'+state)
@@ -138,7 +169,7 @@ async def inspect(page, label):
     await page.locator('#exitTool').focus();await page.keyboard.press('Enter')
     await page.wait_for_function("ARPIASUI.mode()==='navigate' && document.getElementById('toolPanel').hidden")
     await page.wait_for_timeout(50)
-    FOCUS_RETURNS.append({'label':label,'action':'close active tool by Enter','active':await page.evaluate('({id:document.activeElement.id,tag:document.activeElement.tagName,visible:!!document.activeElement.getClientRects().length,hidden:!!document.activeElement.closest("[hidden]")})'),'scope_note':'A missing return target requires functional JS outside FE-03; record existing behavior without changing it.'})
+    FOCUS_RETURNS.append({'label':label,'action':'close active tool by Enter','active':await page.evaluate('({id:document.activeElement.id,tag:document.activeElement.tagName,visible:!!document.activeElement.getClientRects().length,hidden:!!document.activeElement.closest("[hidden]")})'),'scope_note':'Retorno de foco incorreto exige autorização específica para o módulo funcional; registrar o resultado efetivo, sem inferir correção.'})
     # Exemptions, including map editor vertex handles, are recorded, not hidden.
     targets=await page.locator('button,a,input,select,summary,[tabindex="0"]').evaluate_all("""es=>es.filter(e=>e.getClientRects().length&&getComputedStyle(e).visibility!=='hidden'&&!e.closest('[hidden]')).map(e=>{const r=e.getBoundingClientRect();return {id:e.id,name:(e.getAttribute('aria-label')||e.textContent).trim().slice(0,70),width:r.width,height:r.height,tag:e.tagName,exempt:e.matches('.leaflet-control-attribution a')}})""")
     TARGETS.append({'label':label,'controls':targets})
@@ -183,8 +214,8 @@ async def mobility(page,label):
             await session.detach()
         after=await panel.bounding_box();changed=abs(after['width']-before['width'])+abs(after['height']-before['height'])>2
         if label=='desktop' and modality=='pointer':assert changed,(before,after)
-        MODALITIES.append({'label':label,'action':'resize','modality':modality,'observed':changed,'before':before,'after':after,'note':'Native CSS resize only; an unchanged touch attempt does not establish support.'})
-    MODALITIES.append({'label':label,'action':'resize','modality':'keyboard','result':'not-existing','note':'Existing component exposes arrow keys for movement, not resizing; no new mechanism added.'})
+        MODALITIES.append({'label':label,'action':'resize','modality':modality,'observed':changed,'before':before,'after':after,'note':'Somente resize CSS nativo; tentativa por toque sem mudança não comprova suporte.'})
+    MODALITIES.append({'label':label,'action':'resize','modality':'keyboard','result':'not-existing','note':'Componente existente usa setas para movimento, não resize; nenhum mecanismo novo adicionado.'})
 
 async def main():
     async with async_playwright() as p:
@@ -225,9 +256,10 @@ async def main():
     files={f:hashlib.sha256(rendered_source(f)).hexdigest() for f in PRESENTATION}
     result={'phase':PHASE,'evidence':shared['evidence'](),'code_sha256':files,'area':ROWS,'contrast':CONTRASTS,'targets':TARGETS,
             'modalities':MODALITIES,'focus_returns':FOCUS_RETURNS,'rendered_ref':BASE_REF or 'working tree',
-            'method':'WCAG 2.x sRGB relative luminance with alpha compositing through actual ancestors; text threshold 4.5, non-text/focus boundary 3. Not general WCAG certification.',
-            'passed_groups':5,'external_services':'Controlled GIS fixtures; not public homologation'}
+            'method':'Luminância sRGB WCAG 2.x com composição alpha das superfícies efetivas; texto 4,5:1, limites não textuais/foco 3:1. Não é certificação WCAG geral.',
+            'passed_groups':5,'external_services':'GIS simulado; não é homologação pública'}
     (OUT/f'fe03-{PHASE}.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+    comparison()
     print(json.dumps({'phase':PHASE,'passed_groups':5,'area_measurements':len(ROWS),'contrast_states':len(CONTRASTS)},ensure_ascii=False))
 
 if __name__=='__main__':asyncio.run(main())

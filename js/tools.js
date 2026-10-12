@@ -13,6 +13,7 @@ const ARPIASUI=(()=>{
   let mode='navigate',changing=false,dirty=false,backup=null,backupTrash=[],handler=null,editing=null;
   let selection=null,selectionLayer=null,selectionPopup=null,generation=0,pending=null,trash=[],queryLayer=null;
   let vertexCount=0,currentDrawType=null;
+  let toolOpener=null;
   const format=new Intl.NumberFormat('pt-BR',{maximumFractionDigits:2});
   const distanceLabel=value=>value>=1000?`${format.format(value/1000)} km`:`${format.format(value)} m`;
   const areaLabel=value=>value>=10000?`${format.format(value)} m² (${format.format(value/10000)} ha)`:`${format.format(value)} m²`;
@@ -40,6 +41,8 @@ const ARPIASUI=(()=>{
   function clearSelection(){generation++;selection=null;selectionPopup=null;document.querySelectorAll('.layer-control[data-result-source="true"]').forEach(row=>row.removeAttribute('data-result-source'));if(selectionLayer)map.removeLayer(selectionLayer);selectionLayer=null;if(queryMarker)map.removeLayer(queryMarker);queryMarker=null;map.closePopup();closeTerritorial();byId('showSelectionBtn').disabled=true;byId('shareSelectionBtn').disabled=true;byId('menuReport').disabled=true;byId('coords').textContent='Ative Consultar para investigar um local';}
   async function request(next){
     if(changing)return false;if(mode===next)return true;changing=true;
+    const opener=document.activeElement,previousMode=mode;
+    const restoreFocus=next==='navigate'&&byId('toolPanel').contains(opener);
     try{
       if(mode==='edit'&&dirty){if(!await confirm('Há alterações não salvas. Deseja descartá-las e encerrar a edição?','Descartar e sair'))return false;stopHandler();trash=JSON.parse(JSON.stringify(backupTrash));restore(backup);dirty=false;}
       if(next==='edit'&&!await confirm('Deseja iniciar uma camada de trabalho? As bases oficiais permanecem somente para leitura.','Iniciar edição'))return false;
@@ -55,6 +58,15 @@ const ARPIASUI=(()=>{
       shell.classList.toggle('has-tool',next!=='navigate');
       ['consultBtn','mobileConsultBtn'].forEach(id=>{byId(id).classList.toggle('active',next==='consult');byId(id).setAttribute('aria-pressed',String(next==='consult'));});
       [['measureBtn','measure'],['editBtn','edit']].forEach(([id,state])=>{byId(id).classList.toggle('active',next===state);byId(id).setAttribute('aria-pressed',String(next===state));});byId('toolPanel').dataset.mode=next;syncQueryTarget();
+      if(next!=='navigate')toolOpener=opener;
+      else if(restoreFocus){
+        const visible=node=>{
+          if(!node?.isConnected||node.disabled||node.tabIndex<0||node.closest('[hidden],[inert],[aria-hidden="true"]')||!node.getClientRects().length)return false;
+          const r=node.getBoundingClientRect();return getComputedStyle(node).visibility!=='hidden'&&r.bottom>0&&r.right>0&&r.top<innerHeight&&r.left<innerWidth;
+        };
+        const target=[toolOpener,byId(previousMode==='consult'?'consultBtn':'moreBtn'),byId('mobileConsultBtn')].find(visible);
+        target?.focus({preventScroll:true});
+      }
       return true;
     }finally{changing=false;}
   }

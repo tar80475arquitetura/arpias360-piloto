@@ -14,11 +14,11 @@ Proposta para revisão do proprietário, em `codex/fe03-revisao-frontend`. Base 
 ## Apresentação implementada
 
 - Bordas `--control-line:#6e8274`: 4,11:1 sobre branco e 3,81:1 sobre `--row-surface:#f5f7f3`.
-- `--focus:#1c3f60`: 10,88:1 contra o separador branco adjacente. O foco claro `--focus-on-dark:#f4e3a7` tem 10,32:1 contra `--panel-surface:#19352d`. O separador permite identificar foco sem depender da cor do estado do botão.
+- `--focus:#1c3f60`: 10,88:1 sobre fundo branco `#FFFFFF`. O foco claro `--focus-on-dark:#f4e3a7` tem 10,32:1 contra `--panel-surface:#19352d`. O contorno branco adjacente é registrado separadamente; não se presume o fundo pela cor do estado.
 - Novos tokens: `--focus-gap`, `--space-1` a `--space-4`, `--radius-control`, `--radius-panel`, `--panel-height`. Consumidores antigos permanecem; nenhum token temático foi renomeado ou alterado.
 - Ícones do menu, fechamento e busca usam SVGs próprios. IDs, textos e nomes acessíveis dos botões foram preservados. Não houve importação de ícones ou dependências.
 - Contexto em grid compacto; legenda de maturidade depois das categorias. O texto integral, maturidade, disponibilidade, `publicStatus()` e `data-state` permanecem.
-- Desktop: zoom acessível ao lado do painel; ferramenta ativa no lado oposto. Mobile: cabeçalho e controles preservados, com rolagem interna. Movimento reduzido continua respeitado.
+- Desktop: controle de zoom visualmente exposto ao lado do painel no desktop; ferramenta ativa no lado oposto. Mobile: cabeçalho e controles preservados, com rolagem interna. Movimento reduzido continua respeitado.
 
 Os valores acima são pares intrínsecos reproduzíveis por luminância WCAG 2.x. As evidências de navegador incluem fundos efetivos compostos e estados renderizados. Não constituem uma declaração geral de conformidade WCAG.
 
@@ -32,7 +32,7 @@ Capturas e medições são equivalentes em 1366×768, 768×1024, 390×844, 320×
 
 No desktop com Camadas aberto, a amostra passou de 72,53% para 73,48% de área útil (+8.932,25px²; +0,95 ponto percentual). Com painéis fechados houve perda de 532px² no desktop/tablet e 1.020px² no celular, decorrente da ampliação do zoom para alvos de 44px. Os controles continuam acessíveis e sem rolagem horizontal; a perda é menor que 0,70 ponto percentual nas quatro larguras.
 
-**Tablet/celular com Camadas aberto ou recolhido: área útil operável de 0% nos dois estados**, pois o fundo modal existente cobre o mapa e bloqueia interação. Esse comportamento foi preservado; não se contabiliza a região esmaecida como área livre. Mudar a modalidade/recolhimento exigiria lógica fora desta rodada.
+**Tablet/celular com Camadas aberto ou recolhido: área útil operável de 0% nos dois estados**, pois o fundo modal existente cobre o mapa e bloqueia interação. Esse era o comportamento da FE-03 inicial; a Rodada Corretiva 02 recebeu autorização específica para remover a modalidade. Os novos resultados operacionais e suas limitações constam no relatório corretivo. Não se contabiliza a região esmaecida como área operável no registro histórico.
 
 Limites: retângulos incluem os cantos arredondados transparentes; sombras não são contabilizadas. Não é análise pixel a pixel. GIS simulado; não demonstra disponibilidade pública das fontes.
 
@@ -48,7 +48,7 @@ ARPIAS_TEST_OUTPUT=/tmp/fe03-round2 python tests/browser-round2.py
 ARPIAS_FE03_PHASE=before ARPIAS_FE03_BASE_REF=d649c16b0e84ab8655d9a39a4a55df32554b5578 ARPIAS_TEST_OUTPUT=/tmp/fe03-before python tests/browser-fe03.py
 ```
 
-A coleta anterior rende os quatro arquivos de apresentação diretamente dos blobs Git da base, sem modificar o checkout. Os módulos funcionais/dados são idênticos à base. CSS, index, cenários, alturas, fixtures e método são identificados nos resultados; hashes vinculam o código às capturas posteriores.
+A coleta anterior rende os quatro arquivos de apresentação diretamente dos blobs Git da base, sem modificar o checkout. Na implementação inicial, os módulos funcionais/dados eram idênticos à base. Após autorização específica, a coleta substitui também os três módulos funcionais corrigidos; dados continuam idênticos. CSS, index, cenários, alturas, fixtures e método são identificados nos resultados; hashes vinculam o código às capturas posteriores.
 
 O job browser obtém duas gerações do histórico para acessar o pai-base do merge virtual. No PR desta branch, o harness produz antes/depois no artefato `navegador-<SHA>`; em outros PRs/pushes, continua com a regressão posterior. Nenhuma configuração de publicação é alterada.
 
@@ -69,9 +69,13 @@ Meta 44×44: zoom, busca e controles medidos das camadas atingem a meta. Exceç�
 
 ## Limites e decisões pendentes
 
-- **Retorno de foco ao encerrar ferramenta por Enter:** na base e nesta proposta, termina no `body`. Correção exige `js/tools.js`, fora do escopo autorizado; essa parte de P1 permanece como trabalho futuro. Navegação/foco do portal e diálogos nativos seguem com suas regressões existentes.
-- Camadas recolhido mantém o mapa modal/inert em tablet/celular. A revisão desse comportamento funcional permanece futura.
+- **Retorno de foco ao encerrar ferramenta por Enter:** na base e na FE-03 inicial, terminava no `body`. A Rodada Corretiva 02 recebeu autorização específica e implementou restauração de foco em `js/tools.js`; os resultados atuais são registrados no relatório corretivo. Navegação/foco do portal e diálogos nativos seguem com suas regressões existentes.
+- Na FE-03 inicial, Camadas recolhido mantinha o mapa modal/inert em tablet/celular. A corretiva altera a semântica para painel não modal, conforme autorização específica.
 - Paleta e aprovação visual pertencem ao proprietário. Não usar `#187D87`; nenhuma cor de cartografia foi modificada.
 - Exceções de alvo compacto, toque físico, outros navegadores, leitor de tela e homologação pública permanecem pendentes.
 - A descrição do PR e relatório da entrega registram os resultados efetivamente executados e o SHA final. Nenhuma captura nova em `tests/evidence/`; imagens e JSON ficam nos artefatos e na entrega verificável da sessão.
-- Sem mudanças em módulos funcionais (incluindo panels.js), dados, geometria, indicadores, metodologia, pacotes ou lockfile. Sem Jornada 001, merge, alterações de Pages ou publicação.
+- Na implementação inicial não houve mudanças funcionais. A corretiva altera somente os três trechos JavaScript expressamente autorizados; panels.js, dados, geometria, indicadores, metodologia, pacotes e lockfile permanecem preservados. Sem Jornada 001, merge, alterações de Pages ou publicação.
+
+## Rodada Corretiva 02
+
+O relatório anterior não prova operação em telas menores. Consultar [diagnóstico, verificações atuais e governança](FE03_RODADA_CORRETIVA_02.md). As correções específicas de P1/P3 foram autorizadas; somente resultados executados e CI vinculada ao novo SHA sustentam sua validação. Evidências locais não são links públicos; capturas e relatórios são disponibilizados no artefato do PR, com URLs registradas na descrição.
