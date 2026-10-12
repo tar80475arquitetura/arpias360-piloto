@@ -12,12 +12,40 @@
   <link rel="stylesheet" href="js/vendor/leaflet-draw/leaflet.draw.css" />
   <link rel="stylesheet" href="css/ux.css?v=20261011-fe03" />
   <link rel="stylesheet" href="css/portal.css?v=20261011-fe03" />
+  <style>
+    /* Notice occupies document flow; it never overlays the cartographic viewport. */
+    body {display:flex;flex-direction:column}
+    body > .topbar {flex:none}
+    body > .app-shell {flex:1;height:auto;min-height:0}
+    .experimental-notice {flex:none;background:#f4f5f1;color:#203e36;border-bottom:1px solid #6c7d70}
+    .experimental-notice > summary {min-height:44px;padding:8px 16px;cursor:pointer;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+    .experimental-notice > summary:focus-visible {outline:3px solid #203e36;outline-offset:-3px}
+    .experimental-notice-content {max-height:40dvh;overflow:auto;padding:0 16px 12px;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+    .experimental-notice-content p {margin:8px 0}
+    .experimental-notice-content ul {margin:8px 0;padding-left:22px}
+    .portal-inner > .experimental-notice {margin:0 0 24px;border:1px solid #6c7d70;border-radius:8px}
+    body:has(#toolPortal:not([hidden])) > #experimentalNotice {display:none}
+  </style>
 </head>
 <body>
   <section id="toolPortal" class="tool-portal" aria-labelledby="portalQuestion" role="dialog" aria-modal="true">
     <div class="portal-inner">
       <header class="portal-brand"><div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M6 27 13 9l9 5 11-7-3 25-11-4-13 5zM13 9l6 19m3-14 8 18M6 27l16-13"/></svg></div><div><h1>ARPIAS360</h1><p>Avaliação de Riscos e Planejamento Integrado de Áreas Sensíveis.</p></div></header>
       <div class="portal-intro"><div><span class="portal-label">Piloto Niterói/RJ · Um território, várias leituras</span><h2 id="portalQuestion" tabindex="-1">Qual ferramenta você deseja utilizar?</h2><p>Escolha um ponto de partida. Você pode trocar de ferramenta a qualquer momento, mantendo seu trabalho no mesmo mapa.</p></div></div>
+  <details id="portalExperimentalNotice" class="experimental-notice">
+    <summary><strong>ARPIAS360 | Piloto experimental</strong> · Limitações conhecidas</summary>
+    <div class="experimental-notice-content">
+      <p>O ARPIAS360 está em desenvolvimento e validação. Algumas funcionalidades apresentam limitações conhecidas:</p>
+      <ul>
+        <li>Imagens e dados territoriais: serviços oficiais de ortofoto e camadas territoriais apresentaram erros HTTP 503 durante os testes realizados. A disponibilidade desses dados depende dos respectivos provedores.</li>
+        <li>Navegação no mapa: em determinadas resoluções de tela, o painel Camadas pode encobrir os controles de zoom.</li>
+        <li>Edição por toque: vértices de linhas muito próximos podem ser difíceis de selecionar em dispositivos com tela sensível ao toque.</li>
+        <li>Dependências externas: a plataforma utiliza bibliotecas carregadas pelo CDN unpkg.com, incluindo Leaflet e Esri Leaflet, e não funciona integralmente offline.</li>
+      </ul>
+      <p>As informações disponibilizadas destinam-se à pesquisa e ao apoio à análise territorial. Não constituem classificação oficial de risco e não substituem vistorias, avaliações técnicas ou informações oficiais dos órgãos competentes.</p>
+      <p>Antes de utilizar os resultados em decisões, consulte a fonte, a data e a disponibilidade dos dados.</p>
+    </div>
+  </details>
       <div id="portalChoices" class="portal-choices" aria-label="Ferramentas disponíveis"></div>
       <div class="portal-shortcut"><button id="portalSkip" type="button">Pular apresentação · Mapa Livre</button></div>
       <div class="portal-options"><label for="portalProfile">Perfil opcional<select id="portalProfile"><option value="">Sem perfil</option><option value="citizen">Cidadão</option><option value="manager">Gestor público</option><option value="business">Empresa</option><option value="researcher">Pesquisador</option></select></label><button id="portalResume" type="button" hidden></button></div>
@@ -66,6 +94,20 @@
       </div>
     </div>
   </header>
+  <details id="experimentalNotice" class="experimental-notice">
+    <summary><strong>ARPIAS360 | Piloto experimental</strong> · Limitações conhecidas</summary>
+    <div class="experimental-notice-content">
+      <p>O ARPIAS360 está em desenvolvimento e validação. Algumas funcionalidades apresentam limitações conhecidas:</p>
+      <ul>
+        <li>Imagens e dados territoriais: serviços oficiais de ortofoto e camadas territoriais apresentaram erros HTTP 503 durante os testes realizados. A disponibilidade desses dados depende dos respectivos provedores.</li>
+        <li>Navegação no mapa: em determinadas resoluções de tela, o painel Camadas pode encobrir os controles de zoom.</li>
+        <li>Edição por toque: vértices de linhas muito próximos podem ser difíceis de selecionar em dispositivos com tela sensível ao toque.</li>
+        <li>Dependências externas: a plataforma utiliza bibliotecas carregadas pelo CDN unpkg.com, incluindo Leaflet e Esri Leaflet, e não funciona integralmente offline.</li>
+      </ul>
+      <p>As informações disponibilizadas destinam-se à pesquisa e ao apoio à análise territorial. Não constituem classificação oficial de risco e não substituem vistorias, avaliações técnicas ou informações oficiais dos órgãos competentes.</p>
+      <p>Antes de utilizar os resultados em decisões, consulte a fonte, a data e a disponibilidade dos dados.</p>
+    </div>
+  </details>
   <main class="app-shell layers-open">
     <button id="fullscreenPortalBtn" class="fullscreen-portal" type="button">Portal de ferramentas</button>
     <button id="panelBackdrop" class="panel-backdrop" aria-label="Fechar painel de camadas" hidden tabindex="-1"></button>
