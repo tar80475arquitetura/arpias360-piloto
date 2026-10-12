@@ -27,6 +27,7 @@ function sandbox(){
   for(const [start,end] of [['function element(', 'async function readJSON('],['async function readJSON(', 'const baseControl='],['function civilPopup(', 'async function showCivilInfo('],['function validateCollection(', 'async function loadCivil('],['async function loadCivil(', 'civilDefs.forEach(']]){
     vm.runInContext(source.slice(source.indexOf(start),source.indexOf(end,source.indexOf(start))),context);
   }
+  vm.runInContext(source.slice(source.indexOf('function validBaseTile('),source.indexOf('function selectBase(')),context);
   return {context,messages};
 }
 test('all recovered collections retain documented counts and valid coordinates',()=>{
@@ -103,8 +104,49 @@ test('aerial failure stays explicit and offers streets without silently selectin
 
 test('partial aerial tile coverage remains available after the tile batch settles',()=>{
   const {context:c}=sandbox();const ortho={id:'ortho',loaded:true,failedTiles:2};let failures=0;
+  c.document.getElementById=()=>({});c.baseState=(d,state)=>{d.state=state;};c.updateStatus=()=>{};
   c.activeBaseDef=ortho;c.baseFailure=()=>failures++;const start=source.indexOf('function settleBase(');vm.runInContext(source.slice(start,source.indexOf('baseDefs.forEach(d=>{',start)),c);
   c.settleBase(ortho);assert.equal(failures,0);ortho.loaded=false;c.settleBase(ortho);assert.equal(failures,1);c.activeBaseDef={};c.settleBase(ortho);assert.equal(failures,1);
+});
+
+function tileContext(){
+  const {context:c}=sandbox(),events={},nodes={baseFallback:{hidden:true}};
+  const d={id:'ortho',state:'Carregando',loaded:false,failedTiles:0,desc:'Ortofoto 2019',layer:{options:{errorTileUrl:'data:image/png;base64,fallback'},on:(event,fn)=>{events[event]=fn;}}};
+  c.d=d;c.activeBaseDef=d;c.baseDefs=[d];c.baseTimer=null;c.clearTimeout=()=>{};c.attached=true;c.map={hasLayer:()=>c.attached};
+  c.document.getElementById=id=>nodes[id]??={};c.baseState=(def,state)=>{def.state=state;};c.updateStatus=(def,text)=>{nodes.message=text;};
+  const start=source.indexOf("  d.layer.on('loading',()=>{",source.indexOf('const shortNames='));
+  vm.runInContext(source.slice(start,source.indexOf('  // The official mosaic',start)),c);
+  return {c,d,events,nodes};
+}
+test('transparent error replacement never counts as a cartographic tile',()=>{
+  const {c,d,events}=tileContext();events.tileload({tile:{src:d.layer.options.errorTileUrl,naturalWidth:256,naturalHeight:256}});
+  assert.equal(d.loaded,false);assert.equal(d.state,'Carregando');
+  events.tileload({tile:{src:'https://official.test/tile.png',naturalWidth:256,naturalHeight:256}});
+  assert.equal(d.loaded,true);assert.equal(d.state,'Disponível');
+  assert.equal(c.validBaseTile(d,{src:'https://official.test/tile.png',naturalWidth:0,naturalHeight:0}),false);
+});
+test('valid aerial imagery survives a mixed batch and cached valid tiles survive the next loading event',()=>{
+  const {d,events,nodes}=tileContext();d.failedTiles=1;
+  events.tileload({tile:{src:'https://official.test/tile.png',naturalWidth:256,naturalHeight:256}});
+  assert.equal(d.loaded,true);assert.equal(d.state,'Carregado parcialmente');assert.match(nodes.message,/parcialmente/);assert.equal(nodes.baseFallback.hidden,true);
+  d.layer._tiles={valid:{current:true,loaded:123,el:{src:'https://official.test/tile.png',naturalWidth:256,naturalHeight:256}},missing:{current:true,loaded:123,el:{src:d.layer.options.errorTileUrl,naturalWidth:256,naturalHeight:256}}};
+  events.loading();assert.equal(d.loaded,true);assert.equal(d.failedTiles,1);
+});
+test('late valid tile cannot revive an inactive, detached or already failed base',()=>{
+  const {c,d,events}=tileContext(),event={tile:{src:'https://official.test/tile.png',naturalWidth:256,naturalHeight:256}};
+  c.activeBaseDef={};events.tileload(event);assert.equal(d.loaded,false);
+  events.loading();assert.equal(d.loaded,false);assert.equal(d.state,'Carregando');
+  c.activeBaseDef=d;c.attached=false;events.tileload(event);assert.equal(d.loaded,false);
+  c.attached=true;d.state='Indisponível';events.tileload(event);assert.equal(d.loaded,false);assert.equal(d.state,'Indisponível');
+  events.loading();assert.equal(d.state,'Indisponível');assert.equal(d.loaded,false);
+});
+test('explicit retry of an attached failed base removes and reattaches it before loading',()=>{
+  const {context:c}=sandbox(),actions=[],layers=new Set();
+  const d={id:'ortho',state:'Indisponível',loaded:false,layer:{addTo(){actions.push('add');layers.add(d.layer);},isLoading:()=>false}};layers.add(d.layer);
+  c.document.getElementById=()=>({classList:{add(){}},hidden:false});
+  Object.assign(c,{baseDefs:[d],activeBaseDef:d,activeBase:d.layer,previousBaseDef:d,baseGeneration:0,baseTimer:null,baseMeta:{classList:{add(){}}},clearTimeout(){},setTimeout(){},baseState:(def,state)=>{def.state=state;},updateStatus(){},map:{hasLayer:l=>layers.has(l),removeLayer:l=>{actions.push('remove');layers.delete(l);},setMaxZoom(){}}});
+  const start=source.indexOf('function selectBase(');vm.runInContext(source.slice(start,source.indexOf('function baseFailure(',start)),c);c.selectBase(d);
+  assert.deepEqual(actions,['remove','add']);assert.equal(d.state,'Carregando');assert.equal(d.loaded,false);
 });
 
 test('territorial names use official attributes as text and skip unnamed features',()=>{
@@ -125,4 +167,49 @@ test('ordinary navigation clicks never query or create a marker; consultation re
   c.map={on:(name,fn)=>{callback=fn;}};c.ARPIASUI={mode:()=>mode,query:()=>queries++};
   vm.runInContext(source.split('\n').find(line=>line.startsWith("map.on('click'")),c);
   callback({latlng:{lat:-22.9,lng:-43.1}});assert.equal(queries,0);mode='measure';callback({latlng:{}});assert.equal(queries,0);mode='edit';callback({latlng:{}});assert.equal(queries,0);mode='consult';callback({latlng:{}});assert.equal(queries,1);
+});
+
+function overlayContext(){
+  const handlers={},history=[],attributes={};let attached=true,area='area-a',zoom=11,value='';
+  const d={name:'Bairros',input:{checked:true},status:{get textContent(){return value;},set textContent(v){value=v;history.push(v);}},layer:{options:{minZoom:10,where:'1=1'},on:(event,fn)=>{handlers[event]=fn;}}};
+  const c=vm.createContext({map:{getZoom:()=>zoom,getBounds:()=>({toBBoxString:()=>area}),hasLayer:()=>attached,removeLayer:()=>{attached=false;handlers.remove();}},toast(){}});
+  const start=source.indexOf('function configureOverlayLoading(');vm.runInContext(source.slice(start,source.indexOf('overlayDefs.forEach(d=>{',start)),c);
+  c.configureOverlayLoading(d,{setAttribute:(key,v)=>{attributes[key]=v;}});
+  const request=(url='https://gis.test/FeatureServer/310/query')=>{const event={url,params:{}};handlers.requeststart(event);return event;};
+  const success=(event,features)=>handlers.requestsuccess({...event,response:features===undefined?{fields:[]}:{features}});
+  return {d,handlers,history,attributes,request,success,setArea:v=>{area=v;},setZoom:v=>{zoom=v;},attach:()=>{attached=true;}};
+}
+test('empty Esri query after load finishes empty without any false availability',()=>{
+  const t=overlayContext();t.handlers.loading();const metadata=t.request('https://gis.test/FeatureServer/310/'),query=t.request();
+  t.success(metadata);assert.equal(t.d.queryResponses,0);t.handlers.load();assert.equal(t.d.status.textContent,'Carregando');assert.equal(t.attributes['aria-busy'],'true');
+  t.success(query,[]);assert.equal(t.d.status.textContent,'Sem feições nesta área');assert.equal(t.attributes['aria-busy'],'false');assert.equal(t.d.queryResponses,1);assert.ok(!t.history.includes('Disponível'));
+});
+test('query results before load and multiple requests wait for completion, excluding metadata',()=>{
+  for(const sizes of [[0],[1],[0,0],[0,1]]){
+    const t=overlayContext();t.handlers.loading();const metadata=t.request('https://gis.test/FeatureServer/310/');t.success(metadata,[{fakeMetadata:true}]);assert.equal(t.d.queryResponses,0);
+    const requests=sizes.map(()=>t.request());t.success(requests[0],Array.from({length:sizes[0]},()=>({})));
+    assert.equal(t.d.status.textContent,'Carregando');t.handlers.load();
+    for(let i=1;i<sizes.length;i++){assert.equal(t.d.status.textContent,'Carregando');t.success(requests[i],Array.from({length:sizes[i]},()=>({})));}
+    assert.equal(t.d.status.textContent,sizes.some(Boolean)?'Disponível':'Sem feições nesta área');assert.equal(t.d.queryResponses,sizes.length);
+  }
+});
+test('only confirmed cache in the same view can replace a missing query response',()=>{
+  for(const size of [0,1]){
+    const t=overlayContext();t.handlers.loading();t.handlers.load();assert.equal(t.d.status.textContent,'Aguardando carregamento');
+    t.handlers.loading();const q=t.request();t.success(q,Array.from({length:size},()=>({})));t.handlers.load();const confirmed=t.d.status.textContent;
+    t.handlers.loading();t.handlers.load();assert.equal(t.d.status.textContent,confirmed);
+    t.setArea('area-b');t.handlers.loading();t.handlers.load();assert.equal(t.d.status.textContent,'Aguardando carregamento');
+    t.handlers.loading();const malformed=t.request();t.success(malformed);t.handlers.load();assert.equal(t.d.status.textContent,'Aguardando carregamento');
+  }
+});
+test('failed, removed and superseded query callbacks cannot revive availability or contaminate another layer',()=>{
+  const t=overlayContext(),other=overlayContext();t.handlers.loading();const stale=t.request();t.handlers.requesterror(stale);assert.equal(t.d.status.textContent,'Indisponível');assert.equal(t.d.input.checked,false);
+  t.success(stale,[{}]);t.handlers.load();assert.equal(t.d.status.textContent,'Indisponível');
+  t.attach();t.handlers.loading();const removed=t.request();t.handlers.remove();t.attach();t.handlers.loading();const current=t.request();t.success(removed,[{}]);t.handlers.load();assert.equal(t.d.status.textContent,'Carregando');
+  t.success(current,[]);assert.equal(t.d.status.textContent,'Sem feições nesta área');assert.equal(t.d.queryFeatures,0);
+  other.handlers.loading();const unrelated=other.request();other.success(unrelated,[{}]);other.handlers.load();assert.equal(other.d.status.textContent,'Disponível');assert.equal(t.d.status.textContent,'Sem feições nesta área');
+  t.handlers.loading();const earlier=t.request();t.handlers.loading();const newest=t.request();t.handlers.requesterror(earlier);t.success(earlier,[{}]);t.handlers.load();assert.equal(t.d.status.textContent,'Carregando');t.success(newest,[]);assert.equal(t.d.status.textContent,'Sem feições nesta área');
+});
+test('zoom restriction never becomes an empty result or successful load',()=>{
+  const t=overlayContext();t.setZoom(9);t.handlers.loading();t.handlers.load();assert.equal(t.d.status.textContent,'Aproxime o mapa para carregar esta camada');assert.equal(t.d.queryResponses,0);
 });

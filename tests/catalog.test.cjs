@@ -3,6 +3,27 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const catalog=require('../data/catalogo.json');
 const api=require('../js/catalog.js');
+test('a selected failed basemap never describes unavailable imagery as visible',()=>{
+  const item={state:'integrated',control:'base_ortho'};
+  const failed=api.layerStatus('Indisponível',true,1,item);
+  assert.match(failed,/Falha de carregamento.*Mapa-base selecionado.*imagem não carregada/);assert.doesNotMatch(failed,/Camada visível/);
+  assert.match(api.layerStatus('Disponível',true,0,item),/opacidade zero/);
+  assert.match(api.layerStatus('Indisponível',false,1,item),/Camada oculta/);
+});
+test('partial imagery, successful empty data and zoom limits remain distinct operational states',()=>{
+  assert.match(api.operationalStatus('Carregado parcialmente'),/parcialmente/);
+  assert.match(api.operationalStatus('Sem feições nesta área'),/concluído.*nenhuma feição/);
+  assert.match(api.operationalStatus('Aproxime o mapa para carregar esta camada'),/Aguardando aproximação/);
+  assert.match(api.operationalStatus('Indisponível'),/Falha de carregamento/);
+  assert.equal(api.operationalStatus('Carregando'),'Carregando');
+});
+test('empty and partial results never promote unvalidated catalog maturity or lose opacity and visibility',()=>{
+  const item={state:'integrated',control:'layer_bairros'};
+  for(const status of ['Sem feições nesta área','Carregado parcialmente','Indisponível']){
+    const text=api.layerStatus(status,true,0,item);assert.match(text,/^EM INTEGRAÇÃO/);assert.match(text,/opacidade zero/);assert.doesNotMatch(text,/DISPONÍVEL/);
+    assert.match(api.layerStatus(status,false,1,item),/Camada oculta/);
+  }
+});
 test('experimental fragility architecture cannot expose fabricated scores or a map switch',()=>{
   const model=require('../config/fragilidade.json');const item=catalog.groups.find(g=>g.id==='fragility').items.find(i=>i.analysis==='fragility');
   assert.ok(item);assert.equal(item.state,'future');assert.equal(item.control,undefined);assert.equal(model.calculationEnabled,false);
@@ -37,4 +58,16 @@ test('unverified future layers never receive map controls; rainfall sources rema
 });
 test('invalid catalogs fail explicitly rather than creating empty or false-functional groups',()=>{
   for(const bad of [{groups:[]},{groups:[{id:'a',title:'A',items:[]}]},{groups:[{id:'a',title:'A',items:[{name:'A',source:'X',state:'available'}]}]},{groups:[{id:'a',title:'A',items:[{name:'A',source:'X',state:'integrated'}]}]}])assert.throws(()=>api.validate(bad));
+});
+
+test('GIS uncertainty, loading, empty results and failure retain separate presentation and maturity',()=>{
+  const item={state:'integrated',control:'layer_bairros'};
+  const expected=[['Aguardando carregamento','Aguardando carregamento'],['Carregando','Carregando'],['Sem feições nesta área','Carregamento concluído · nenhuma feição encontrada nesta área'],['Indisponível','Falha de carregamento · serviço inacessível ou não verificado']];
+  for(const [raw,status]of expected){
+    assert.equal(api.operationalStatus(raw),status);
+    for(const [visible,opacity]of [[true,1],[true,0],[false,1]]){
+      const text=api.layerStatus(raw,visible,opacity,item);assert.ok(text.startsWith('EM INTEGRAÇÃO · '+status));assert.doesNotMatch(text,/DISPONÍVEL/);
+      assert.ok(text.endsWith(!visible?'Camada oculta':opacity===0?'Camada no mapa · opacidade zero (não perceptível)':'Camada visível'));
+    }
+  }
 });

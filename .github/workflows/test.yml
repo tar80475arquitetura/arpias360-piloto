@@ -54,6 +54,8 @@ jobs:
           git fetch --no-tags origin ab885c61040a0db08505efc4f56ae1fb991c1d00 --depth=1
           ARPIAS_FE03_PHASE=before ARPIAS_FE03_BASE_REF=ab885c61040a0db08505efc4f56ae1fb991c1d00 python tests/browser-fe03-corrective.py
           python tests/browser-fe03-corrective.py
+          # P4/P2/P3; a matriz de zoom mantém P1 histórico explícito, sem ocultar regressões.
+          python tests/browser-fe03-deep.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

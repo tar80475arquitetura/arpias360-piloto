@@ -193,6 +193,16 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
   .layer-panel {width:min(var(--panel-width),88vw);box-shadow:var(--shadow)}
   .floating-search {left:76px;right:16px;width:auto;transform:none}
 }
+/* The single-row header needs about 651px including its intrinsic controls.
+   Reflow only the narrow tablet boundary; keep the 683px native-zoom layout. */
+@media(min-width:600px) and (max-width:660px) {
+  :root {--header-height:108px}
+  .topbar {display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:44px 44px;gap:2px 8px;padding:6px 12px}
+  .brand-block {grid-column:1;grid-row:1;max-width:none}
+  .header-end {grid-column:2;grid-row:1}
+  .toolbar {grid-column:1/-1;grid-row:2;width:100%}
+  .toolbar .tool-button {flex:1;min-width:0}
+}
 @media(max-width:899px) {
   .panel-backdrop:not([hidden]) {display:block;position:absolute;inset:0;width:100%;border:0;background:#152d2540;z-index:1100}
 }
