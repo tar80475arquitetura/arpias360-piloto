@@ -404,7 +404,11 @@ input::placeholder,textarea::placeholder {color:var(--muted);opacity:1}
 }
 
 @media(max-width:599px) {
-  .layer-panel {height:min(420px,62dvh)}
+  /* Reserve map space even after the public notice reduces the app viewport.
+     max-height also constrains a previously resized/persisted panel. */
+  .layer-panel {height:min(420px,48%);max-height:48%}
+  .territorial-panel {max-height:min(62dvh,48%)}
+  .query-sheet:not([hidden]) {max-height:min(52dvh,48%)}
   .panel-title-row {padding:6px 10px}
   .header-end .tool-button {min-width:44px;padding-inline:8px}
   .topbar {column-gap:6px}

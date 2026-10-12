@@ -20,7 +20,8 @@
     .experimental-notice {flex:none;background:#f4f5f1;color:#203e36;border-bottom:1px solid #6c7d70}
     .experimental-notice > summary {min-height:44px;padding:8px 16px;cursor:pointer;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
     .experimental-notice > summary:focus-visible {outline:3px solid #203e36;outline-offset:-3px}
-    .experimental-notice-content {max-height:40dvh;overflow:auto;padding:0 16px 12px;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+    .experimental-notice-content {max-height:min(40dvh,max(72px,calc(100dvh - var(--header-height) - 60px - 320px)));overflow:auto;padding:0 16px 12px;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+    .experimental-notice-content:focus-visible {outline:3px solid #203e36;outline-offset:-3px}
     .experimental-notice-content p {margin:8px 0}
     .experimental-notice-content ul {margin:8px 0;padding-left:22px}
     .portal-inner > .experimental-notice {margin:0 0 24px;border:1px solid #6c7d70;border-radius:8px}
@@ -34,7 +35,7 @@
       <div class="portal-intro"><div><span class="portal-label">Piloto Niterói/RJ · Um território, várias leituras</span><h2 id="portalQuestion" tabindex="-1">Qual ferramenta você deseja utilizar?</h2><p>Escolha um ponto de partida. Você pode trocar de ferramenta a qualquer momento, mantendo seu trabalho no mesmo mapa.</p></div></div>
   <details id="portalExperimentalNotice" class="experimental-notice">
     <summary><strong>ARPIAS360 | Piloto experimental</strong> · Limitações conhecidas</summary>
-    <div class="experimental-notice-content">
+    <div class="experimental-notice-content" tabindex="0" role="region" aria-label="Limitações do piloto experimental">
       <p>O ARPIAS360 está em desenvolvimento e validação. Algumas funcionalidades apresentam limitações conhecidas:</p>
       <ul>
         <li>Imagens e dados territoriais: serviços oficiais de ortofoto e camadas territoriais apresentaram erros HTTP 503 durante os testes realizados. A disponibilidade desses dados depende dos respectivos provedores.</li>
@@ -96,7 +97,7 @@
   </header>
   <details id="experimentalNotice" class="experimental-notice">
     <summary><strong>ARPIAS360 | Piloto experimental</strong> · Limitações conhecidas</summary>
-    <div class="experimental-notice-content">
+    <div class="experimental-notice-content" tabindex="0" role="region" aria-label="Limitações do piloto experimental">
       <p>O ARPIAS360 está em desenvolvimento e validação. Algumas funcionalidades apresentam limitações conhecidas:</p>
       <ul>
         <li>Imagens e dados territoriais: serviços oficiais de ortofoto e camadas territoriais apresentaram erros HTTP 503 durante os testes realizados. A disponibilidade desses dados depende dos respectivos provedores.</li>

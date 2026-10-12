@@ -335,6 +335,35 @@ async def zoom_matrix(pw,browser):
             rows.append(row);(OUT/'zoom-matrix-incremental.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2));await context.close()
             if profile:profile.cleanup()
     return rows
+async def notice_navigation(pw,browser):
+    """Added publication regression: keep old assertions and test notice/panel together."""
+    rows=[]
+    for label,w,h in [('320',320,568),('375',375,667),('390',390,844),('600',600,1024),('768',768,1024),('899',899,1024),('desktop',1366,768)]:
+        for expanded in [False,True]:
+            context,page,cdp,profile=await test_context(pw,browser,label,w,h)
+            notice=page.locator('#experimentalNotice');assert await notice.is_visible()
+            text=await notice.text_content();assert all(t in text for t in ['HTTP 503','controles de zoom','vértices de linhas','unpkg.com','não funciona integralmente offline','Não constituem classificação oficial de risco','não substituem vistorias']),text
+            await notice.locator('summary').focus()
+            if expanded:await page.keyboard.press('Enter')
+            assert await notice.evaluate('e=>e.open')==expanded
+            assert await page.evaluate("[...document.querySelectorAll('.experimental-notice')].filter(e=>e.getClientRects().length).length")==1
+            if expanded:
+                await page.locator('#experimentalNotice .experimental-notice-content').focus();assert await page.locator('#experimentalNotice .experimental-notice-content').evaluate('e=>e===document.activeElement')
+            boxes=await page.evaluate("() => {const n=document.getElementById('experimentalNotice').getBoundingClientRect(),m=document.getElementById('map').getBoundingClientRect();return {noticeBottom:n.bottom,mapTop:m.top,mapHeight:m.height,scrollWidth:document.documentElement.scrollWidth}}")
+            assert boxes['noticeBottom']<=boxes['mapTop']+.5 and boxes['scrollWidth']<=w and boxes['mapHeight']>0,boxes
+            await setup(page,'fechado')
+            for state in ['fechado','aberto']:
+                if state=='aberto':
+                    await page.locator('#layersBtn').focus();await page.keyboard.press('Enter');await page.wait_for_timeout(150);assert not await page.locator('#panel').evaluate("e=>e.classList.contains('hidden')")
+                await page.evaluate("window.__c05TouchEvents=[];['touchstart','touchmove','touchend'].forEach(type=>document.addEventListener(type,e=>window.__c05TouchEvents.push({type,target:e.target.id||e.target.className,points:[...e.touches].map(t=>({x:t.clientX,y:t.clientY}))}),{capture:true,passive:true}))")
+                row=await audit(page,cdp,'notice-'+label+'-'+str(expanded),state)
+                assert all(i['respondeu']for i in row['interacoes'][2:]),row
+                assert not await page.locator('#panel').get_attribute('aria-modal') and not await page.locator('#map').evaluate("e=>!!e.closest('[inert]')")
+                row.update(notice_expanded=expanded,notice_boxes=boxes);rows.append(row);(OUT/'notice-navigation.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2))
+                if state=='aberto':
+                    await page.locator('#closePanel').focus();await page.keyboard.press('Enter');assert await page.locator('#panel').evaluate("e=>e.classList.contains('hidden')");assert await page.locator('#layersBtn').evaluate('e=>e===document.activeElement')
+            await context.close()
+    return rows
 async def main():
     report={'phase':PHASE,'evidence':shared['evidence'](),'package_id':PACKAGE_ID,'fixture':{'origin':'explicit-local-override'if fixture_path else'synthetic-local-stdlib','bytes':len(CARTO),'sha256':hashlib.sha256(CARTO).hexdigest(),'scope':'Opaque synthetic raster in controlled responses; NOT orthophoto/GIS service validation','CDN_dependency':'shared harness still downloads Leaflet/Esri from unpkg.com'},'p4':[]}
     async with async_playwright()as pw:
@@ -349,7 +378,9 @@ async def main():
             if PHASE!='p3-before':
                 report['p3_extra']=await edit_shapes(pw,browser)
                 report['b2_extent']=await edit_extent(pw,browser)
-        if PHASE=='after':report['zoom_matrix']=await zoom_matrix(pw,browser)
+        if PHASE=='after':
+            report['zoom_matrix']=await zoom_matrix(pw,browser)
+            report['notice_navigation']=await notice_navigation(pw,browser)
         await browser.close()
     (OUT/f'{PHASE}-results.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     if 'zoom_matrix'in report:

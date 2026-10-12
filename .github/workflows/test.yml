@@ -1,7 +1,7 @@
 name: Testes ARPIAS360
 on:
   push:
-    branches: [codex/arpias360-next, main]
+    branches: [codex/arpias360-next, main, audit/fe03-aviso-publico]
   pull_request:
     branches: [main]
 permissions:
