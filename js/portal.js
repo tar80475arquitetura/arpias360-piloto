@@ -2,16 +2,19 @@
 (function(root){
   const key='arpias360.portal.v1';
   const modes=[
-    {id:'resilience',title:'Resiliência Ambiental',icon:'M4 20V10l8-7 8 7v10M8 20v-6h8v6M3 8l4-3M17 5l4 3',description:'Explore riscos ambientais e climáticos, suscetibilidade, geomorfologia, Defesa Civil, prevenção e fragilidade urbana.',groups:['risk','environment','climate','relief','disaster','fragility','infrastructure']},
-    {id:'territorial',title:'Ordem Territorial',icon:'M3 21V8h7v13M10 21V3h7v18M17 21V12h4v9M6 11v2M13 7v2M13 12v2',description:'Explore segurança pública, acessibilidade, infraestrutura, serviços, governança e indicadores socioeconômicos. As fontes planejadas continuam identificadas no catálogo.',groups:['territory','planning','security','infrastructure','social','cadastre']},
-    {id:'integrated',title:'Análise Integrada',icon:'M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3V6M9 3v15M15 6v15',description:'Relacione leituras ambientais, territoriais, urbanas, socioeconômicas e imobiliárias. A Jornada Territorial 001 está prevista para uma etapa futura.',groups:['territory','environment','social','market','planning','fragility']},
-    {id:'free',title:'Mapa Livre',icon:'M3 7l9-5 9 5-9 5-9-5M3 12l9 5 9-5M3 17l9 5 9-5',description:'Acesse o WebGIS completo e organize sua exploração com todas as categorias, camadas e ferramentas.',groups:[]}
+    {id:'market',title:'Mercado Imobiliário',subtitle:'Pesquisa e Índices',color:'#D4A64A',icon:'M3 21V4h10v17M13 9h8v12M6 8h3M6 12h3M6 16h3M16 13h2M16 17h2',description:'Pesquisa territorial, cadastro, infraestrutura e indicadores imobiliários. Dados e índices somente com fontes identificadas.',groups:['market','cadastre','planning','territory','infrastructure','social']},
+    {id:'civil',title:'Defesa Civil',subtitle:'Fragilidade Ambiental',color:'#F28C28',icon:'M12 3 2 21h20L12 3M12 9v5M12 18v.1',description:'Riscos ambientais, prevenção, sirenes, pluviômetros, pontos de apoio e resiliência urbana.',groups:['risk','disaster','fragility','climate','environment','relief']},
+    {id:'police',title:'Policial',subtitle:'Ordem Territorial',color:'#438CF5',icon:'M12 2 20 6v6c0 5-3 8-8 10-5-2-8-5-8-10V6zM9 12l2 2 4-4',description:'Segurança territorial, acessibilidade, equipamentos e infraestrutura pública com dados abertos.',groups:['security','territory','infrastructure','social','planning','cadastre']},
+    {id:'armed',title:'Forças Armadas',subtitle:'Segurança Nacional',color:'#3DAE57',icon:'M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0-18 0M12 3v9l6 6M12 12h9',description:'Infraestrutura, mobilidade, logística e resiliência territorial com dados públicos.',groups:['infrastructure','territory','risk','relief','climate','planning']},
+    {id:'public',title:'Gestão Pública',subtitle:'Estadual e Municipal',color:'#A78BFA',icon:'M3 10h18M5 10V20M10 10V20M14 10V20M19 10V20M2 21h20M12 2 2 8h20z',description:'Planejamento, serviços, cadastro territorial, políticas públicas e indicadores de desenvolvimento.',groups:['planning','territory','cadastre','social','infrastructure','market']},
+    {id:'free',title:'Mapa Livre',subtitle:'Catálogo completo',color:'#6EBAA4',icon:'M3 7l9-5 9 5-9 5-9-5M3 12l9 5 9-5M3 17l9 5 9-5',description:'Acesse o WebGIS completo, preservando todas as categorias e ferramentas.',groups:[]}
   ];
+  const legacy={resilience:'civil',territorial:'police',integrated:'public'};
   const profiles=['citizen','manager','business','researcher'];
-  function mode(id){return modes.find(m=>m.id===id)||modes[3];}
+  function mode(id){return modes.find(m=>m.id===(legacy[id]||id))||modes[5];}
   function validate(value){
     if(!value||typeof value!=='object'||Array.isArray(value)||value.version!==1)return null;
-    return {version:1,mode:modes.some(m=>m.id===value.mode)?value.mode:'free',profile:profiles.includes(value.profile)?value.profile:''};
+    return {version:1,mode:mode(value.mode).id,profile:profiles.includes(value.profile)?value.profile:''};
   }
   function read(storage){try{return validate(JSON.parse(storage.getItem(key)));}catch{return null;}}
   function write(storage,value){try{const clean=validate(value);if(!clean)return false;storage.setItem(key,JSON.stringify(clean));return true;}catch{return false;}}
