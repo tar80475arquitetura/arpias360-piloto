@@ -3,7 +3,7 @@
   const api=window.ARPIASPortal,portal=document.getElementById('toolPortal');
   if(!api||!portal)return;
   let storage;try{storage=window.localStorage;}catch{storage=null;}
-  let state=api.read(storage)||{version:1,mode:'free',profile:''};
+  let state=api.read(storage)||{version:1,mode:'market',profile:''};
   let originalSections=[],background=[];
   const select=document.getElementById('toolModeSelect');
   const profile=document.getElementById('portalProfile');
@@ -12,13 +12,14 @@
   const cards=document.getElementById('portalChoices');
   const webgis=[document.querySelector('.topbar'),document.querySelector('.app-shell')];
   for(const item of api.modes){
+    if(item.id==='free'){const option=document.createElement('option');option.value=item.id;option.textContent=item.title;select.append(option);continue;}
     const button=document.createElement('button');button.type='button';button.className='portal-card';button.dataset.tool=item.id;
     const icon=document.createElementNS('http://www.w3.org/2000/svg','svg');icon.setAttribute('viewBox','0 0 24 24');icon.setAttribute('aria-hidden','true');
     const path=document.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d',item.icon);icon.append(path);
     const title=document.createElement('strong');title.textContent=item.title;
-    const description=document.createElement('span');description.textContent=item.description;
-    const action=document.createElement('small');action.textContent='Abrir ferramenta →';
-    button.append(icon,title,description,action);button.addEventListener('click',()=>enter(item.id));cards.append(button);
+    const description=document.createElement('span');description.textContent=(item.subtitle?item.subtitle+' · ':'')+item.description;
+    const action=document.createElement('small');action.textContent='Acessar modo →';
+    button.style.setProperty('--mode-accent',item.color||'#D4A64A');button.append(icon,title,description,action);button.addEventListener('click',()=>enter(item.id));cards.append(button);
     const option=document.createElement('option');option.value=item.id;option.textContent=item.title;select.append(option);
   }
   function save(){if(!api.write(storage,state))status.textContent='Não foi possível salvar a preferência neste dispositivo. Você pode continuar usando as ferramentas.';else status.textContent='';}
@@ -41,8 +42,8 @@
     const item=api.mode(state.mode);select.value=item.id;
     document.getElementById('toolContextTitle').textContent=item.title;
     document.getElementById('toolContextDescription').textContent=item.description;
-    document.getElementById('toolContextHint').textContent=item.groups.length?'Categorias deste contexto aparecem primeiro e têm uma borda verde. Todas as categorias continuam acessíveis.':'Todas as categorias na ordem original. A escolha de ferramenta não altera a visibilidade das camadas.';
-    document.body.dataset.toolContext=item.id;organize();
+    document.getElementById('toolContextHint').textContent=item.groups.length?'Categorias vinculadas a este modo aparecem primeiro. As 14 categorias e todas as camadas permanecem acessíveis.':'Todas as categorias permanecem disponíveis na ordem original.';
+    document.body.dataset.toolContext=item.id;document.body.style.setProperty('--mode-accent',item.color||'#D4A64A');organize();
   }
   function hide(){
     portal.hidden=true;document.body.classList.remove('portal-active');
